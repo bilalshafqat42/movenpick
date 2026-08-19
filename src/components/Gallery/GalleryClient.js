@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, useGSAP } from "@/lib/gsap";
 import { GALLERY_ITEM_COUNT } from "@/content/sections/gallery";
@@ -15,10 +15,15 @@ const getLoopedIndex = (index) => {
   return (index + GALLERY_ITEM_COUNT) % GALLERY_ITEM_COUNT;
 };
 
-export default function GalleryClient({ eyebrow, heading, items: galleryItems }) {
+export default function GalleryClient({ heading, text, items: galleryItems }) {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
   const carouselRef = useRef(null);
+
+  const [cursorVisible, setCursorVisible] = useState(false);
+  const cursorRef = useRef(null);
+  const cursorMoveXRef = useRef(null);
+  const cursorMoveYRef = useRef(null);
 
   const cardRefs = useRef([]);
   const imageWrapperRefs = useRef([]);
@@ -46,9 +51,85 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
   const [isDragging, setIsDragging] = useState(false);
 
   /*
+   * A JS-driven cursor rather than the native CSS `cursor` property — see
+   * ProjectGalleryClient for why: browsers cap how large a native cursor
+   * image can render, so a real element positioned under the pointer is
+   * the only way to show this icon at full size in every browser.
+   *
+   * Visibility is driven by a global pointermove listener checked against
+   * the carousel's bounding box, rather than onMouseEnter/onMouseLeave on
+   * the carousel itself — this carousel calls setPointerCapture during a
+   * drag (see handlePointerDown below), and a captured pointer can leave
+   * the visible area without ever firing mouseleave, which would leave
+   * the icon stuck on screen after a drag ends outside the carousel.
+   */
+  useEffect(() => {
+    const cursor = cursorRef.current;
+
+    if (!cursor) {
+      return undefined;
+    }
+
+    cursorMoveXRef.current = gsap.quickTo(cursor, "x", {
+      duration: 0.12,
+      ease: "power3.out",
+    });
+
+    cursorMoveYRef.current = gsap.quickTo(cursor, "y", {
+      duration: 0.12,
+      ease: "power3.out",
+    });
+
+    let wasInside = false;
+
+    const handlePointerMove = (event) => {
+      const carousel = carouselRef.current;
+
+      if (!carousel || event.pointerType !== "mouse") {
+        return;
+      }
+
+      const rect = carousel.getBoundingClientRect();
+      const isInside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (isInside && !wasInside) {
+        gsap.set(cursor, { x: event.clientX, y: event.clientY });
+      }
+
+      wasInside = isInside;
+
+      setCursorVisible(isInside);
+
+      if (isInside) {
+        cursorMoveXRef.current?.(event.clientX);
+        cursorMoveYRef.current?.(event.clientY);
+      }
+    };
+
+    const handlePointerLeaveWindow = () => {
+      wasInside = false;
+      setCursorVisible(false);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerleave", handlePointerLeaveWindow);
+    window.addEventListener("blur", handlePointerLeaveWindow);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerleave", handlePointerLeaveWindow);
+      window.removeEventListener("blur", handlePointerLeaveWindow);
+    };
+  }, []);
+
+  /*
    * Exact desktop dimensions:
    *
-   * Centre: 670 × 768
+   * Centre: 900 × 600
    * Side:   210 × 446
    *
    * On mobile only, the centre image is reduced
@@ -63,7 +144,7 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
        * New value: 78vw × 0.9 = 70.2vw
        */
       const centreWidth = viewportWidth * 0.702;
-      const centreHeight = centreWidth * (768 / 670);
+      const centreHeight = centreWidth * (600 / 900);
 
       const sideWidth = Math.max(48, viewportWidth * 0.11);
       const sideHeight = sideWidth * (446 / 210);
@@ -83,7 +164,7 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
        * New value: 74vw × 0.9 = 66.6vw
        */
       const centreWidth = viewportWidth * 0.666;
-      const centreHeight = centreWidth * (768 / 670);
+      const centreHeight = centreWidth * (600 / 900);
 
       const sideWidth = Math.max(62, viewportWidth * 0.13);
       const sideHeight = sideWidth * (446 / 210);
@@ -99,7 +180,7 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
 
     if (viewportWidth <= 1024) {
       const centreWidth = Math.min(560, viewportWidth * 0.58);
-      const centreHeight = centreWidth * (768 / 670);
+      const centreHeight = centreWidth * (600 / 900);
 
       const sideWidth = 138;
       const sideHeight = sideWidth * (446 / 210);
@@ -115,7 +196,7 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
 
     if (viewportWidth <= 1350) {
       const centreWidth = Math.min(620, viewportWidth * 0.5);
-      const centreHeight = centreWidth * (768 / 670);
+      const centreHeight = centreWidth * (600 / 900);
 
       const sideWidth = 175;
       const sideHeight = sideWidth * (446 / 210);
@@ -129,15 +210,12 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
       };
     }
 
-    /*
-     * Desktop remains unchanged.
-     */
     return {
-      centreWidth: 670,
-      centreHeight: 768,
+      centreWidth: 900,
+      centreHeight: 600,
       sideWidth: 210,
       sideHeight: 446,
-      sideYOffset: 322,
+      sideYOffset: 600 - 446,
     };
   }, []);
 
@@ -1012,11 +1090,11 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
       onKeyDown={handleKeyDown}
     >
       <header ref={headingRef} className={styles.headingGroup}>
-        <p className={styles.eyebrow}>{eyebrow}</p>
-
         <h2 id="gallery-title" className={styles.heading}>
           {heading}
         </h2>
+
+        <p className={styles.text}>{text}</p>
       </header>
 
       <div
@@ -1086,7 +1164,7 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
                       (max-width: 767px) 66.6vw,
                       (max-width: 1024px) 58vw,
                       (max-width: 1350px) 50vw,
-                      670px
+                      900px
                     "
                     className={styles.image}
                   />
@@ -1106,6 +1184,15 @@ export default function GalleryClient({ eyebrow, heading, items: galleryItems })
             </article>
           );
         })}
+      </div>
+
+      <div
+        ref={cursorRef}
+        className={styles.customCursor}
+        data-visible={cursorVisible ? "true" : "false"}
+        aria-hidden="true"
+      >
+        <Image src="/images/drag-icon.svg" alt="" width={200} height={200} />
       </div>
 
       <div className={styles.pagination} aria-label="Gallery pagination">

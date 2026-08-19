@@ -12,8 +12,8 @@
 
   overflow: hidden;
 
-  background: #f2ede5;
-  color: #18191b;
+  background: var(--color-cream);
+  color: var(--color-gold);
 }
 
 /* =========================================================
@@ -32,27 +32,28 @@
   text-align: center;
 }
 
-.eyebrow {
-  margin: 0 0 6px;
-
-  font-family: var(--font-curve);
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1;
-
-  color: #18191b;
-}
-
 .heading {
   margin: 0;
 
-  font-family: var(--font-heading);
+  font-family: var(--font-gloock);
   font-size: 36px;
   font-weight: 400;
   line-height: 1.12;
   letter-spacing: -0.015em;
 
-  color: #18191b;
+  color: var(--color-gold);
+}
+
+.text {
+  max-width: 620px;
+  margin: 18px auto 0;
+
+  font-family: var(--font-noto-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+
+  color: rgba(137, 118, 85, 0.75);
 }
 
 /* =========================================================
@@ -65,13 +66,11 @@
   flex: 0 0 auto;
 
   width: 100vw;
-  height: 910px;
+  height: 740px;
 
   margin: 0;
 
   overflow: visible;
-
-  cursor: grab;
 
   touch-action: pan-y;
   user-select: none;
@@ -80,12 +79,35 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.carousel[data-dragging="true"] {
-  cursor: grabbing;
+.carousel,
+.carousel * {
+  cursor: none !important;
 }
 
-.carousel[data-dragging="true"] .cardButton {
-  cursor: grabbing;
+/* =========================================================
+   Custom cursor
+   ========================================================= */
+
+.customCursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+
+  width: 200px;
+  height: 200px;
+  margin-top: -100px;
+  margin-left: -100px;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition: opacity 100ms ease;
+}
+
+.customCursor[data-visible="true"] {
+  opacity: 1;
 }
 
 .card {
@@ -93,7 +115,7 @@
   top: 0;
   left: 50%;
 
-  width: 670px;
+  width: 900px;
   margin: 0;
 
   text-align: center;
@@ -150,7 +172,7 @@
 }
 
 .cardButton:focus-visible {
-  outline: 1px solid #18191b;
+  outline: 1px solid var(--color-gold);
   outline-offset: 7px;
 }
 
@@ -164,7 +186,7 @@
   display: block;
 
   width: 100%;
-  height: 768px;
+  height: 600px;
 
   margin: 0;
 
@@ -234,28 +256,27 @@
 .cardTitle {
   margin: 0 0 14px;
 
-  font-family: var(--font-heading);
-  font-size: 18px;
-  font-weight: 400;
+  font-family: var(--font-noto-sans);
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.25;
 
   letter-spacing: 0.28em;
   text-transform: uppercase;
 
-  color: #18191b;
+  color: var(--color-red);
 }
 
 .cardDescription {
   max-width: 620px;
   margin: 0 auto;
 
-  font-family: var(--font-body);
-  font-size: 18px;
+  font-family: var(--font-noto-sans);
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
 
-  /* color: #18191b; */
-  color: #868380;
+  color: rgba(137, 118, 85, 0.75);
 }
 
 /* =========================================================
@@ -284,7 +305,7 @@
   padding: 0;
   border: 0;
 
-  background: rgba(24, 25, 27, 0.24);
+  background: rgba(137, 118, 85, 0.24);
 
   cursor: pointer;
 
@@ -296,11 +317,11 @@
 .paginationButton[data-active="true"] {
   width: 40px;
 
-  background: #18191b;
+  background: var(--color-gold);
 }
 
 .paginationButton:focus-visible {
-  outline: 1px solid #18191b;
+  outline: 1px solid var(--color-gold);
   outline-offset: 5px;
 }
 
@@ -324,7 +345,7 @@
   }
 
   .carousel {
-    height: 840px;
+    height: 560px;
   }
 }
 
@@ -344,7 +365,7 @@
   }
 
   .carousel {
-    height: min(calc(66.5vw + 150px), 800px);
+    height: min(calc(38.7vw + 150px), 560px);
   }
 }
 
@@ -365,22 +386,22 @@
     margin-bottom: 40px;
   }
 
-  .eyebrow {
-    font-size: 30px;
-  }
-
   .heading {
     font-size: 32px;
+  }
+
+  .text {
+    font-size: 14px;
   }
 
   .carousel {
     /*
      * Centre image is 10% smaller:
      *
-     * 66.6vw × 768/670 = approximately 76.35vw.
+     * 66.6vw × 600/900 = approximately 44.4vw.
      * Additional height is reserved for the card text.
      */
-    height: min(calc(76.35vw + 144px), 735px);
+    height: min(calc(44.4vw + 144px), 490px);
   }
 
   .cardContent {
@@ -423,19 +444,15 @@
     margin-bottom: 34px;
   }
 
-  .eyebrow {
-    font-size: 28px;
-  }
-
   .heading {
     font-size: 29px;
   }
 
   .carousel {
     /*
-     * 70.2vw × 768/670 = approximately 80.47vw.
+     * 70.2vw × 600/900 = approximately 46.8vw.
      */
-    height: min(calc(80.47vw + 132px), 590px);
+    height: min(calc(46.8vw + 132px), 360px);
   }
 }
 

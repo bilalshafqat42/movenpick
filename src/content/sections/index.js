@@ -2,7 +2,7 @@ import { AMENITIES_FIELDS } from "@/content/sections/amenities";
 import { HERO_FIELDS } from "@/content/sections/hero";
 import { PROJECT_OVERVIEW_FIELDS } from "@/content/sections/projectOverview";
 import { PROJECT_GALLERY_FIELDS } from "@/content/sections/projectGallery";
-import { ABOUT_FIELDS } from "@/content/sections/about";
+import { TRUSTED_PARTNER_FIELDS } from "@/content/sections/trustedPartner";
 import { SEA_SECTION_FIELDS } from "@/content/sections/seaSection";
 import { PAYMENT_FIELDS } from "@/content/sections/payment";
 import { LOCATION_FIELDS } from "@/content/sections/location";
@@ -51,12 +51,6 @@ export const SECTION_REGISTRY = {
     minRole: "EDITOR",
     fields: PROJECT_OVERVIEW_FIELDS,
   },
-  about: {
-    label: "About",
-    group: "content",
-    minRole: "EDITOR",
-    fields: ABOUT_FIELDS,
-  },
   amenities: {
     label: "Amenities",
     group: "content",
@@ -68,6 +62,12 @@ export const SECTION_REGISTRY = {
     group: "content",
     minRole: "EDITOR",
     fields: PROJECT_GALLERY_FIELDS,
+  },
+  trustedPartner: {
+    label: "Trusted Partner",
+    group: "content",
+    minRole: "EDITOR",
+    fields: TRUSTED_PARTNER_FIELDS,
   },
   location: {
     label: "Location",

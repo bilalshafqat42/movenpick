@@ -1,16 +1,14 @@
 import dynamic from "next/dynamic";
 
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
-import { fieldDefault } from "@/lib/section-defaults";
-import { ABOUT_FIELDS } from "@/content/sections/about";
 import { CHAT_AGENT_FIELDS } from "@/content/sections/chatAgent";
 import { LOCATION_FIELDS, shapeLocationContent } from "@/content/sections/location";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProjectOverview from "@/components/ProjectOverview";
-import About from "@/components/About";
 import Amenities from "@/components/Amenities";
 import ProjectGallery from "@/components/ProjectGallery";
+import TrustedPartner from "@/components/TrustedPartner";
 import Project from "@/components/Project";
 import SeaSection from "@/components/SeaSection";
 import Gallery from "@/components/Gallery";
@@ -40,17 +38,6 @@ const Contact = dynamic(() => import("@/components/Contact"));
 const ContactPopup = dynamic(() => import("@/components/ContactPopup"));
 
 export default async function Home() {
-  const aboutContent = await getSectionContent(
-    "about",
-    buildDefaultsFromFields(ABOUT_FIELDS),
-  );
-
-  /*
-   * SafeImage needs a guaranteed-present fallback URL alongside the
-   * possibly-broken one from the panel — see src/components/SafeImage.js.
-   */
-  aboutContent.imageFallback = fieldDefault(ABOUT_FIELDS, "image");
-
   const chatAgentContent = await getSectionContent(
     "chatAgent",
     buildDefaultsFromFields(CHAT_AGENT_FIELDS),
@@ -69,11 +56,13 @@ export default async function Home() {
 
         <ProjectOverview />
 
-        <About {...aboutContent} />
-
         <Amenities />
 
         <ProjectGallery />
+
+        <TrustedPartner />
+
+        <Gallery />
 
         <Project />
 
@@ -85,8 +74,6 @@ export default async function Home() {
         />
 
         <SeaSection />
-
-        <Gallery />
 
         <Payment />
 
