@@ -1,0 +1,174 @@
+import { AMENITIES_FIELDS } from "@/content/sections/amenities";
+import { HERO_FIELDS } from "@/content/sections/hero";
+import { ABOUT_FIELDS } from "@/content/sections/about";
+import { SEA_SECTION_FIELDS } from "@/content/sections/seaSection";
+import { PAYMENT_FIELDS } from "@/content/sections/payment";
+import { LOCATION_FIELDS } from "@/content/sections/location";
+import { PROJECT_FIELDS } from "@/content/sections/project";
+import { GALLERY_FIELDS } from "@/content/sections/gallery";
+import { CONTACT_FIELDS } from "@/content/sections/contact";
+import { FOOTER_FIELDS } from "@/content/sections/footer";
+import { NAVIGATION_FIELDS } from "@/content/sections/navigation";
+import { APPEARANCE_FIELDS } from "@/content/sections/appearance";
+import { CHAT_AGENT_FIELDS } from "@/content/sections/chatAgent";
+import { SEO_FIELDS } from "@/content/sections/seo";
+import { ROBOTS_FIELDS } from "@/content/sections/robotsTxt";
+import { PRIVACY_FIELDS } from "@/content/sections/privacy";
+import { TERMS_FIELDS } from "@/content/sections/terms";
+
+/*
+ * Every editable section registers itself here: a slug (used in the
+ * /admin-panel/[section] URL), a label for the sidebar, which sidebar
+ * group it belongs to, the minimum role allowed to view/edit it, and its
+ * list of fields. Adding a new section to the admin panel means adding
+ * one entry here plus one sections/<name>.js file — nothing else in the
+ * admin UI needs to change.
+ */
+export const SECTION_REGISTRY = {
+  navigation: {
+    label: "Menu & CTA Link",
+    group: "header",
+    minRole: "EDITOR",
+    fields: NAVIGATION_FIELDS,
+  },
+  appearance: {
+    label: "Logo & Favicon",
+    group: "header",
+    minRole: "ADMIN",
+    fields: APPEARANCE_FIELDS,
+  },
+  hero: {
+    label: "Hero",
+    group: "content",
+    minRole: "EDITOR",
+    fields: HERO_FIELDS,
+  },
+  about: {
+    label: "About",
+    group: "content",
+    minRole: "EDITOR",
+    fields: ABOUT_FIELDS,
+  },
+  amenities: {
+    label: "Amenities",
+    group: "content",
+    minRole: "EDITOR",
+    fields: AMENITIES_FIELDS,
+  },
+  location: {
+    label: "Location",
+    group: "content",
+    minRole: "EDITOR",
+    fields: LOCATION_FIELDS,
+  },
+  project: {
+    label: "Project",
+    group: "content",
+    minRole: "EDITOR",
+    fields: PROJECT_FIELDS,
+  },
+  gallery: {
+    label: "Gallery",
+    group: "content",
+    minRole: "EDITOR",
+    fields: GALLERY_FIELDS,
+  },
+  contact: {
+    label: "Contact",
+    group: "content",
+    minRole: "EDITOR",
+    fields: CONTACT_FIELDS,
+  },
+  seaSection: {
+    label: "Sea Section",
+    group: "content",
+    minRole: "EDITOR",
+    fields: SEA_SECTION_FIELDS,
+  },
+  payment: {
+    label: "Payment Plan",
+    group: "content",
+    minRole: "EDITOR",
+    fields: PAYMENT_FIELDS,
+  },
+  footer: {
+    label: "Footer",
+    group: "content",
+    minRole: "EDITOR",
+    fields: FOOTER_FIELDS,
+  },
+  chatAgent: {
+    label: "Chat Widget",
+    group: "content",
+    minRole: "EDITOR",
+    fields: CHAT_AGENT_FIELDS,
+  },
+  /*
+   * ADMIN, not EDITOR, unlike the rest of "content": legal copy has a
+   * different kind of consequence than a heading or an image, closer to
+   * SEO below than to About or Amenities.
+   */
+  privacy: {
+    label: "Privacy Policy",
+    group: "content",
+    minRole: "ADMIN",
+    fields: PRIVACY_FIELDS,
+    viewLiveHref: "/privacy",
+    viewLiveLabel: "View live page",
+  },
+  terms: {
+    label: "Terms & Conditions",
+    group: "content",
+    minRole: "ADMIN",
+    fields: TERMS_FIELDS,
+    viewLiveHref: "/terms",
+    viewLiveLabel: "View live page",
+  },
+  seo: {
+    label: "SEO & Sharing",
+    group: "seo",
+    minRole: "ADMIN",
+    fields: SEO_FIELDS,
+  },
+  robots: {
+    label: "robots.txt",
+    group: "seo",
+    minRole: "ADMIN",
+    fields: ROBOTS_FIELDS,
+    viewLiveHref: "/robots.txt",
+    viewLiveLabel: "View / download robots.txt",
+  },
+  sitemap: {
+    label: "Sitemap",
+    group: "seo",
+    minRole: "ADMIN",
+    fields: [],
+    viewLiveHref: "/sitemap.xml",
+    viewLiveLabel: "View / download sitemap.xml",
+  },
+};
+
+/*
+ * Sidebar groups, in display order. A group with no accessible sections
+ * for the current role (or none built yet) still shows, with a
+ * "Coming soon" note — see Sidebar.js.
+ */
+export const SECTION_GROUPS = [
+  { key: "header", label: "Header" },
+  { key: "content", label: "Content" },
+  { key: "seo", label: "SEO & Sharing" },
+];
+
+export function getSectionConfig(slug) {
+  return SECTION_REGISTRY[slug] ?? null;
+}
+
+export function listSectionSlugs() {
+  return Object.keys(SECTION_REGISTRY);
+}
+
+export function listSectionsByGroup(groupKey) {
+  return Object.entries(SECTION_REGISTRY)
+    .filter(([, config]) => config.group === groupKey)
+    .map(([slug, config]) => ({ slug, ...config }));
+}

@@ -1,0 +1,344 @@
+.footer {
+  position: relative;
+
+  width: 100%;
+
+  background: #18191b;
+  color: #ffffff;
+}
+
+.inner {
+  position: relative;
+
+  display: grid;
+  grid-template-columns:
+    minmax(250px, 1.3fr)
+    minmax(150px, 0.65fr)
+    minmax(260px, 1fr);
+  grid-template-rows:
+    auto
+    1fr
+    auto;
+
+  column-gap: clamp(70px, 8vw, 150px);
+  row-gap: 0;
+
+  width: 100%;
+  min-height: 645px;
+
+  padding: 116px clamp(70px, 8.5vw, 116px) 76px;
+
+  will-change: transform;
+}
+
+/* Logo */
+
+.logo {
+  grid-column: 1;
+  grid-row: 1;
+
+  align-self: start;
+  justify-self: start;
+
+  display: inline-flex;
+
+  color: #ffffff;
+}
+
+.logoMark {
+  display: block;
+
+  width: 240px;
+  aspect-ratio: 147 / 40;
+
+  background-color: currentColor;
+
+  -webkit-mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
+  mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-position: center;
+  mask-position: center;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Contact blocks */
+
+.contactBlock {
+  min-width: 0;
+}
+
+.telephone {
+  grid-column: 2;
+  grid-row: 1;
+
+  align-self: start;
+}
+
+.tollFree {
+  grid-column: 3;
+  grid-row: 1;
+
+  align-self: start;
+}
+
+.email {
+  grid-column: 2;
+  grid-row: 2;
+
+  align-self: center;
+}
+
+.address {
+  grid-column: 3;
+  grid-row: 2;
+
+  align-self: center;
+}
+
+.label {
+  margin: 0 0 10px;
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.value {
+  margin: 0;
+
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.45;
+
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-style: normal;
+
+  transition: color 300ms ease;
+}
+
+a.value:hover,
+a.value:focus-visible {
+  color: #ffffff;
+}
+
+a.value:focus-visible,
+.logo:focus-visible,
+.cookiesButton:focus-visible {
+  outline: 1px solid #ffffff;
+  outline-offset: 6px;
+}
+
+/* Bottom row */
+
+.copyright {
+  grid-column: 1;
+  grid-row: 3;
+
+  align-self: end;
+
+  margin: 0;
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.legalRow {
+  grid-column: 2;
+  grid-row: 3;
+
+  align-self: end;
+  justify-self: start;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.legalLink {
+  color: rgba(255, 255, 255, 0.38);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+
+  transition: color 300ms ease;
+}
+
+.legalLink:hover,
+.legalLink:focus-visible {
+  color: #ffffff;
+}
+
+.cookiesButton {
+  padding: 0;
+  border: 0;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.38);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+
+  cursor: pointer;
+
+  transition: color 300ms ease;
+}
+
+.cookiesButton:hover,
+.cookiesButton:focus-visible {
+  color: #ffffff;
+}
+
+/* Medium desktop */
+
+@media (max-width: 1180px) {
+  .inner {
+    grid-template-columns:
+      minmax(220px, 1.1fr)
+      minmax(140px, 0.7fr)
+      minmax(220px, 1fr);
+
+    column-gap: 56px;
+
+    min-height: 600px;
+
+    padding: 96px 60px 66px;
+  }
+
+  .logoMark {
+    width: 210px;
+  }
+
+  .value {
+    font-size: 15px;
+  }
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+
+    min-height: auto;
+
+    padding: 82px 32px 58px;
+
+    column-gap: 48px;
+    row-gap: 58px;
+  }
+
+  .logo {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .telephone {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .tollFree {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .email {
+    grid-column: 1;
+    grid-row: 3;
+
+    align-self: start;
+  }
+
+  .address {
+    grid-column: 2;
+    grid-row: 3;
+
+    align-self: start;
+  }
+
+  .copyright {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .legalRow {
+    grid-column: 2;
+    grid-row: 4;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .inner {
+    display: flex;
+    flex-direction: column;
+
+    min-height: auto;
+
+    padding: 70px 22px 48px;
+
+    gap: 42px;
+  }
+
+  .logoMark {
+    width: 180px;
+  }
+
+  .contactBlock {
+    width: 100%;
+  }
+
+  .label {
+    font-size: 12px;
+  }
+
+  .value {
+    font-size: 15px;
+  }
+
+  .copyright {
+    margin-top: 24px;
+  }
+
+  .legalRow {
+    align-self: flex-start;
+  }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .inner {
+    transform: none !important;
+  }
+
+  .inner > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

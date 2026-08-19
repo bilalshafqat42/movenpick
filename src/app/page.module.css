@@ -1,0 +1,136 @@
+.heroAboutScene {
+  position: relative;
+
+  /*
+   * The sticky screen remains one viewport tall.
+   *
+   * The complete scene uses three viewport heights:
+   *
+   * 1. Hero state
+   * 2. Beige left-panel state
+   * 3. Complete About state
+   */
+  width: 100%;
+  height: 300svh;
+
+  background: #073d61;
+}
+
+.stickyViewport {
+  position: sticky;
+  top: 0;
+
+  width: 100%;
+
+  height: 100vh;
+  height: 100svh;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  background: #073d61;
+}
+
+.heroLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  transform-origin: center center;
+
+  will-change: transform;
+}
+
+.aboutLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  /*
+   * The internal About panels are animated
+   * independently through their clip paths.
+   *
+   * Pointer events remain disabled so the invisible
+   * About container does not block the Hero buttons.
+   */
+  pointer-events: none;
+}
+
+/*
+ * These classes can remain available for any
+ * temporary or future standard content sections.
+ */
+
+.standardSection {
+  position: relative;
+  z-index: 3;
+
+  min-height: 100svh;
+
+  padding: clamp(110px, 10vw, 180px) clamp(24px, 6vw, 100px);
+
+  background: #f2ede5;
+  color: #18191b;
+}
+
+.standardSection h2 {
+  margin: 0;
+
+  font-family: var(--font-heading);
+  font-size: clamp(54px, 7vw, 120px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Mobile */
+
+@media (max-width: 767px) {
+  .heroAboutScene {
+    /*
+     * A slightly shorter scroll distance on mobile
+     * keeps the three stages responsive and comfortable.
+     */
+    height: 260svh;
+  }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .heroAboutScene {
+    height: auto;
+  }
+
+  .stickyViewport {
+    position: relative;
+    top: auto;
+
+    height: auto;
+
+    overflow: visible;
+  }
+
+  .heroLayer,
+  .aboutLayer {
+    position: relative;
+    inset: auto;
+
+    width: 100%;
+    min-height: 100svh;
+
+    transform: none !important;
+  }
+
+  .aboutLayer {
+    pointer-events: auto;
+  }
+}

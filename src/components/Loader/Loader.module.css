@@ -1,0 +1,62 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(180deg, #0d78a6 0%, #073d61 100%);
+
+  will-change: opacity;
+}
+
+/* =========================================================
+   Logo
+
+   350px desktop / 210px mobile (30% smaller than the original
+   500px / 300px). Forced to solid white regardless of whatever
+   colour is baked into the source SVG: brightness(0) flattens
+   all non-transparent pixels to black, invert(1) then flips
+   that to white, so this works correctly no matter what colour
+   the logo file itself actually is.
+   ========================================================= */
+
+.logoWrapper {
+  display: block;
+
+  width: 350px;
+  max-width: 80vw;
+
+  will-change: transform, opacity;
+}
+
+.logo {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  filter: brightness(0) invert(1);
+}
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .logoWrapper {
+    width: 210px;
+  }
+}
+
+/* =========================================================
+   Reduced motion
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    display: none;
+  }
+}

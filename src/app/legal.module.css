@@ -1,0 +1,76 @@
+/*
+ * Shared by /privacy and /terms: a plain, readable legal document layout,
+ * unlike the marketing sections it sits alongside. Long-form body copy
+ * needs a comfortable reading width and left-aligned text, not the
+ * centred, full-bleed treatment the rest of the site uses.
+ */
+.page {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+
+  background: #ffffff;
+  color: #14212b;
+}
+
+.content {
+  width: min(100%, 760px);
+  margin: 0 auto;
+
+  padding: clamp(96px, 12vw, 148px) 24px clamp(72px, 8vw, 120px);
+}
+
+.heading {
+  margin: 0 0 32px;
+
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+
+  color: #14212b;
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.75;
+
+  color: #354552;
+}
+
+.body p {
+  margin: 0 0 20px;
+}
+
+.body p:last-child {
+  margin-bottom: 0;
+}
+
+.body a {
+  color: #0d78a6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.body ul,
+.body ol {
+  margin: 0 0 20px;
+  padding-left: 22px;
+}
+
+.body li {
+  margin-bottom: 8px;
+}
+
+.body li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .content {
+    padding: 88px 20px 64px;
+  }
+}

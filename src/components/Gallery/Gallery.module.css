@@ -1,0 +1,458 @@
+.gallery {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+
+  min-height: 1120px;
+
+  padding: 140px 0 82px;
+
+  overflow: hidden;
+
+  background: #f2ede5;
+  color: #18191b;
+}
+
+/* =========================================================
+   Section heading
+   ========================================================= */
+
+.headingGroup {
+  position: relative;
+  z-index: 10;
+
+  flex: 0 0 auto;
+
+  width: min(calc(100% - 48px), 760px);
+  margin: 0 auto 72px;
+
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+
+  font-family: var(--font-curve);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+
+  color: #18191b;
+}
+
+.heading {
+  margin: 0;
+
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+
+  color: #18191b;
+}
+
+/* =========================================================
+   Carousel stage
+   ========================================================= */
+
+.carousel {
+  position: relative;
+
+  flex: 0 0 auto;
+
+  width: 100vw;
+  height: 910px;
+
+  margin: 0;
+
+  overflow: visible;
+
+  cursor: grab;
+
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.carousel[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.carousel[data-dragging="true"] .cardButton {
+  cursor: grabbing;
+}
+
+.card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+
+  width: 670px;
+  margin: 0;
+
+  text-align: center;
+
+  transform: translateX(-50%);
+  transform-origin: center top;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  will-change: width, transform, opacity;
+}
+
+.card[data-position="centre"] {
+  z-index: 4;
+}
+
+.card[data-position="left"],
+.card[data-position="right"] {
+  z-index: 2;
+}
+
+.card[data-position="hidden"] {
+  z-index: 1;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   Image button
+   ========================================================= */
+
+.cardButton {
+  display: block;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: inherit;
+
+  cursor: pointer;
+
+  touch-action: pan-y;
+}
+
+.cardButton:disabled {
+  cursor: default;
+}
+
+.cardButton:focus-visible {
+  outline: 1px solid #18191b;
+  outline-offset: 7px;
+}
+
+/* =========================================================
+   Images
+   ========================================================= */
+
+.imageWrapper {
+  position: relative;
+
+  display: block;
+
+  width: 100%;
+  height: 768px;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  background: #d8d0c6;
+
+  transform-origin: center bottom;
+
+  will-change: height;
+}
+
+.image {
+  object-fit: cover;
+  object-position: center center;
+
+  pointer-events: none;
+
+  user-select: none;
+  -webkit-user-select: none;
+
+  -webkit-user-drag: none;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  transform: translateZ(0);
+
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card[data-position="left"]:hover .image,
+.card[data-position="right"]:hover .image {
+  transform: translateZ(0) scale(1.025);
+}
+
+/*
+ * Disable hover zoom while actively dragging.
+ */
+.carousel[data-dragging="true"] .image {
+  transform: translateZ(0) scale(1) !important;
+}
+
+/* =========================================================
+   Centre-card text
+   ========================================================= */
+
+.cardContent {
+  width: min(100%, 620px);
+  min-height: 110px;
+
+  margin: 28px auto 0;
+  padding: 0 12px;
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  will-change: transform, opacity;
+}
+
+.card[data-position="centre"] .cardContent {
+  visibility: visible;
+}
+
+.cardTitle {
+  margin: 0 0 14px;
+
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.25;
+
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+
+  color: #18191b;
+}
+
+.cardDescription {
+  max-width: 620px;
+  margin: 0 auto;
+
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  /* color: #18191b; */
+  color: #868380;
+}
+
+/* =========================================================
+   Pagination
+   ========================================================= */
+
+.pagination {
+  position: relative;
+  z-index: 10;
+
+  display: none;
+  /* display: flex; */
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  margin-top: 28px;
+}
+
+.paginationButton {
+  display: block;
+
+  width: 20px;
+  height: 2px;
+
+  padding: 0;
+  border: 0;
+
+  background: rgba(24, 25, 27, 0.24);
+
+  cursor: pointer;
+
+  transition:
+    width 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.paginationButton[data-active="true"] {
+  width: 40px;
+
+  background: #18191b;
+}
+
+.paginationButton:focus-visible {
+  outline: 1px solid #18191b;
+  outline-offset: 5px;
+}
+
+.paginationButton:disabled {
+  cursor: default;
+}
+
+/* =========================================================
+   Medium desktop
+   ========================================================= */
+
+@media (max-width: 1350px) {
+  .gallery {
+    min-height: 1040px;
+
+    padding-top: 132px;
+  }
+
+  .headingGroup {
+    margin-bottom: 58px;
+  }
+
+  .carousel {
+    height: 840px;
+  }
+}
+
+/* =========================================================
+   Tablet
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .gallery {
+    min-height: auto;
+
+    padding: 124px 0 72px;
+  }
+
+  .headingGroup {
+    margin-bottom: 48px;
+  }
+
+  .carousel {
+    height: min(calc(66.5vw + 150px), 800px);
+  }
+}
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .gallery {
+    min-height: auto;
+
+    padding: 100px 0 64px;
+  }
+
+  .headingGroup {
+    width: calc(100% - 40px);
+
+    margin-bottom: 40px;
+  }
+
+  .eyebrow {
+    font-size: 30px;
+  }
+
+  .heading {
+    font-size: 32px;
+  }
+
+  .carousel {
+    /*
+     * Centre image is 10% smaller:
+     *
+     * 66.6vw × 768/670 = approximately 76.35vw.
+     * Additional height is reserved for the card text.
+     */
+    height: min(calc(76.35vw + 144px), 735px);
+  }
+
+  .cardContent {
+    width: min(100%, 560px);
+    min-height: 104px;
+
+    margin-top: 20px;
+    padding-inline: 8px;
+  }
+
+  .cardTitle {
+    margin-bottom: 10px;
+
+    font-size: 16px;
+    letter-spacing: 0.18em;
+  }
+
+  .cardDescription {
+    max-width: 94%;
+
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .pagination {
+    margin-top: 22px;
+  }
+}
+
+/* =========================================================
+   Small mobile
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .gallery {
+    padding-top: 92px;
+  }
+
+  .headingGroup {
+    margin-bottom: 34px;
+  }
+
+  .eyebrow {
+    font-size: 28px;
+  }
+
+  .heading {
+    font-size: 29px;
+  }
+
+  .carousel {
+    /*
+     * 70.2vw × 768/670 = approximately 80.47vw.
+     */
+    height: min(calc(80.47vw + 132px), 590px);
+  }
+}
+
+/* =========================================================
+   Reduced motion
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .headingGroup > *,
+  .card,
+  .imageWrapper,
+  .cardContent,
+  .image {
+    transition: none !important;
+  }
+
+  .carousel {
+    scroll-behavior: auto;
+  }
+}

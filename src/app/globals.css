@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --font-body: var(--font-inter), Arial, sans-serif;
+  --font-heading: var(--font-minerva-modern), Georgia, serif;
+  --font-curve: var(--font-kinan), cursive;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: #f2ede5;
+  color: #17201f;
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-curve {
+  font-family: var(--font-curve);
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
