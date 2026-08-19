@@ -12,13 +12,13 @@ export const APPEARANCE_FIELDS = [
     label:
       "Logo — SVG preferred (or transparent PNG, at least 300×82px / 600×164px for retina). Displayed at 147×40px in the header, aspect ratio 3.6:1 — see note above",
     type: "IMAGE",
-    defaultValue: "/logos/oceara-logo.svg",
+    defaultValue: "/logos/movenpick-logo.svg",
   },
   {
     key: "favicon",
     label:
       "Favicon — square image, at least 512×512px (SVG or PNG, transparent background recommended)",
     type: "IMAGE",
-    defaultValue: "/icons/favicon-default.svg",
+    defaultValue: "/logos/movenpick-favicon.svg",
   },
 ];

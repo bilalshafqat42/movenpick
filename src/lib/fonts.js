@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import { Gloock, Noto_Sans } from "next/font/google";
 
 export const inter = localFont({
   src: "../fonts/Inter-Variable.ttf",
@@ -21,5 +22,19 @@ export const minervaModern = localFont({
   variable: "--font-minerva-modern",
   weight: "400",
   style: "normal",
+  display: "swap",
+});
+
+export const gloock = Gloock({
+  variable: "--font-gloock",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export const notoSans = Noto_Sans({
+  variable: "--font-noto-sans",
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
   display: "swap",
 });

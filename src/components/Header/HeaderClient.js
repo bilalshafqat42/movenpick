@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 
 import styles from "./Header.module.css";
 
-const HEADER_CHANGE_PROGRESS = 0.66;
 const DESKTOP_MEDIA_QUERY = "(min-width: 901px)";
 
 const FOCUSABLE_SELECTOR = [
@@ -262,7 +262,7 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
       if (!reduceMotion) {
         introTimeline = gsap.timeline({
           defaults: {
-            ease: "power3.out",
+            ease: ENTRANCE_EASE,
           },
         });
 
@@ -270,34 +270,34 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
           .from(`.${styles.menuControl}`, {
             autoAlpha: 0,
             y: -14,
-            duration: 0.9,
+            duration: ENTRANCE_DURATION,
           })
           .from(
             `.${styles.logo}`,
             {
               autoAlpha: 0,
               y: -14,
-              duration: 0.9,
+              duration: ENTRANCE_DURATION,
             },
-            "-=0.7",
+            ENTRANCE_STAGGER,
           )
           .from(
             `.${styles.callback}`,
             {
               autoAlpha: 0,
               y: -14,
-              duration: 0.9,
+              duration: ENTRANCE_DURATION,
             },
-            "-=0.7",
+            ENTRANCE_STAGGER * 2,
           )
           .from(
             `.${styles.divider}`,
             {
               scaleX: 0,
               transformOrigin: "left center",
-              duration: 1.2,
+              duration: ENTRANCE_DURATION,
             },
-            "-=0.55",
+            ENTRANCE_STAGGER * 3,
           );
       } else {
         gsap.set(
@@ -314,53 +314,23 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
         );
       }
 
-      const heroScene = document.getElementById("hero-about-scene");
+      /*
+       * Frosted-glass background past a small scroll threshold. The header
+       * is a solid cream bar at rest; this only adds the blur once there is
+       * page content behind it to blur.
+       */
+      const headerScrollTrigger = ScrollTrigger.create({
+        start: 24,
+        end: "max",
 
-      let headerScrollTrigger;
-
-      if (heroScene) {
-        headerScrollTrigger = ScrollTrigger.create({
-          trigger: heroScene,
-          start: "top top",
-          end: "bottom bottom",
-
-          onUpdate: (self) => {
-            header.dataset.scrolled =
-              self.progress >= HEADER_CHANGE_PROGRESS ? "true" : "false";
-          },
-
-          onLeave: () => {
-            header.dataset.scrolled = "true";
-          },
-
-          onEnterBack: (self) => {
-            header.dataset.scrolled =
-              self.progress >= HEADER_CHANGE_PROGRESS ? "true" : "false";
-          },
-
-          onLeaveBack: () => {
-            header.dataset.scrolled = "false";
-          },
-
-          onRefresh: (self) => {
-            header.dataset.scrolled =
-              self.progress >= HEADER_CHANGE_PROGRESS ? "true" : "false";
-          },
-        });
-      } else {
-        headerScrollTrigger = ScrollTrigger.create({
-          start: 80,
-          end: "max",
-
-          onUpdate: (self) => {
-            header.dataset.scrolled = self.scroll() > 80 ? "true" : "false";
-          },
-        });
-      }
+        onUpdate: (self) => {
+          header.dataset.scrolled = self.scroll() > 24 ? "true" : "false";
+        },
+      });
 
       return () => {
         introTimeline?.kill();
-        headerScrollTrigger?.kill();
+        headerScrollTrigger.kill();
       };
     },
     {

@@ -17,7 +17,16 @@ export default async function Amenities() {
     buildDefaultsFromFields(AMENITIES_FIELDS),
   );
 
-  const { eyebrow, items } = shapeAmenitiesContent(content);
+  const { heading, introText, items, ctaText, ctaLabel } =
+    shapeAmenitiesContent(content);
 
-  return <AmenitiesClient eyebrow={eyebrow} items={items} />;
+  return (
+    <AmenitiesClient
+      heading={heading}
+      introText={introText}
+      items={items}
+      ctaText={ctaText}
+      ctaLabel={ctaLabel}
+    />
+  );
 }

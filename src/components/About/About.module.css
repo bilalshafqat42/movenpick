@@ -1,55 +1,23 @@
 .about {
-  position: absolute;
-  inset: 0;
+  position: relative;
+
+  display: flex;
 
   width: 100%;
-  height: 100%;
+  min-height: 100svh;
 
-  overflow: hidden;
-
-  background: transparent;
   color: #18191b;
 }
 
-.leftPanel {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-
+.textPanel {
   display: flex;
   align-items: center;
 
   width: 50%;
-  height: 100%;
 
-  padding: clamp(100px, 10vw, 190px) clamp(50px, 8vw, 150px);
-
-  overflow: hidden;
+  padding: clamp(60px, 8vw, 140px) clamp(40px, 6vw, 120px);
 
   background: #f2ede5;
-
-  clip-path: inset(0% 100% 0% 0%);
-
-  will-change: clip-path;
-}
-
-.rightPanel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  width: 50%;
-  height: 100%;
-
-  overflow: hidden;
-
-  background: #071c16;
-
-  clip-path: inset(100% 0% 0% 0%);
-
-  will-change: clip-path;
 }
 
 .content {
@@ -82,11 +50,17 @@
   text-wrap: balance;
 }
 
+.imagePanel {
+  position: relative;
+
+  width: 50%;
+
+  background: #071c16;
+}
+
 .image {
   object-fit: cover;
   object-position: center center;
-
-  will-change: transform;
 }
 
 .imageOverlay {
@@ -101,31 +75,31 @@
 }
 
 @media (max-width: 1024px) {
-  .leftPanel {
+  .textPanel {
     padding: 100px clamp(34px, 6vw, 70px);
   }
 }
 
 @media (max-width: 767px) {
-  .leftPanel {
-    top: 0;
-    bottom: auto;
+  .about {
+    flex-direction: column;
 
-    width: 100%;
-    height: 50%;
-
-    align-items: flex-end;
-
-    padding: 90px 22px 42px;
+    min-height: auto;
   }
 
-  .rightPanel {
-    top: auto;
-    right: 0;
-    bottom: 0;
-
+  .textPanel,
+  .imagePanel {
     width: 100%;
-    height: 50%;
+  }
+
+  .textPanel {
+    padding: 64px 22px;
+  }
+
+  .imagePanel {
+    min-height: 340px;
+
+    aspect-ratio: 4 / 3;
   }
 
   .content {
@@ -139,19 +113,5 @@
   .title {
     max-width: 380px;
     font-size: 34px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .leftPanel,
-  .rightPanel {
-    clip-path: none !important;
-  }
-
-  .image,
-  .content > * {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
   }
 }

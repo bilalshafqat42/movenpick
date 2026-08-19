@@ -27,7 +27,7 @@ const SESSION_KEY = "movenpick-loader-shown";
  * which runs before the browser paints, so there's no visible
  * flash either way.
  */
-export default function Loader({ logoUrl = "/logos/oceara-logo.svg" }) {
+export default function Loader({ logoUrl = "/logos/movenpick-logo.svg" }) {
   const pathname = usePathname();
   const isAdminPanel = pathname?.startsWith("/admin-panel") ?? false;
 

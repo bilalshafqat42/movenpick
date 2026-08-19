@@ -4,6 +4,13 @@
   --font-body: var(--font-inter), Arial, sans-serif;
   --font-heading: var(--font-minerva-modern), Georgia, serif;
   --font-curve: var(--font-kinan), cursive;
+
+  /* Movenpick brand palette */
+  --color-cream: #fff0e7;
+  --color-cream-rgb: 255, 240, 231;
+  --color-gold: #897655;
+  --color-red: #f95331;
+  --color-cta-red: #ff4016;
 }
 
 *,

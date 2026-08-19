@@ -7,8 +7,10 @@ import { CHAT_AGENT_FIELDS } from "@/content/sections/chatAgent";
 import { LOCATION_FIELDS, shapeLocationContent } from "@/content/sections/location";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import HeroAboutScene from "./HeroAboutScene";
+import ProjectOverview from "@/components/ProjectOverview";
+import About from "@/components/About";
 import Amenities from "@/components/Amenities";
+import ProjectGallery from "@/components/ProjectGallery";
 import Project from "@/components/Project";
 import SeaSection from "@/components/SeaSection";
 import Gallery from "@/components/Gallery";
@@ -20,10 +22,8 @@ import Chat from "@/components/Chat/Chat";
 /*
  * This is a Server Component (no "use client") so sections like Amenities
  * can fetch their own content from the database as async Server
- * Components. The one part of the page that genuinely needs client refs
- * and a GSAP timeline — the pinned Hero -> About scene — lives in its own
- * Client Component, HeroAboutScene. The map's `ssr: false` dynamic import
- * needs a Client Component too, so that lives in DynamicMapSection.
+ * Components. The map's `ssr: false` dynamic import needs a Client
+ * Component, so that lives in DynamicMapSection.
  */
 const MapSection = dynamic(() => import("./DynamicMapSection"));
 
@@ -46,9 +46,8 @@ export default async function Home() {
   );
 
   /*
-   * Carried alongside the resolved content because About is rendered inside
-   * HeroAboutScene, a Client Component, so it cannot fetch its own fallback.
-   * See src/components/SafeImage.js.
+   * SafeImage needs a guaranteed-present fallback URL alongside the
+   * possibly-broken one from the panel — see src/components/SafeImage.js.
    */
   aboutContent.imageFallback = fieldDefault(ABOUT_FIELDS, "image");
 
@@ -66,9 +65,15 @@ export default async function Home() {
       <Header />
 
       <main>
-        <HeroAboutScene heroSlot={<Hero />} aboutContent={aboutContent} />
+        <Hero />
+
+        <ProjectOverview />
+
+        <About {...aboutContent} />
 
         <Amenities />
+
+        <ProjectGallery />
 
         <Project />
 

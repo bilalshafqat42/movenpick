@@ -1,23 +1,12 @@
-"use client";
-
-import { forwardRef } from "react";
 import SafeImage from "@/components/SafeImage";
 
 import styles from "./About.module.css";
 
-const About = forwardRef(function About(
-  { className = "", eyebrow, heading, image, imageFallback },
-  ref,
-) {
+export default function About({ eyebrow, heading, image, imageFallback }) {
   return (
-    <section
-      ref={ref}
-      id="about"
-      className={`${styles.about} ${className}`}
-      aria-labelledby="about-title"
-    >
-      <div className={styles.leftPanel} data-about-left>
-        <div className={styles.content} data-about-content>
+    <section id="about" className={styles.about} aria-labelledby="about-title">
+      <div className={styles.textPanel}>
+        <div className={styles.content}>
           <p className={styles.eyebrow}>{eyebrow}</p>
 
           <h2 id="about-title" className={styles.title}>
@@ -26,7 +15,7 @@ const About = forwardRef(function About(
         </div>
       </div>
 
-      <div className={styles.rightPanel} data-about-right data-about-media>
+      <div className={styles.imagePanel}>
         <SafeImage
           src={image}
           fallbackSrc={imageFallback}
@@ -41,8 +30,4 @@ const About = forwardRef(function About(
       </div>
     </section>
   );
-});
-
-About.displayName = "About";
-
-export default About;
+}

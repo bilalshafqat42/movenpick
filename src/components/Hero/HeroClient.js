@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import SafeImage from "@/components/SafeImage";
 import { useCallback, useRef } from "react";
 
 import { gsap, useGSAP } from "@/lib/gsap";
+import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 import styles from "./Hero.module.css";
 
 export default function HeroClient({
@@ -12,221 +14,116 @@ export default function HeroClient({
   eyebrow,
   heading,
   text,
-  ctaLabel,
-  ctaHref,
-  ctaIcon,
 }) {
   const sectionRef = useRef(null);
-  const imageRef = useRef(null);
   const contentRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
+  const imageBlockRef = useRef(null);
 
   /*
-   * Clicking Scroll Down moves the page to the end
-   * of the shared Hero/About scene.
-   *
-   * The Hero-to-About transition remains controlled
-   * by the timeline inside page.js.
+   * Clicking Scroll Down reveals the rest of the Hero itself — the framed
+   * building photo and the pattern behind it — rather than jumping straight
+   * into the About section below. `block: "end"` aligns the bottom of the
+   * image block with the bottom of the viewport, so the whole composition
+   * becomes visible without scrolling past it.
    */
-  const revealAbout = useCallback((event) => {
+  const revealImage = useCallback((event) => {
     event.preventDefault();
 
-    const scene = document.getElementById("hero-about-scene");
+    const imageBlock = imageBlockRef.current;
 
-    if (!scene) {
+    if (!imageBlock) {
       return;
     }
 
-    const destination =
-      scene.offsetTop + scene.offsetHeight - window.innerHeight;
-
-    window.scrollTo({
-      top: destination,
-      behavior: "smooth",
-    });
+    imageBlock.scrollIntoView({ behavior: "smooth", block: "end" });
   }, []);
 
   useGSAP(
     () => {
       const section = sectionRef.current;
-      const image = imageRef.current;
       const content = contentRef.current;
       const scrollIndicator = scrollIndicatorRef.current;
+      const imageBlock = imageBlockRef.current;
 
-      if (!section || !image || !content) {
+      if (!section || !content) {
         return;
       }
 
-      const eyebrow = content.querySelector(`.${styles.eyebrow}`);
-      const title = content.querySelector(`.${styles.title}`);
-      const subtitle = content.querySelector(`.${styles.subtitle}`);
-      const discoverLink = content.querySelector(`.${styles.discoverLink}`);
+      const eyebrowEl = content.querySelector(`.${styles.eyebrow}`);
+      const titleEl = content.querySelector(`.${styles.title}`);
+      const subtitleEl = content.querySelector(`.${styles.subtitle}`);
+      const imageFrameEl = imageBlock?.querySelector(`.${styles.imageFrame}`);
+      const patternEl = imageBlock?.querySelector(`.${styles.patternShape}`);
 
-      if (!eyebrow || !title || !subtitle || !discoverLink) {
+      if (!eyebrowEl || !titleEl || !subtitleEl) {
         return;
       }
 
-      const matchMedia = gsap.matchMedia();
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
 
-      matchMedia.add(
-        {
-          desktop: "(min-width: 768px)",
-          mobile: "(max-width: 767px)",
-          reduceMotion: "(prefers-reduced-motion: reduce)",
-        },
-        (context) => {
-          const {
-            desktop = false,
-            mobile = false,
-            reduceMotion = false,
-          } = context.conditions ?? {};
+      if (reduceMotion) {
+        gsap.set(
+          [
+            eyebrowEl,
+            titleEl,
+            subtitleEl,
+            scrollIndicator,
+            imageFrameEl,
+            patternEl,
+          ],
+          { autoAlpha: 1, y: 0 },
+        );
 
-          if (reduceMotion) {
-            gsap.set(image, {
-              scale: 1,
-              yPercent: 0,
-            });
+        return;
+      }
 
-            gsap.set(
-              [eyebrow, title, subtitle, discoverLink, scrollIndicator],
-              {
-                autoAlpha: 1,
-                y: 0,
-              },
-            );
-
-            return;
-          }
-
-          /*
-           * Initial Hero entrance.
-           *
-           * A small image scale is used so the background
-           * remains sharper than the previous 1.09 scale.
-           */
-          const entranceTimeline = gsap.timeline({
-            defaults: {
-              ease: "power3.out",
-            },
-          });
-
-          entranceTimeline
-            .fromTo(
-              image,
-              {
-                scale: mobile ? 1.01 : 1.015,
-              },
-              {
-                scale: 1,
-                duration: mobile ? 1.4 : 1.7,
-                ease: "power2.out",
-              },
-              0,
-            )
-            .fromTo(
-              eyebrow,
-              {
-                autoAlpha: 0,
-                y: mobile ? 22 : 28,
-              },
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.9,
-              },
-              0.38,
-            )
-            .fromTo(
-              title,
-              {
-                autoAlpha: 0,
-                y: mobile ? 30 : 42,
-              },
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: mobile ? 1 : 1.1,
-              },
-              0.5,
-            )
-            .fromTo(
-              subtitle,
-              {
-                autoAlpha: 0,
-                y: mobile ? 18 : 24,
-              },
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.85,
-              },
-              0.68,
-            )
-            .fromTo(
-              discoverLink,
-              {
-                autoAlpha: 0,
-                y: mobile ? 16 : 22,
-              },
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.8,
-              },
-              0.8,
-            );
-
-          /*
-           * Scroll Down remains visible.
-           *
-           * It is no longer faded out through ScrollTrigger.
-           * The About panel will naturally cover it during
-           * the Hero-to-About transition.
-           */
-          if (scrollIndicator) {
-            entranceTimeline.fromTo(
-              scrollIndicator,
-              {
-                autoAlpha: 0,
-                y: 14,
-              },
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.75,
-              },
-              0.95,
-            );
-          }
-
-          /*
-           * Very subtle vertical background movement.
-           *
-           * Keeping this movement small prevents the image
-           * from looking soft or overly enlarged.
-           */
-          gsap.to(image, {
-            yPercent: desktop ? 2.5 : 1.5,
-            ease: "none",
-
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: "bottom top",
-              scrub: mobile ? 0.5 : 0.75,
-              invalidateOnRefresh: true,
-            },
-          });
-        },
-      );
-
-      return () => {
-        matchMedia.revert();
-      };
+      /*
+       * Each element starts one ENTRANCE_STAGGER after the previous —
+       * building photo first, pattern shape last, per the requested order.
+       */
+      gsap
+        .timeline({ defaults: { ease: ENTRANCE_EASE } })
+        .fromTo(
+          eyebrowEl,
+          { autoAlpha: 0, y: 22 },
+          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+          0,
+        )
+        .fromTo(
+          titleEl,
+          { autoAlpha: 0, y: 32 },
+          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+          ENTRANCE_STAGGER,
+        )
+        .fromTo(
+          subtitleEl,
+          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+          ENTRANCE_STAGGER * 2,
+        )
+        .fromTo(
+          scrollIndicator,
+          { autoAlpha: 0, y: 14 },
+          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+          ENTRANCE_STAGGER * 3,
+        )
+        .fromTo(
+          imageFrameEl,
+          { autoAlpha: 0, y: 28 },
+          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+          ENTRANCE_STAGGER * 4,
+        )
+        .fromTo(
+          patternEl,
+          { autoAlpha: 0, y: 28 },
+          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+          ENTRANCE_STAGGER * 5,
+        );
     },
-    {
-      scope: sectionRef,
-    },
+    { scope: sectionRef },
   );
 
   return (
@@ -236,71 +133,49 @@ export default function HeroClient({
       className={styles.hero}
       aria-labelledby="hero-title"
     >
-      <div ref={imageRef} className={styles.imageWrapper}>
-        <div ref={imageRef} className={styles.imageWrapper}>
+      <div ref={contentRef} className={styles.content}>
+        <p className={styles.eyebrow}>Duis aute irure</p>
+
+        <h1 id="hero-title" className={styles.title}>
+The home of active wellness        </h1>
+
+        <p className={styles.subtitle}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </div>
+
+      <a
+        ref={scrollIndicatorRef}
+        href="#hero-image"
+        className={styles.scrollIndicator}
+        aria-label="Scroll down to discover Movenpick"
+        onClick={revealImage}
+      >
+        <span className={styles.scrollLine} aria-hidden="true" />
+        <span className={styles.scrollText}>Scroll Down</span>
+      </a>
+
+      <div ref={imageBlockRef} id="hero-image" className={styles.imageBlock}>
+        <Image
+          src="/images/hero/pattern.avif"
+          alt=""
+          aria-hidden="true"
+          fill
+          quality={80}
+          sizes="100vw"
+          className={styles.patternShape}
+        />
+
+        <div className={styles.imageFrame}>
           <SafeImage
             src={mainImage}
             fallbackSrc={mainImageFallback}
             alt="[Add Movenpick hero image description]"
             fill
-            quality={75}
-            sizes="100vw"
-            priority
+            quality={85}
+            sizes="(max-width: 1024px) 88vw, 904px"
             className={styles.image}
           />
         </div>
       </div>
-
-      <div className={styles.imageOverlay} aria-hidden="true" />
-
-      <div ref={contentRef} className={styles.content}>
-        <p className={styles.eyebrow}>{eyebrow}</p>
-
-        <h1 id="hero-title" className={styles.title}>
-          {heading}
-        </h1>
-
-        <p className={styles.subtitle}>{text}</p>
-
-        {/*
-         * "#contact" (the field's own default) opens the enquiry popup,
-         * exactly as before — anything else the panel is told to use is a
-         * real, working link, not silently overridden by the popup
-         * regardless of what was typed. See hero.js's own field label.
-         */}
-        <a
-          href={ctaHref}
-          className={styles.discoverLink}
-          {...(ctaHref === "#contact" ? { "data-contact-popup": true } : {})}
-        >
-          <span>{ctaLabel}</span>
-          {ctaIcon ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={ctaIcon}
-              alt=""
-              aria-hidden="true"
-              className={styles.linkIcon}
-            />
-          ) : (
-            <span className={styles.linkIcon} aria-hidden="true">
-              →
-            </span>
-          )}
-        </a>
-      </div>
-
-      <a
-        ref={scrollIndicatorRef}
-        href="#about"
-        className={styles.scrollIndicator}
-        aria-label="Scroll down to discover Movenpick"
-        onClick={revealAbout}
-      >
-        <span className={styles.scrollText}>Scroll Down</span>
-
-        <span className={styles.scrollLine} aria-hidden="true" />
-      </a>
     </section>
   );
 }

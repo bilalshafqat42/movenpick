@@ -37,10 +37,7 @@
    ========================================================= */
 
 .header {
-  --header-background: rgba(255, 255, 255, 0);
-  --header-foreground: #ffffff;
-  --header-divider: rgba(255, 255, 255, 0.35);
-  --header-blur: blur(0px) saturate(100%);
+  --header-divider: rgba(137, 118, 85, 0.22);
 
   position: fixed;
   inset: 0 0 auto;
@@ -50,65 +47,39 @@
 
   box-sizing: border-box;
 
-  background: var(--header-background);
-  color: var(--header-foreground);
-
-  backdrop-filter: var(--header-blur);
-  -webkit-backdrop-filter: var(--header-blur);
+  background: var(--color-cream);
+  color: var(--color-gold);
 
   box-shadow: none;
 
   transition:
-    background-color 600ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 600ms cubic-bezier(0.16, 1, 0.3, 1),
-    backdrop-filter 600ms cubic-bezier(0.16, 1, 0.3, 1),
-    -webkit-backdrop-filter 600ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 600ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Glass background layer */
-
-.header::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.46) 0%,
-    rgba(248, 248, 244, 0.32) 58%,
-    rgba(242, 243, 239, 0.22) 100%
-  );
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* =========================================================
-   Glassmorphism state
+   Scrolled state — frosted cream glass
    ========================================================= */
 
 .header[data-scrolled="true"] {
-  --header-background: rgba(247, 247, 243, 0.18);
-  --header-foreground: #18191b;
-  --header-divider: rgba(24, 25, 27, 0.12);
-  --header-blur: blur(32px) saturate(165%) contrast(102%);
+  background: rgba(var(--color-cream-rgb), 0.72);
 
-  backdrop-filter: var(--header-blur);
-  -webkit-backdrop-filter: var(--header-blur);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
 
   box-shadow:
-    0 1px 0 rgba(24, 25, 27, 0.05),
-    0 10px 34px rgba(24, 25, 27, 0.04);
+    0 1px 0 rgba(137, 118, 85, 0.12),
+    0 10px 30px rgba(137, 118, 85, 0.08);
 }
 
-.header[data-scrolled="true"]::before {
-  opacity: 1;
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .header[data-scrolled="true"] {
+    background: rgba(var(--color-cream-rgb), 0.96);
+  }
 }
 
 /* =========================================================
@@ -214,13 +185,13 @@
 .logoMark {
   display: block;
 
-  width: 147px;
-  height: 40px;
+  width: 250px;
+  height: 70px;
 
   background-color: currentColor;
 
-  -webkit-mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
-  mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
+  -webkit-mask-image: var(--logo-mask-url, url("/logos/movenpick-logo.svg"));
+  mask-image: var(--logo-mask-url, url("/logos/movenpick-logo.svg"));
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
@@ -520,12 +491,12 @@
   display: block;
 
   width: clamp(120px, 10.5vw, 165px);
-  aspect-ratio: 147 / 40;
+  aspect-ratio: 250 / 70;
 
   background-color: currentColor;
 
-  -webkit-mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
-  mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
+  -webkit-mask-image: var(--logo-mask-url, url("/logos/movenpick-logo.svg"));
+  mask-image: var(--logo-mask-url, url("/logos/movenpick-logo.svg"));
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
@@ -714,7 +685,7 @@
     width: 100px;
     height: auto;
 
-    aspect-ratio: 147 / 40;
+    aspect-ratio: 250 / 70;
   }
 
   .callback {
@@ -730,11 +701,6 @@
 
   .callback::after {
     bottom: -5px;
-  }
-
-  .header[data-scrolled="true"] {
-    --header-background: rgba(247, 247, 243, 0.2);
-    --header-blur: blur(26px) saturate(160%) contrast(102%);
   }
 }
 
@@ -818,30 +784,11 @@
 }
 
 /* =========================================================
-   Glass fallback
-   ========================================================= */
-
-@supports not (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
-  .header[data-scrolled="true"] {
-    --header-background: rgba(247, 248, 246, 0.92);
-
-    background: rgba(247, 248, 246, 0.92);
-  }
-
-  .header[data-scrolled="true"]::before {
-    opacity: 0;
-  }
-}
-
-/* =========================================================
    Reduced motion
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .header,
-  .header::before,
   .divider,
   .callback::after,
   .closeIcon,

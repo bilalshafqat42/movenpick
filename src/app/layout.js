@@ -1,5 +1,5 @@
 import "./globals.css";
-import { inter, kinan, minervaModern } from "@/lib/fonts";
+import { inter, kinan, minervaModern, gloock, notoSans } from "@/lib/fonts";
 import Loader from "@/components/Loader";
 
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
@@ -119,9 +119,13 @@ export default async function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={[inter.variable, kinan.variable, minervaModern.variable].join(
-        " ",
-      )}
+      className={[
+        inter.variable,
+        kinan.variable,
+        minervaModern.variable,
+        gloock.variable,
+        notoSans.variable,
+      ].join(" ")}
     >
       <body>
         <script

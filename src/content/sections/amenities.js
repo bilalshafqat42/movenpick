@@ -1,46 +1,29 @@
 /*
- * Field definitions for the Amenities section, matching exactly what's
- * currently hardcoded in src/components/Amenities/AmenitiesClient.js as
- * of the day this was wired up to the database. These defaultValues are
- * what getSectionContent() falls back to for any field not yet saved in
- * the database (or if the database is briefly unreachable) — the public
- * site never regresses because of this integration.
- *
- * This is also the pattern every future section (and every future
- * project reusing this admin system) follows: a plain array of
- * { key, label, type, defaultValue } describing what's editable, nothing
- * page-specific baked into the admin code itself.
+ * Field definitions for the Amenities section: a centered heading and
+ * intro paragraph, a static list of key points (each with its own photo,
+ * swapped in on hover/focus), a closing line with a "Submit Request"
+ * button, and one photo panel.
  */
 
 const ITEMS = [
   {
-    title: "[Feature 1 title]",
-    description: "[Feature 1 description]",
-    image: "/images/amenities/feature-1.svg",
+    title: "Duis Aute Irure Dolor In Reprehenderit",
+    image: "/images/project/project.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
   {
-    title: "[Feature 2 title]",
-    description: "[Feature 2 description]",
-    image: "/images/amenities/feature-2.svg",
+    title: "Duis Aute Irure Dolor In Reprehenderit",
+    image: "/images/project/project.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
   {
-    title: "[Feature 3 title]",
-    description: "[Feature 3 description]",
-    image: "/images/amenities/feature-3.svg",
+    title: "Duis Aute Irure Dolor In Reprehenderit",
+    image: "/images/project/project.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
   {
-    title: "[Feature 4 title]",
-    description: "[Feature 4 description]",
-    image: "/images/amenities/feature-4.svg",
-    imageAlt: "Placeholder — replace with a real photo",
-  },
-  {
-    title: "[Feature 5 title]",
-    description: "[Feature 5 description]",
-    image: "/images/amenities/feature-5.svg",
+    title: "Duis Aute Irure Dolor In Reprehenderit",
+    image: "/images/project/project.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
 ];
@@ -53,10 +36,18 @@ function itemFieldKey(itemNumber, fieldName) {
 
 export const AMENITIES_FIELDS = [
   {
-    key: "eyebrow",
-    label: "Eyebrow",
+    key: "heading",
+    label: "Heading",
     type: "TEXT",
-    defaultValue: "[Eyebrow]",
+    defaultValue: "Duis Aute Irure Dolor In Reprehenderit",
+  },
+  {
+    key: "intro-text",
+    label: "Intro text",
+    type: "TEXT",
+    long: true,
+    defaultValue:
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
   },
 
   ...ITEMS.flatMap((item, index) => {
@@ -68,13 +59,6 @@ export const AMENITIES_FIELDS = [
         label: `Item ${itemNumber} — Title`,
         type: "TEXT",
         defaultValue: item.title,
-      },
-      {
-        key: itemFieldKey(itemNumber, "description"),
-        label: `Item ${itemNumber} — Description`,
-        type: "TEXT",
-        long: true,
-        defaultValue: item.description,
       },
       {
         key: itemFieldKey(itemNumber, "image"),
@@ -90,12 +74,26 @@ export const AMENITIES_FIELDS = [
       },
     ];
   }),
+
+  {
+    key: "cta-text",
+    label: "Closing text (next to the button)",
+    type: "TEXT",
+    long: true,
+    defaultValue:
+      "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.",
+  },
+  {
+    key: "cta-label",
+    label: "Button label",
+    type: "TEXT",
+    defaultValue: "Submit Request",
+  },
 ];
 
 /*
  * Reshapes the flat key -> value content map (what getSectionContent()
- * returns) into the { eyebrow, items } prop shape AmenitiesClient
- * actually renders.
+ * returns) into the prop shape AmenitiesClient actually renders.
  */
 export function shapeAmenitiesContent(content) {
   const items = Array.from({ length: AMENITIES_ITEM_COUNT }, (_, index) => {
@@ -103,14 +101,16 @@ export function shapeAmenitiesContent(content) {
 
     return {
       title: content[itemFieldKey(itemNumber, "title")],
-      description: content[itemFieldKey(itemNumber, "description")],
       image: content[itemFieldKey(itemNumber, "image")],
       imageAlt: content[itemFieldKey(itemNumber, "imageAlt")],
     };
   });
 
   return {
-    eyebrow: content.eyebrow,
+    heading: content.heading,
+    introText: content["intro-text"],
     items,
+    ctaText: content["cta-text"],
+    ctaLabel: content["cta-label"],
   };
 }

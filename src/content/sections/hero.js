@@ -7,7 +7,7 @@ export const HERO_FIELDS = [
     key: "main-image",
     label: "Main image",
     type: "IMAGE",
-    defaultValue: "/images/hero/hero.svg",
+    defaultValue: "/images/hero/main.avif",
   },
   {
     key: "eyebrow",

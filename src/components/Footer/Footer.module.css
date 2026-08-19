@@ -53,8 +53,8 @@
 
   background-color: currentColor;
 
-  -webkit-mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
-  mask-image: var(--logo-mask-url, url("/logos/oceara-logo.svg"));
+  -webkit-mask-image: var(--logo-mask-url, url("/logos/movenpick-logo.svg"));
+  mask-image: var(--logo-mask-url, url("/logos/movenpick-logo.svg"));
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
