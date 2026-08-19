@@ -1,6 +1,6 @@
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
 import { fieldDefault } from "@/lib/section-defaults";
-import { PAYMENT_FIELDS } from "@/content/sections/payment";
+import { PAYMENT_FIELDS, shapePaymentContent } from "@/content/sections/payment";
 import PaymentClient from "./PaymentClient";
 
 export default async function Payment() {
@@ -9,20 +9,17 @@ export default async function Payment() {
     buildDefaultsFromFields(PAYMENT_FIELDS),
   );
 
+  const { heading, text, image, imageAlt, milestones } =
+    shapePaymentContent(content);
+
   return (
     <PaymentClient
-      eyebrow={content.eyebrow}
-      heading={content.heading}
-      planNumber1={content["plan-number-1"]}
-      planNumber2={content["plan-number-2"]}
-      planLabel1={content["plan-label-1"]}
-      planLabel2={content["plan-label-2"]}
-      image={content.image}
+      heading={heading}
+      text={text}
+      image={image}
       imageFallback={fieldDefault(PAYMENT_FIELDS, "image")}
-      imageAlt={content["image-alt"]}
-      brochureButtonLabel={content["brochure-button-label"]}
-      brochureUrl={content["brochure-url"]}
-      submitButtonLabel={content["submit-button-label"]}
+      imageAlt={imageAlt}
+      milestones={milestones}
     />
   );
 }

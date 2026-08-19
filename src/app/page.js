@@ -64,7 +64,7 @@ export default async function Home() {
 
         <Gallery />
 
-        <Project />
+        {/* <Project /> */}
 
         <MapSection
           eyebrow={locationContent.eyebrow}
