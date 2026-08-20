@@ -424,8 +424,30 @@
     font-size: 16px;
   }
 
+  .content {
+    gap: 20px;
+  }
+
+  /*
+   * Full-bleed and pinned to the section's bottom edge. The standard
+   * "break out of a padded parent" trick: width: 100vw is the true
+   * viewport width regardless of any ancestor's padding, and
+   * margin-left: calc(50% - 50vw) shifts the element's left edge back
+   * to the viewport's left edge from wherever its padded parent placed
+   * it — this holds no matter how deeply nested it is, unlike
+   * cancelling a specific ancestor's padding value directly. The
+   * negative bottom margin cancels .amenities' own bottom padding so
+   * the photo's bottom edge is the section's bottom edge.
+   */
   .imagePanel {
-    min-height: 280px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-bottom: calc(-1 * clamp(60px, 8vw, 110px));
+
+    /* 5 points less than the previous 60vh, so more of the section
+       fits in view at once on mobile. */
+    min-height: 55vh;
   }
 }
 
