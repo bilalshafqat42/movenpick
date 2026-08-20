@@ -12,7 +12,13 @@
    ========================================================= */
 
 .intro {
-  max-width: 760px;
+  /*
+   * 10 of the page's 12 columns wide (83.333vw), matching the width
+   * other sections' headings use, rather than the narrower fixed
+   * 760px this had before.
+   */
+  width: min(83.333vw, 1400px);
+  max-width: 100%;
   margin: 0 auto clamp(48px, 6vw, 80px);
 
   text-align: center;
@@ -47,32 +53,51 @@
 
 .body {
   display: flex;
-  gap: clamp(40px, 6vw, 90px);
-  align-items: flex-start;
+  /*
+   * Stretch (the default, made explicit here) rather than flex-start:
+   * the two columns need to match height, with whichever is naturally
+   * taller (usually the milestone table, at 7 rows) setting it for
+   * both — the image then fills that height via object-fit: cover.
+   */
+  align-items: stretch;
+  gap: 0;
 
-  max-width: 1300px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .imagePanel {
   position: relative;
 
-  flex: 1;
-  min-width: 0;
-  min-height: 560px;
+  /*
+   * A literal 50vw, bled to the true left edge of the viewport with a
+   * negative margin — same full-bleed technique used elsewhere on the
+   * site (e.g. Amenities) — rather than a flex-sized column inset by
+   * the section's own page-gutter padding like the table beside it.
+   * .tablePanel's own padding-left below replaces the old flex `gap`,
+   * since a gap would eat into this now-fixed-width column.
+   */
+  flex: none;
+  width: 50vw;
+  margin-left: calc(-1 * var(--page-gutter));
 
   overflow: hidden;
 
   background: var(--color-gold);
 
   /*
-   * Initial state is also set through GSAP. Keeping it here prevents a
-   * flash before JS loads. Hidden from the left: the reveal opens from
-   * right to left.
+   * Fully hidden as a plain fallback before JS computes the real
+   * 30-band venetian mask (see PaymentClient's buildVenetianMask) —
+   * this is just here to prevent a flash of the unmasked image before
+   * that runs, not the actual reveal shape.
    */
-  clip-path: inset(0% 0% 0% 100%);
+  mask-image: linear-gradient(0deg, transparent 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(0deg, transparent 0%, transparent 100%);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
 
-  will-change: clip-path;
+  will-change: mask-image;
 }
 
 .imageLayer {
@@ -104,8 +129,19 @@
    ========================================================= */
 
 .tablePanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
   flex: 1;
   min-width: 0;
+
+  /*
+   * Replaces the old flex `gap` on .body — that gap would have eaten
+   * into .imagePanel's now-fixed 50vw width instead of just spacing
+   * the table away from it.
+   */
+  padding-left: clamp(40px, 6vw, 90px);
 }
 
 .tableHeader {
@@ -188,8 +224,18 @@
   }
 
   .imagePanel {
+    /*
+     * Cancels the desktop-only 50vw bleed — stacked layout, so the
+     * image is just a normal full-width block again.
+     */
+    flex: none;
     width: 100%;
+    margin-left: 0;
     min-height: 380px;
+  }
+
+  .tablePanel {
+    padding-left: 0;
   }
 }
 
@@ -222,7 +268,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .imagePanel {
-    clip-path: none !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
   }
 
   .imageLayer,

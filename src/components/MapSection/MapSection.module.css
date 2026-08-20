@@ -153,7 +153,7 @@
   display: grid;
   place-items: center;
 
-  background: #d9e4eb;
+  background: var(--color-cream);
 
   pointer-events: none;
 }
@@ -648,7 +648,7 @@
 
   border-radius: 0;
 
-  background: rgba(242, 237, 229, 0.95);
+  background: rgba(var(--color-cream-rgb), 0.95);
   color: #18191b;
 
   backdrop-filter: blur(7px);
@@ -725,7 +725,7 @@
   border: 0;
   border-radius: 0;
 
-  background: rgba(242, 237, 229, 0.72);
+  background: rgba(var(--color-cream-rgb), 0.72);
 
   font-family: var(--font-body);
   font-size: 8px;
@@ -760,7 +760,7 @@
 
   padding: 40px;
 
-  background: #d9e4eb;
+  background: var(--color-cream);
 }
 
 .mapError p {
@@ -846,12 +846,11 @@
     width: 100%;
     height: 100vh;
     height: 100svh;
-    min-height: 680px;
 
     overflow: hidden;
     isolation: isolate;
 
-    background: #d9e4eb;
+    background: var(--color-cream);
   }
 
   .map {
@@ -899,11 +898,11 @@
 
     background: linear-gradient(
       180deg,
-      rgba(242, 237, 229, 1) 0%,
-      rgba(242, 237, 229, 0.99) 54%,
-      rgba(242, 237, 229, 0.9) 70%,
-      rgba(242, 237, 229, 0.54) 86%,
-      rgba(242, 237, 229, 0) 100%
+      rgba(var(--color-cream-rgb), 1) 0%,
+      rgba(var(--color-cream-rgb), 0.99) 54%,
+      rgba(var(--color-cream-rgb), 0.9) 70%,
+      rgba(var(--color-cream-rgb), 0.54) 86%,
+      rgba(var(--color-cream-rgb), 0) 100%
     );
 
     backdrop-filter: blur(5px);
@@ -1123,7 +1122,7 @@
 
     padding: 9px 10px;
 
-    background: rgba(242, 237, 229, 0.94);
+    background: rgba(var(--color-cream-rgb), 0.94);
 
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
@@ -1172,10 +1171,6 @@
 
   .description {
     font-size: 15px;
-  }
-
-  .mapStage {
-    min-height: 660px;
   }
 
   .travelOverlay,
@@ -1268,10 +1263,6 @@
    ========================================================= */
 
 @media (max-width: 767px) and (max-height: 720px) {
-  .mapStage {
-    min-height: 620px;
-  }
-
   .travelOverlay,
   .travelContent {
     min-height: 280px;
