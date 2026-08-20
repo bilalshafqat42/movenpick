@@ -145,12 +145,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /*
+   * Only align-items (horizontal) mattered while the card was small,
+   * since its content plus padding filled the whole box either way.
+   * Once it grows to nearly the full section height, content needs
+   * justify-content too or it just sits at the top of all that extra
+   * vertical space.
+   */
+  justify-content: center;
 
   width: min(450px, 90%);
 
   padding: clamp(36px, 4vw, 56px) clamp(28px, 4vw, 48px);
 
-  background: rgba(var(--color-cream-rgb), 0.82);
+  background: rgba(var(--color-cream-rgb), 1);
+  /*
+   * Its own fill is almost the same cream as the page background
+   * behind it, so once it grows to cover the whole photo there'd
+   * otherwise be no visible edge at all to show where it ends —
+   * this border and shadow stay visible even then.
+   */
+  border: 1px solid rgba(var(--color-gold-rgb), 0.25);
+  box-shadow: 0 24px 60px rgba(var(--color-gold-rgb), 0.18);
 
   backdrop-filter: blur(22px) saturate(140%);
   -webkit-backdrop-filter: blur(22px) saturate(140%);

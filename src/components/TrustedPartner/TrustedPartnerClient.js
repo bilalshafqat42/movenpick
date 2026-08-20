@@ -77,6 +77,7 @@ export default function TrustedPartnerClient({
       });
 
       let mediaTrigger;
+      let growTrigger;
 
       /*
        * A separate trigger for the photo/card, since it sits further down
@@ -104,11 +105,101 @@ export default function TrustedPartnerClient({
               );
           },
         });
+
+        /*
+         * Once the card's own bottom edge reaches the bottom of the
+         * screen — exactly where it naturally settles after the reveal
+         * above — continuing to scroll grows it from its small centred
+         * card into a full-bleed panel covering the entire photo.
+         *
+         * Pinning all four edges (top/right/bottom/left) as an inset
+         * from the media block's own edges, then animating all four
+         * straight to 0, is what actually guarantees growth on every
+         * side at once: each edge moves independently and by an equal
+         * amount, with no dependency on a width/height that's changing
+         * at the same time. The previous version instead centred the
+         * card with top/left:50% plus a -50% transform and animated
+         * only width/height — that trick keeps a *fixed*-size box
+         * centred, but once the box's own size is what's changing, the
+         * -50% shift (relative to the box's current, moving size) no
+         * longer traces a straight line to the edges, so growth looked
+         * uneven rather than expanding equally on every side.
+         */
+        const cardRect = card.getBoundingClientRect();
+        const mediaRect = media.getBoundingClientRect();
+
+        const insetX = (mediaRect.width - cardRect.width) / 2;
+        const insetY = (mediaRect.height - cardRect.height) / 2;
+
+        gsap.set(card, {
+          top: insetY,
+          right: insetX,
+          bottom: insetY,
+          left: insetX,
+          xPercent: 0,
+          yPercent: 0,
+          width: "auto",
+          height: "auto",
+        });
+
+        growTrigger = ScrollTrigger.create({
+          trigger: card,
+          start: "bottom bottom",
+          /*
+           * Tied to the media block's own geometry (via a separate
+           * endTrigger) rather than a fixed viewport-height distance —
+           * a fixed distance has no relationship to how much of the
+           * section is actually still left to scroll through, so
+           * depending on the card's own height it could easily still
+           * be short of full size by the time the section itself had
+           * nearly scrolled out of view. Ending when the media block's
+           * own bottom edge reaches 80% down the viewport (i.e. the
+           * section has scrolled until only its bottom 20% remains)
+           * guarantees it's fully grown well before the section ends,
+           * regardless of exactly how tall the card started out.
+           */
+          endTrigger: media,
+          end: "bottom 80%",
+          /*
+           * Pins the media block on screen for exactly this scroll
+           * range. Without it, the card was only ever centred
+           * relative to the media block — and since the media block
+           * itself keeps scrolling up the page as the card grows, it
+           * only looked centred on screen at one particular scroll
+           * position; everywhere else in the range, the media block
+           * (and the card centred in it) sat off-centre in the
+           * viewport. Freezing the media block in place for the
+           * duration of the grow keeps it — and the card growing
+           * inside it — genuinely centred on screen throughout.
+           */
+          pin: media,
+          pinSpacing: true,
+          scrub: 0.5,
+          invalidateOnRefresh: true,
+
+          animation: gsap.fromTo(
+            card,
+            {
+              top: insetY,
+              right: insetX,
+              bottom: insetY,
+              left: insetX,
+            },
+            {
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              ease: "none",
+            },
+          ),
+        });
       }
 
       return () => {
         textTrigger.kill();
         mediaTrigger?.kill();
+        growTrigger?.kill();
       };
     },
     { scope: sectionRef },
