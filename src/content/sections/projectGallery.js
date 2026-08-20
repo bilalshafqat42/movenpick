@@ -6,40 +6,46 @@
  */
 const SLIDES = [
   {
-    image: "/images/gallery/boy.avif",
-    alt: "Placeholder — replace with a real photo",
-    heading: "[Slide 1 heading]",
-    text: "[Slide 1 caption]",
+    image: "/images/slider.avif",
+    alt: "Movenpick building exterior",
+    heading: "Excepteur sint occaecat cupidatat",
+    text:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
   {
     image: "/images/gallery/game.avif",
     alt: "Placeholder — replace with a real photo",
-    heading: "[Slide 2 heading]",
-    text: "[Slide 2 caption]",
+    heading: "Excepteur sint occaecat cupidatat",
+    text:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
   {
     image: "/images/gallery/stone.avif",
     alt: "Placeholder — replace with a real photo",
-    heading: "[Slide 3 heading]",
-    text: "[Slide 3 caption]",
+    heading: "Excepteur sint occaecat cupidatat",
+    text:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
   {
     image: "/images/gallery/yacht.avif",
     alt: "Placeholder — replace with a real photo",
-    heading: "[Slide 4 heading]",
-    text: "[Slide 4 caption]",
+    heading: "Excepteur sint occaecat cupidatat",
+    text:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
   {
     image: "/images/gallery/wellness.avif",
     alt: "Placeholder — replace with a real photo",
-    heading: "[Slide 5 heading]",
-    text: "[Slide 5 caption]",
+    heading: "Excepteur sint occaecat cupidatat",
+    text:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
   {
     image: "/images/gallery/garden.avif",
     alt: "Placeholder — replace with a real photo",
-    heading: "[Slide 6 heading]",
-    text: "[Slide 6 caption]",
+    heading: "Excepteur sint occaecat cupidatat",
+    text:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
 ];
 

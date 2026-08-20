@@ -170,6 +170,18 @@ export default function ProjectGalleryClient({ slides }) {
 
   const activeSlide = slides[activeIndex];
 
+  /*
+   * The classic range-slider-thumb trick: positioning the fill's left
+   * edge at X% and then shifting it back by X% of its OWN width (via
+   * transform, not a track-relative unit) means it lands flush against
+   * the track's left edge at X=0 and flush against the right edge at
+   * X=100 — regardless of whether the fill's width is a percentage or,
+   * on desktop, a fixed 150px. A plain percentage `left` alone would
+   * push a fixed-width fill past the track's right edge at X=100.
+   */
+  const fillLeftPercent =
+    slideCount > 1 ? (activeIndex / (slideCount - 1)) * 100 : 0;
+
   return (
     <section
       ref={sectionRef}
@@ -215,14 +227,14 @@ export default function ProjectGalleryClient({ slides }) {
         </p>
 
         <div className={styles.pagination}>
-          <div className={styles.dashes} aria-hidden="true">
-            {slides.map((_, index) => (
-              <span
-                key={index}
-                className={styles.dash}
-                data-active={index === activeIndex ? "true" : "false"}
-              />
-            ))}
+          <div className={styles.track} aria-hidden="true">
+            <div
+              className={styles.trackFill}
+              style={{
+                left: `${fillLeftPercent}%`,
+                transform: `translateX(-${fillLeftPercent}%)`,
+              }}
+            />
           </div>
 
           <span className={styles.counter}>
