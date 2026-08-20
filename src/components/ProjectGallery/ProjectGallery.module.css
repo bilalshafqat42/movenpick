@@ -14,6 +14,13 @@
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+
+  /*
+   * Exit snap point for Amenities' pinned scroll journey (see
+   * Amenities.module.css .stageWrapper) — this section's own top edge
+   * is the clean "fully arrived" resting point right after it.
+   */
+  scroll-snap-align: start;
 }
 
 .gallery,

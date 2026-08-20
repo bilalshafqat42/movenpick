@@ -42,23 +42,101 @@
 }
 
 /* =========================================================
+   Stage wrapper: pins .stickyViewport on screen for the whole
+   scroll-driven journey through the 4 items (desktop only —
+   see the tablet override further down).
+   ========================================================= */
+
+.stageWrapper {
+  position: relative;
+
+  /*
+   * "Magnetic" entry: scroll-snap-align (paired with the proximity
+   * scroll-snap-type set globally in globals.css) pulls a gesture that
+   * lands near this element's top into a clean, full-page-aligned
+   * start rather than stopping mid-header-overlap. The matching exit
+   * snap point lives on ProjectGallery, the section right after this
+   * one's pinned journey ends.
+   */
+  scroll-snap-align: start;
+}
+
+.stickyViewport {
+  position: sticky;
+
+  /*
+   * 90px matches the fixed header's height (see Header.module.css
+   * .inner). Sticking at top: 0 put this content's top edge directly
+   * under the header, which is solid now rather than transparent, so
+   * the first heading was hidden behind it.
+   */
+  top: 90px;
+
+  height: 80vh;
+  height: 80svh;
+}
+
+/* =========================================================
    Body: item list + photo
    ========================================================= */
 
 .body {
-  display: flex;
-  gap: clamp(40px, 6vw, 90px);
+  position: relative;
 
-  max-width: 1300px;
-  margin: 0 auto;
+  display: flex;
+
+  height: 100%;
 }
 
 .content {
   display: flex;
   flex-direction: column;
+  gap: 48px;
+
+  /*
+   * Stretched to the row's full height by .body's flex default
+   * (align-items: stretch), which is what lets .divider's margin-top:
+   * auto below push the closing group all the way to the bottom.
+   */
+  max-width: calc(50vw - var(--page-gutter) * 3);
+}
+
+/*
+ * A single continuous track running the full height of the list,
+ * rather than a separate on/off marker per item. .progressFill grows
+ * from the top (scaleY 0 → 1, transform-origin: top) as the pinned
+ * scroll journey advances, so it reads as one steadily-filling
+ * indicator rather than four independent switches.
+ */
+.itemsWrapper {
+  position: relative;
+
+  padding-left: 20px;
+}
+
+.progressTrack {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  z-index: 1;
+
+  width: 2px;
+
+  background: rgba(137, 118, 85, 0.22);
+}
+
+.progressFill {
+  position: absolute;
+  top: 0;
+  left: 0;
 
   width: 100%;
-  max-width: 380px;
+  height: 100%;
+
+  background: var(--color-gold);
+
+  transform: scaleY(0);
 }
 
 .items {
@@ -66,7 +144,7 @@
   flex-direction: column;
   gap: 4px;
 
-  margin: 0 0 32px;
+  margin: 0;
   padding: 0;
 
   list-style: none;
@@ -75,7 +153,6 @@
 .item {
   display: flex;
   align-items: center;
-  gap: 14px;
 
   width: 100%;
   padding: 10px 0;
@@ -90,24 +167,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.itemBar {
-  width: 2px;
-  height: 20px;
-
-  background: var(--color-cta-red);
-
-  opacity: 0;
-
-  transition: opacity 250ms ease;
-}
-
-.item[data-active="true"] .itemBar {
-  opacity: 1;
-}
-
 .itemTitle {
   font-family: var(--font-gloock);
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 400;
   line-height: 1.35;
 
@@ -116,14 +178,31 @@
   transition: color 250ms ease;
 }
 
+/*
+ * Selected (the item whose photo is currently shown) reads in black;
+ * actively hovering — even a different item, mid-transition — always
+ * shows gold, which is why this rule comes after the selected one: the
+ * two states can apply to the same element at once when hovering is
+ * literally what selects it.
+ */
 .item[data-active="true"] .itemTitle {
+  color: #000000;
+}
+
+.item:hover .itemTitle {
   color: var(--color-gold);
 }
 
 .divider {
   width: 100%;
   height: 1px;
-  margin: 0 0 24px;
+
+  /*
+   * Pushes itself — and everything after it, since they share .content's
+   * flex column — all the way to the bottom, leaving the item list
+   * pinned at the top with the freed space collapsing in between.
+   */
+  margin: auto 0 0;
 
   border: 0;
 
@@ -141,7 +220,7 @@
   margin: 0;
 
   font-family: var(--font-noto-sans);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
 
@@ -149,6 +228,8 @@
 }
 
 .requestButton {
+  position: relative;
+
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -160,7 +241,7 @@
   background: transparent;
 
   font-family: var(--font-noto-sans);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.14em;
@@ -169,15 +250,42 @@
   color: var(--color-cta-red);
 
   cursor: pointer;
+  overflow: hidden;
 
-  transition:
-    background-color 300ms ease,
-    color 300ms ease;
+  transition: color 500ms ease;
+}
+
+/*
+ * Fill animation: a red layer sweeps in from the left on hover, same
+ * technique as the Project Overview CTAs.
+ */
+.requestButton::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background: var(--color-cta-red);
+
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.requestButton:hover::before,
+.requestButton:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.requestButton > span {
+  position: relative;
+  z-index: 1;
 }
 
 .requestButton:hover,
 .requestButton:focus-visible {
-  background: var(--color-cta-red);
   color: var(--color-cream);
 }
 
@@ -195,11 +303,20 @@
    ========================================================= */
 
 .imagePanel {
-  position: relative;
+  /*
+   * Taken out of normal flow entirely and given a literal 50vw width —
+   * inside a grid, the gap between columns eats into each column's own
+   * share of the width, so neither column actually reaches a true 50%.
+   * Positioning it against .body (not the viewport) keeps it correctly
+   * placed within the page's normal scroll flow while still sizing
+   * against the viewport width.
+   */
+  position: absolute;
+  top: 0;
+  right: calc(-1 * var(--page-gutter));
+  bottom: calc(-1 * clamp(60px, 8vw, 110px));
 
-  flex: 1;
-  min-width: 0;
-  min-height: 420px;
+  width: 50vw;
 
   overflow: hidden;
 }
@@ -218,21 +335,27 @@
   will-change: transform;
 }
 
+/*
+ * One of these per item, all stacked in the same box — separate from
+ * .imagePanel above them (whose own clip-path is reserved for the
+ * scroll-scrubbed entrance wipe). AmenitiesClient keeps every item's
+ * layer mounted permanently and animates only the active one's
+ * clip-path + stacking order, so the previous photo stays visible
+ * underneath as the new one wipes over it instead of the page
+ * background showing through.
+ */
+.imageWipe {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  will-change: clip-path;
+}
+
 .image {
   object-fit: cover;
   object-position: center center;
-
-  animation: imageFadeIn 400ms ease;
-}
-
-@keyframes imageFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }
 
 /* =========================================================
@@ -240,15 +363,50 @@
    ========================================================= */
 
 @media (max-width: 1024px) {
+  /*
+   * The pinned, scroll-driven journey is desktop only — no
+   * ScrollTrigger is created for it below 1025px (see
+   * AmenitiesClient), so the tall inline height that drives the
+   * scroll distance needs cancelling here too, or the section would
+   * just leave a huge empty gap with nothing scrubbing through it.
+   */
+  .stageWrapper {
+    height: auto !important;
+  }
+
+  .stickyViewport {
+    position: static;
+    height: auto;
+  }
+
   .body {
+    display: flex;
     flex-direction: column;
+    gap: clamp(40px, 6vw, 90px);
+
+    height: auto;
   }
 
   .content {
     max-width: 100%;
   }
 
+  .itemsWrapper {
+    padding-left: 0;
+  }
+
+  .progressTrack {
+    display: none;
+  }
+
+  .divider {
+    margin: 0 0 24px;
+  }
+
   .imagePanel {
+    position: static;
+
+    width: auto;
     min-height: 380px;
   }
 }
@@ -285,7 +443,7 @@
     transform: none !important;
   }
 
-  .image {
-    animation: none;
+  .requestButton::before {
+    transition: none;
   }
 }

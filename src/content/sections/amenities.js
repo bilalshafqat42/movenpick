@@ -1,29 +1,42 @@
 /*
  * Field definitions for the Amenities section: a centered heading and
- * intro paragraph, a static list of key points (each with its own photo,
- * swapped in on hover/focus), a closing line with a "Submit Request"
- * button, and one photo panel.
+ * intro paragraph, a static list of key points — each with its own
+ * photo AND its own description, swapped in together on hover/focus —
+ * and a closing "Submit Request" button.
  */
 
+/*
+ * Reusing four of the Project Gallery's photos (public/images/gallery/)
+ * so each item shows a distinct real image instead of the same
+ * placeholder repeated four times.
+ */
 const ITEMS = [
   {
     title: "Duis Aute Irure Dolor In Reprehenderit",
-    image: "/images/project/project.avif",
+    description:
+      "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.",
+    image: "/images/gallery/boy.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
   {
     title: "Duis Aute Irure Dolor In Reprehenderit",
-    image: "/images/project/project.avif",
+    description:
+      "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.",
+    image: "/images/gallery/yacht.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
   {
     title: "Duis Aute Irure Dolor In Reprehenderit",
-    image: "/images/project/project.avif",
+    description:
+      "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.",
+    image: "/images/gallery/wellness.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
   {
     title: "Duis Aute Irure Dolor In Reprehenderit",
-    image: "/images/project/project.avif",
+    description:
+      "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.",
+    image: "/images/gallery/garden.avif",
     imageAlt: "Placeholder — replace with a real photo",
   },
 ];
@@ -61,6 +74,13 @@ export const AMENITIES_FIELDS = [
         defaultValue: item.title,
       },
       {
+        key: itemFieldKey(itemNumber, "description"),
+        label: `Item ${itemNumber} — Description`,
+        type: "TEXT",
+        long: true,
+        defaultValue: item.description,
+      },
+      {
         key: itemFieldKey(itemNumber, "image"),
         label: `Item ${itemNumber} — Image`,
         type: "IMAGE",
@@ -75,14 +95,6 @@ export const AMENITIES_FIELDS = [
     ];
   }),
 
-  {
-    key: "cta-text",
-    label: "Closing text (next to the button)",
-    type: "TEXT",
-    long: true,
-    defaultValue:
-      "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua.",
-  },
   {
     key: "cta-label",
     label: "Button label",
@@ -101,6 +113,7 @@ export function shapeAmenitiesContent(content) {
 
     return {
       title: content[itemFieldKey(itemNumber, "title")],
+      description: content[itemFieldKey(itemNumber, "description")],
       image: content[itemFieldKey(itemNumber, "image")],
       imageAlt: content[itemFieldKey(itemNumber, "imageAlt")],
     };
@@ -110,7 +123,6 @@ export function shapeAmenitiesContent(content) {
     heading: content.heading,
     introText: content["intro-text"],
     items,
-    ctaText: content["cta-text"],
     ctaLabel: content["cta-label"],
   };
 }

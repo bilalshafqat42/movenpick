@@ -35,6 +35,22 @@ body {
   color: #17201f;
 }
 
+/*
+ * "proximity" (not "mandatory") is what keeps this scoped: the browser
+ * only snaps to elements that opt in with scroll-snap-align, and even
+ * then only when a scroll gesture naturally comes to rest near one. No
+ * other section declares scroll-snap-align, so this has no effect on
+ * them — it only engages around Amenities' pinned scroll journey (see
+ * Amenities.module.css and ProjectGallery.module.css).
+ */
+html {
+  scroll-snap-type: y proximity;
+
+  /* Matches the fixed header's height so a snap point's element lands
+     fully below it, not partially hidden underneath. */
+  scroll-padding-top: 90px;
+}
+
 .font-heading {
   font-family: var(--font-heading);
 }
