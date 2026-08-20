@@ -66,7 +66,17 @@
   flex: 0 0 auto;
 
   width: 100vw;
-  height: 740px;
+  /*
+   * The centre card is absolutely positioned, so it doesn't
+   * contribute to this element's own height — this fixed value is
+   * what .gallery's flex layout (and its own overflow: hidden) sizes
+   * around. 740px was tuned for the old fixed 600px-tall centre image
+   * plus a 28px caption margin; the centre image can now be up to
+   * ~733px tall (8-of-12-columns wide, capped at 1100px, at its
+   * original 3:2 aspect ratio) and the caption margin is 48px, so the
+   * old value was clipping the caption underneath.
+   */
+  height: 960px;
 
   margin: 0;
 
@@ -238,7 +248,7 @@
   width: min(100%, 620px);
   min-height: 110px;
 
-  margin: 28px auto 0;
+  margin: 48px auto 0;
   padding: 0 12px;
 
   opacity: 0;
@@ -396,12 +406,11 @@
 
   .carousel {
     /*
-     * Centre image is 10% smaller:
-     *
-     * 66.6vw × 600/900 = approximately 44.4vw.
-     * Additional height is reserved for the card text.
+     * Matches GalleryClient's mobile centre-card height (50% of the
+     * viewport's height, a tall portrait card) plus room for the
+     * caption below it.
      */
-    height: min(calc(44.4vw + 144px), 490px);
+    height: calc(50vh + 144px);
   }
 
   .cardContent {
@@ -449,10 +458,7 @@
   }
 
   .carousel {
-    /*
-     * 70.2vw × 600/900 = approximately 46.8vw.
-     */
-    height: min(calc(46.8vw + 132px), 360px);
+    height: calc(48vh + 132px);
   }
 }
 

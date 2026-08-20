@@ -9,30 +9,30 @@ const GALLERY_ITEMS = [
   {
     image: "/images/gallery/wellness.avif",
     alt: "Hot stone wellness treatment",
-    title: "Wellness Resort",
+    title: "Amenities Name",
     description:
-      "[Movenpick gallery intro copy]",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   },
   {
     image: "/images/gallery/garden.avif",
     alt: "Woman enjoying an active outdoor lifestyle",
-    title: "Active Living",
+    title: "Amenities Name",
     description:
-      "Thoughtfully planned spaces encourage movement, recreation and a more balanced way of living.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   },
   {
     image: "/images/gallery/yoga.avif",
     alt: "Landscaped outdoor community retreat",
-    title: "Nature Retreat",
+    title: "Amenities Name",
     description:
-      "Immersive landscaped spaces create quiet moments for reflection, connection and relaxation.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   },
   {
     image: "/images/gallery/drawing.avif",
     alt: "Resort-inspired outdoor lifestyle",
-    title: "Resort Moments",
+    title: "Amenities Name",
     description:
-      "Everyday life is elevated through carefully considered leisure spaces and resort-inspired surroundings.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   },
 ];
 

@@ -127,24 +127,30 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
   }, []);
 
   /*
-   * Exact desktop dimensions:
+   * Desktop dimensions:
    *
-   * Centre: 900 × 600
+   * Centre: 8 of 12 page columns wide (see the desktop tier below),
+   *         900 × 600's own 3:2 aspect ratio preserved at any width
    * Side:   210 × 446
    *
-   * On mobile only, the centre image is reduced
-   * by 10% compared with the previous mobile width.
+   * Mobile (≤767px) is driven by viewport height instead: the centre
+   * card is a tall 50vh portrait card rather than a short landscape
+   * strip, so it reads as "vertical" and fills most of the screen.
    */
   const getResponsiveSizes = useCallback(() => {
     const viewportWidth = carouselRef.current?.clientWidth || window.innerWidth;
 
     if (viewportWidth <= 480) {
       /*
-       * Previous value: 78vw
-       * New value: 78vw × 0.9 = 70.2vw
+       * Mobile centre card: 50% of the *viewport's height* (not the
+       * old width-driven 3:2 landscape crop) — a tall, portrait card
+       * that reads as "vertical" and fills most of the screen, rather
+       * than a short strip. 0.75 (3:4) is a portrait aspect ratio;
+       * the viewportWidth cap keeps it from ever overflowing sideways
+       * on unusually tall/narrow devices.
        */
-      const centreWidth = viewportWidth * 0.702;
-      const centreHeight = centreWidth * (600 / 900);
+      const centreHeight = window.innerHeight * 0.5;
+      const centreWidth = Math.min(centreHeight * 0.75, viewportWidth * 0.86);
 
       const sideWidth = Math.max(48, viewportWidth * 0.11);
       const sideHeight = sideWidth * (446 / 210);
@@ -159,12 +165,8 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
     }
 
     if (viewportWidth <= 767) {
-      /*
-       * Previous value: 74vw
-       * New value: 74vw × 0.9 = 66.6vw
-       */
-      const centreWidth = viewportWidth * 0.666;
-      const centreHeight = centreWidth * (600 / 900);
+      const centreHeight = window.innerHeight * 0.5;
+      const centreWidth = Math.min(centreHeight * 0.75, viewportWidth * 0.86);
 
       const sideWidth = Math.max(62, viewportWidth * 0.13);
       const sideHeight = sideWidth * (446 / 210);
@@ -210,12 +212,21 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
       };
     }
 
+    /*
+     * 8 of the page's 12 columns wide, same technique as Hero's framed
+     * building photo (Hero.module.css .imageFrame): 66.667vw is 8/12
+     * of the viewport, capped so it doesn't grow unreasonably large
+     * on very wide screens.
+     */
+    const centreWidth = Math.min(viewportWidth * 0.66667, 1100);
+    const centreHeight = centreWidth * (600 / 900);
+
     return {
-      centreWidth: 900,
-      centreHeight: 600,
+      centreWidth,
+      centreHeight,
       sideWidth: 210,
       sideHeight: 446,
-      sideYOffset: 600 - 446,
+      sideYOffset: centreHeight - 446,
     };
   }, []);
 
