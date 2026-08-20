@@ -9,63 +9,109 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { gsap, useGSAP } from "@/lib/gsap";
 import styles from "./MapSection.module.css";
 
+/*
+ * Reads from NEXT_PUBLIC_MAPBOX_STYLE_URL (set in .env.local) so a new
+ * Mapbox Studio style can be swapped in without a code change — falls
+ * back to the original style if that's unset, so the map still works
+ * with no env var configured at all.
+ */
 const MAPBOX_STYLE_URL =
+  process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL ||
   "mapbox://styles/refinedubai/cmrj946d7001k01r45t5vgnju";
 
 /*
  * Mapbox coordinates always follow:
  * [longitude, latitude]
  *
- * Confirm the final approved project coordinate
- * before the website is published.
+ * Confirmed from Google Maps: Movenpick Residences Dubai Motor City
+ * (Velos Residence), 25.051605624752366, 55.248930731847.
  */
 const projectLocation = {
   id: "project",
   name: "Movenpick",
   time: "Project Location",
-  coordinates: [55.3076, 25.2908],
+  coordinates: [55.248930731847, 25.051605624752366],
   zoom: 13.8,
   isProject: true,
   popupAnchor: "bottom",
-  popupOffset: [0, -62],
+  /*
+   * Lifted further above the pin than before (was -62) — the pin
+   * itself also grew larger since this was tuned, and several
+   * destinations sit right next to the project in Motor City, so the
+   * label needs more clearance to stop reading as hidden underneath
+   * theirs.
+   */
+  popupOffset: [0, -90],
 };
 
+/*
+ * Order matches LOCATION_ITEMS in src/content/sections/location.js
+ * exactly — merged onto this array by index, not by id or name.
+ */
 const DEFAULT_DESTINATIONS = [
   {
-    id: "airport",
-    name: "Dubai International Airport (DXB)",
-    time: "15 Min",
-    coordinates: [55.3644, 25.2532],
-    zoom: 12.4,
+    id: "autodrome",
+    name: "Dubai Autodrome",
+    time: "2 Min",
+    coordinates: [55.2381, 25.0509],
+    zoom: 13.4,
     popupAnchor: "bottom-left",
     popupOffset: [14, -13],
   },
   {
-    id: "downtown",
-    name: "Downtown Dubai, Burj Khalifa",
-    time: "20 Min",
-    coordinates: [55.2744, 25.1972],
-    zoom: 12.4,
+    // Coordinates unconfirmed — see the matching note in location.js.
+    id: "medcare",
+    name: "Medcare Medical Centre",
+    time: "2 Min",
+    coordinates: [55.228, 25.05],
+    zoom: 13.4,
     popupAnchor: "bottom-right",
     popupOffset: [-14, -13],
   },
   {
-    id: "creek-golf",
-    name: "Dubai Creek Golf Club",
-    time: "20 Min",
-    coordinates: [55.3337, 25.2425],
+    id: "polo-club",
+    name: "Dubai Polo & Equestrian Club",
+    time: "7 Min",
+    coordinates: [55.254, 25.043],
     zoom: 13,
     popupAnchor: "top-left",
     popupOffset: [14, 13],
   },
   {
+    id: "hills-mall",
+    name: "Dubai Hills Mall",
+    time: "9 Min",
+    coordinates: [55.245, 25.101],
+    zoom: 13,
+    popupAnchor: "top-right",
+    popupOffset: [-14, 13],
+  },
+  {
     id: "marina",
     name: "Dubai Marina",
-    time: "30 Min",
+    time: "19 Min",
     coordinates: [55.139, 25.0805],
     zoom: 12.2,
     popupAnchor: "bottom-right",
     popupOffset: [-14, -13],
+  },
+  {
+    id: "airport",
+    name: "Dubai International Airport (DXB)",
+    time: "23 Min",
+    coordinates: [55.3644, 25.2532],
+    zoom: 12.4,
+    popupAnchor: "bottom-left",
+    popupOffset: [14, -13],
+
+    /*
+     * Set true to hide this destination's pin, popup, and sidebar
+     * list entry again. Left in place rather than removed/commented
+     * out — this array is merged onto location.js's LOCATION_ITEMS by
+     * INDEX, so deleting this entry would shift every destination
+     * after it onto the wrong one.
+     */
+    hidden: false,
   },
 ];
 
@@ -128,7 +174,12 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
       // moves the pin's label but never breaks the map.
       coordinates: panelCoordinates ?? destination.coordinates,
     };
-  });
+  })
+    // Filtered out here, after the index-based merge above, rather
+    // than removed from DEFAULT_DESTINATIONS itself — that array's
+    // order has to stay intact for every OTHER destination's index to
+    // still line up with the right entry in location.js.
+    .filter((destination) => !destination.hidden);
 
   const mergedAllLocations = [projectLocation, ...mergedDestinations];
 
@@ -722,17 +773,14 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
     mapRef.current = map;
 
     /*
-     * Prevent page scrolling over the map from zooming it.
+     * All pinch/scroll zoom disabled — zooming happens only by
+     * clicking a marker or the Reset View button.
      */
     map.scrollZoom.disable();
+    map.touchZoomRotate.disable();
     map.boxZoom.disable();
     map.doubleClickZoom.disable();
     map.keyboard.disable();
-
-    /*
-     * Touch zoom remains available, but rotation is disabled.
-     */
-    map.touchZoomRotate.disableRotation();
 
     /*
      * Keep required Mapbox attribution visible.
@@ -833,6 +881,20 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
         .setLngLat(location.coordinates)
         .addTo(map);
 
+      /*
+       * The project's marker and popup are added to the map before
+       * the destinations below it in this same loop — with no
+       * explicit stacking order, later-added markers/popups paint on
+       * top, so the project pin was getting buried under whichever
+       * destination labels happened to overlap it. Forcing it (and
+       * its own label) above everything else keeps it prominent
+       * regardless of add order or which destinations are nearby.
+       */
+      if (location.isProject) {
+        marker.getElement().style.zIndex = "50";
+        popup.getElement().style.zIndex = "40";
+      }
+
       mapItemsRef.current.push({
         id: location.id,
         element: markerButton,
@@ -886,7 +948,9 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
 
       map.fitBounds(createAllLocationsBounds(mergedAllLocations), {
         padding,
-        maxZoom: isMobile ? 9.15 : 10,
+        // 10% more than the previous 9.15 / 10, so the project reads
+        // more prominently on both the initial view and Reset View.
+        maxZoom: isMobile ? 10.07 : 11,
         duration,
         essential: true,
         retainPadding: false,

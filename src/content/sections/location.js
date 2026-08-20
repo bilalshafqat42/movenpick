@@ -7,28 +7,46 @@
  */
 const LOCATION_ITEMS = [
   {
-    time: "15 Min",
-    destination: "Dubai International Airport (DXB)",
-    latitude: "25.2532",
-    longitude: "55.3644",
+    time: "2 Min",
+    destination: "Dubai Autodrome",
+    latitude: "25.0509",
+    longitude: "55.2381",
   },
   {
-    time: "20 Min",
-    destination: "Downtown Dubai, Burj Khalifa",
-    latitude: "25.1972",
-    longitude: "55.2744",
+    // Coordinates unconfirmed — "Medcare Medical Centre" has several
+    // Dubai branches; verify which one and update before publishing
+    // (see the note at the top of this file on why both fields must
+    // be edited together).
+    time: "2 Min",
+    destination: "Medcare Medical Centre",
+    latitude: "25.0500",
+    longitude: "55.2280",
   },
   {
-    time: "20 Min",
-    destination: "Dubai Creek Golf Club",
-    latitude: "25.2425",
-    longitude: "55.3337",
+    // Coordinates approximate — confirm before publishing.
+    time: "7 Min",
+    destination: "Dubai Polo & Equestrian Club",
+    latitude: "25.0430",
+    longitude: "55.2540",
   },
   {
-    time: "30 Min",
+    // Coordinates approximate — confirm before publishing.
+    time: "9 Min",
+    destination: "Dubai Hills Mall",
+    latitude: "25.1010",
+    longitude: "55.2450",
+  },
+  {
+    time: "19 Min",
     destination: "Dubai Marina",
     latitude: "25.0805",
     longitude: "55.139",
+  },
+  {
+    time: "23 Min",
+    destination: "Dubai International Airport (DXB)",
+    latitude: "25.2532",
+    longitude: "55.3644",
   },
 ];
 
@@ -43,13 +61,13 @@ export const LOCATION_FIELDS = [
     key: "eyebrow",
     label: "Eyebrow",
     type: "TEXT",
-    defaultValue: "Connected To The",
+    defaultValue: "",
   },
   {
     key: "heading",
     label: "Heading",
     type: "TEXT",
-    defaultValue: "City, Grounded By Nature",
+    defaultValue: "Duis Aute Irure Dolor In Reprehenderit",
   },
   {
     key: "intro-text",
@@ -57,7 +75,7 @@ export const LOCATION_FIELDS = [
     type: "TEXT",
     long: true,
     defaultValue:
-      "Enjoy the tranquillity of island living while remaining effortlessly connected to Dubai's most important destinations, business districts, lifestyle hubs and leisure experiences.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
   },
   // map-image/map-image-alt deliberately removed, 18 August 2026: this
   // section rendered as a static image until the site replaced it with

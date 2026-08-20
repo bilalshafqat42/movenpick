@@ -7,7 +7,7 @@
 
   overflow: hidden;
 
-  background: #f2ede5;
+  background: var(--color-cream);
   color: #18191b;
 }
 
@@ -19,7 +19,7 @@
 
   width: 100%;
 
-  background: #f2ede5;
+  background: var(--color-cream);
 
   will-change: transform, opacity;
 }
@@ -40,7 +40,7 @@
 
   padding: clamp(110px, 10vw, 165px) var(--page-gutter) clamp(82px, 8vw, 122px);
 
-  background: #f2ede5;
+  background: var(--color-cream);
 
   text-align: center;
 }
@@ -97,7 +97,12 @@
   overflow: hidden;
   isolation: isolate;
 
-  background: #d9e4eb;
+  /*
+   * Was a light blue (#d9e4eb) — visible briefly before the map
+   * finishes loading, or in any gap around it, so it needs to match
+   * the same warm cream tone the loaded map is now filtered toward.
+   */
+  background: var(--color-cream);
 }
 
 .map {
@@ -116,6 +121,13 @@
   height: 100%;
 }
 
+/*
+ * No CSS filter here any more: the map now loads a custom Mapbox
+ * Studio style (see NEXT_PUBLIC_MAPBOX_STYLE_URL in MapSection.js)
+ * that's already designed in the brand's cream/beige palette natively
+ * — a CSS filter on top of that would just distort an already-correct
+ * render, which is exactly the workaround this replaced.
+ */
 .map :global(.mapboxgl-canvas) {
   outline: none;
 }
@@ -179,11 +191,11 @@
 
   background: linear-gradient(
     90deg,
-    rgba(242, 237, 229, 1) 0%,
-    rgba(242, 237, 229, 0.99) 48%,
-    rgba(242, 237, 229, 0.86) 68%,
-    rgba(242, 237, 229, 0.42) 84%,
-    rgba(242, 237, 229, 0) 100%
+    rgba(255, 240, 231, 1) 0%,
+    rgba(255, 240, 231, 0.99) 48%,
+    rgba(255, 240, 231, 0.86) 68%,
+    rgba(255, 240, 231, 0.42) 84%,
+    rgba(255, 240, 231, 0) 100%
   );
 
   backdrop-filter: blur(7px);
@@ -505,8 +517,8 @@
   display: grid;
   place-items: center;
 
-  width: 70px;
-  height: 90px;
+  width: 84px;
+  height: 108px;
 }
 
 .projectMarkerInner {
@@ -514,23 +526,36 @@
 
   display: block;
 
-  width: 58px;
-  height: 58px;
+  width: 70px;
+  height: 70px;
 
-  border: 3px solid #f2ede5;
+  border: 3px solid var(--color-cream);
   border-radius: 50% 50% 50% 0;
 
-  background: #123f2a;
+  background: var(--color-red);
 
   transform: rotate(-45deg) scale(0.94);
 
-  box-shadow: 0 16px 36px rgba(18, 63, 42, 0.28);
+  /*
+   * A larger, more saturated glow than a plain drop shadow — this is
+   * the site's one project marker among several destination pins, so
+   * it needs to read as clearly more important at a glance, not just
+   * slightly different.
+   */
+  box-shadow:
+    0 0 0 8px rgba(249, 83, 49, 0.16),
+    0 18px 40px rgba(249, 83, 49, 0.45);
 
   transition:
     transform 450ms cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 450ms ease;
 }
 
+/*
+ * The pin itself is rotated -45deg for its teardrop shape; the icon
+ * needs the opposite +45deg so it reads upright on screen instead of
+ * rotating along with it.
+ */
 .projectMarkerInner::before {
   content: "";
 
@@ -538,13 +563,15 @@
   top: 50%;
   left: 50%;
 
-  width: 21px;
-  height: 21px;
+  width: 32px;
+  height: 32px;
 
-  border: 3px solid #f2ede5;
-  border-radius: 50%;
+  background-image: url("/icons/moven-white.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .projectMarker:hover .projectMarkerInner,
@@ -552,12 +579,14 @@
 .projectMarker[data-active="true"] .projectMarkerInner {
   transform: rotate(-45deg) scale(1);
 
-  box-shadow: 0 20px 42px rgba(18, 63, 42, 0.38);
+  box-shadow:
+    0 0 0 10px rgba(249, 83, 49, 0.2),
+    0 22px 46px rgba(249, 83, 49, 0.55);
 }
 
 .projectMarker:focus-visible,
 .locationMarker:focus-visible {
-  outline: 1px solid #123f2a;
+  outline: 1px solid var(--color-red);
   outline-offset: 5px;
 }
 
@@ -579,7 +608,7 @@
   width: 10px;
   height: 10px;
 
-  border: 2px solid #f2ede5;
+  border: 2px solid var(--color-cream);
   border-radius: 50%;
 
   background: #123f2a;
@@ -1059,20 +1088,18 @@
   }
 
   .projectMarker {
-    width: 54px;
-    height: 70px;
+    width: 62px;
+    height: 80px;
   }
 
   .projectMarkerInner {
-    width: 45px;
-    height: 45px;
+    width: 52px;
+    height: 52px;
   }
 
   .projectMarkerInner::before {
-    width: 16px;
-    height: 16px;
-
-    border-width: 2px;
+    width: 22px;
+    height: 22px;
   }
 
   .locationMarker {
