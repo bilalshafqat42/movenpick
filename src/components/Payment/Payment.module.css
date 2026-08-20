@@ -79,6 +79,13 @@
   flex: none;
   width: 50vw;
   margin-left: calc(-1 * var(--page-gutter));
+  /*
+   * Bled to the section's true bottom edge too, cancelling .payment's
+   * own bottom padding — otherwise the image stopped short of the
+   * section boundary, leaving a visible gap of plain background below
+   * it before the next section started.
+   */
+  margin-bottom: calc(-1 * clamp(60px, 8vw, 110px));
 
   overflow: hidden;
 
@@ -231,6 +238,7 @@
     flex: none;
     width: 100%;
     margin-left: 0;
+    margin-bottom: 0;
     min-height: 380px;
   }
 
