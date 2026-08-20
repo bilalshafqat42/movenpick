@@ -334,14 +334,32 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
    * selectIndex above, used for hover/focus) would get overwritten by
    * the very next scroll tick's recomputed step — the click would
    * flash and immediately revert. Scrolling the page itself to a
-   * point inside that stage's range makes the change actually stick.
-   * Falls back to selectIndex wherever the pin is disabled (tablet,
-   * mobile, reduced motion) and no stage ScrollTrigger exists.
+   * point inside that stage's range makes the change actually stick,
+   * and drives the progress bar along with it since that's fed by the
+   * same real scroll position. Falls back to selectIndex wherever the
+   * pin is disabled (tablet, mobile, reduced motion) and no stage
+   * ScrollTrigger exists.
+   *
+   * Checks the trigger's *actual* live scroll progress, not
+   * activeIndexRef — hovering a heading right before clicking it (the
+   * normal way a mouse click happens) already moves activeIndexRef to
+   * this same index via selectIndex, which would otherwise make this
+   * look like "already there" and skip the scroll entirely.
    */
   const jumpToStage = (index) => {
     const trigger = stageTriggerRef.current;
 
-    if (!trigger || index === activeIndexRef.current) {
+    if (!trigger) {
+      selectIndex(index);
+      return;
+    }
+
+    const currentStep = Math.min(
+      items.length - 1,
+      Math.floor(trigger.progress * items.length),
+    );
+
+    if (currentStep === index) {
       selectIndex(index);
       return;
     }
