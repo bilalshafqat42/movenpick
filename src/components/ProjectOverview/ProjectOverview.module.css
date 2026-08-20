@@ -95,6 +95,8 @@
 }
 
 .ctaButton {
+  position: relative;
+
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -114,14 +116,42 @@
 
   color: var(--color-cta-red);
 
-  transition:
-    background-color 300ms ease,
-    color 300ms ease;
+  overflow: hidden;
+
+  transition: color 500ms ease;
+}
+
+/*
+ * Fill animation: a red layer sweeps in from the left on hover, rather
+ * than the background just snapping to solid red.
+ */
+.ctaButton::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background: var(--color-cta-red);
+
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ctaButton:hover::before,
+.ctaButton:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.ctaButton > span {
+  position: relative;
+  z-index: 1;
 }
 
 .ctaButton:hover,
 .ctaButton:focus-visible {
-  background: var(--color-cta-red);
   color: var(--color-cream);
 }
 
@@ -232,5 +262,9 @@
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
+  }
+
+  .ctaButton::before {
+    transition: none;
   }
 }
