@@ -49,15 +49,16 @@ const projectLocation = {
  * exactly — merged onto this array by index, not by id or name.
  */
 const DEFAULT_DESTINATIONS = [
-  {
-    id: "autodrome",
-    name: "Dubai Autodrome",
-    time: "2 Min",
-    coordinates: [55.2381, 25.0509],
-    zoom: 13.4,
-    popupAnchor: "bottom-left",
-    popupOffset: [14, -13],
-  },
+  /*
+   * Medcare (plus the project itself) sits only a short real-world
+   * distance apart, which on screen at this zoom is just a few dozen
+   * pixels between pins — not enough room for its label to nudge
+   * diagonally away from its own pin and clear the project's. What
+   * actually prevents the overlap is pointing in a genuinely
+   * different compass direction (right, left, above, below) — not
+   * how far out any single one goes, so a plain 50px along that
+   * direction is enough without pushing labels far from their pin.
+   */
   {
     // Coordinates unconfirmed — see the matching note in location.js.
     id: "medcare",
@@ -65,17 +66,8 @@ const DEFAULT_DESTINATIONS = [
     time: "2 Min",
     coordinates: [55.228, 25.05],
     zoom: 13.4,
-    popupAnchor: "bottom-right",
-    popupOffset: [-14, -13],
-  },
-  {
-    id: "polo-club",
-    name: "Dubai Polo & Equestrian Club",
-    time: "7 Min",
-    coordinates: [55.254, 25.043],
-    zoom: 13,
-    popupAnchor: "top-left",
-    popupOffset: [14, 13],
+    popupAnchor: "right",
+    popupOffset: [-10, 0],
   },
   {
     id: "hills-mall",
@@ -83,8 +75,8 @@ const DEFAULT_DESTINATIONS = [
     time: "9 Min",
     coordinates: [55.245, 25.101],
     zoom: 13,
-    popupAnchor: "top-right",
-    popupOffset: [-14, 13],
+    popupAnchor: "bottom",
+    popupOffset: [0, -10],
   },
   {
     id: "marina",
@@ -92,8 +84,8 @@ const DEFAULT_DESTINATIONS = [
     time: "19 Min",
     coordinates: [55.139, 25.0805],
     zoom: 12.2,
-    popupAnchor: "bottom-right",
-    popupOffset: [-14, -13],
+    popupAnchor: "right",
+    popupOffset: [-10, 0],
   },
   {
     id: "airport",
@@ -112,6 +104,15 @@ const DEFAULT_DESTINATIONS = [
      * after it onto the wrong one.
      */
     hidden: false,
+  },
+  {
+    id: "burj-khalifa",
+    name: "Burj Khalifa",
+    time: "20 Min",
+    coordinates: [55.274376, 25.197197],
+    zoom: 12.6,
+    popupAnchor: "bottom-left",
+    popupOffset: [14, -13],
   },
 ];
 

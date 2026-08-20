@@ -7,12 +7,6 @@
  */
 const LOCATION_ITEMS = [
   {
-    time: "2 Min",
-    destination: "Dubai Autodrome",
-    latitude: "25.0509",
-    longitude: "55.2381",
-  },
-  {
     // Coordinates unconfirmed — "Medcare Medical Centre" has several
     // Dubai branches; verify which one and update before publishing
     // (see the note at the top of this file on why both fields must
@@ -21,13 +15,6 @@ const LOCATION_ITEMS = [
     destination: "Medcare Medical Centre",
     latitude: "25.0500",
     longitude: "55.2280",
-  },
-  {
-    // Coordinates approximate — confirm before publishing.
-    time: "7 Min",
-    destination: "Dubai Polo & Equestrian Club",
-    latitude: "25.0430",
-    longitude: "55.2540",
   },
   {
     // Coordinates approximate — confirm before publishing.
@@ -47,6 +34,14 @@ const LOCATION_ITEMS = [
     destination: "Dubai International Airport (DXB)",
     latitude: "25.2532",
     longitude: "55.3644",
+  },
+  {
+    // Time is an estimate (Motor City to Downtown Dubai via Sheikh
+    // Zayed Road) — confirm the actual drive time before publishing.
+    time: "20 Min",
+    destination: "Burj Khalifa",
+    latitude: "25.197197",
+    longitude: "55.274376",
   },
 ];
 

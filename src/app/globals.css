@@ -1,9 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --font-body: var(--font-inter), Arial, sans-serif;
-  --font-heading: var(--font-minerva-modern), Georgia, serif;
-  --font-curve: var(--font-kinan), cursive;
+  /*
+   * These three names are the old Oceara template's font roles
+   * (body/heading/decorative-cursive), still referenced across the
+   * site (MapSection, Hero, Contact, Chat, and others) rather than
+   * every one of those files having been individually migrated to
+   * --font-gloock/--font-noto-sans directly. Repointing the aliases
+   * here to the Movenpick brand fonts — instead of editing every
+   * file that still uses var(--font-body)/var(--font-heading)/
+   * var(--font-curve) — is what actually makes Gloock and Noto Sans
+   * the fonts used everywhere on the site, not just wherever a file
+   * happened to already reference them by their real names.
+   */
+  --font-body: var(--font-noto-sans), Arial, sans-serif;
+  --font-heading: var(--font-gloock), Georgia, serif;
+  --font-curve: var(--font-gloock), cursive;
 
   /* Movenpick brand palette */
   --color-cream: #fff0e7;
