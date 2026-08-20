@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -12,9 +11,11 @@ const SESSION_KEY = "movenpick-loader-shown";
 /*
  * One-time branded splash screen:
  *
- * - Full-screen gradient background.
- * - Logo (forced white via CSS filter, see Loader.module.css) enters
- *   from the left while fading in, then continues travelling right
+ * - Full-screen cream background.
+ * - Logo (rendered as a CSS mask so it takes the brand gold regardless
+ *   of whatever colour is baked into the source SVG, see
+ *   Loader.module.css) enters from the left while fading in, then
+ *   continues travelling right
  *   while fading out, like it's passing through rather than just
  *   appearing and disappearing in place.
  * - Shown once per browser session (sessionStorage), so hard
@@ -124,15 +125,12 @@ export default function Loader({ logoUrl = "/logos/movenpick-logo.svg" }) {
 
   return (
     <div ref={overlayRef} className={styles.overlay} aria-hidden="true">
-      <span ref={logoRef} className={styles.logoWrapper}>
-        <Image
-          src={logoUrl}
-          alt=""
-          width={500}
-          height={140}
-          priority
-          className={styles.logo}
-        />
+      <span
+        ref={logoRef}
+        className={styles.logoWrapper}
+        style={{ "--logo-mask-url": `url("${logoUrl}")` }}
+      >
+        <span className={styles.logo} />
       </span>
     </div>
   );

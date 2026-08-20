@@ -1,7 +1,7 @@
 .amenities {
   width: 100%;
 
-  padding: clamp(60px, 8vw, 110px) clamp(20px, 5vw, 60px);
+  padding: clamp(60px, 8vw, 110px) var(--page-gutter);
 
   background: var(--color-cream);
   color: var(--color-gold);

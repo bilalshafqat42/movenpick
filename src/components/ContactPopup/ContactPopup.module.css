@@ -39,14 +39,14 @@
   overflow-x: hidden;
   overflow-y: auto;
 
-  background: linear-gradient(180deg, #0d78a6 0%, #073d61 100%);
+  background: var(--color-cream);
 
-  color: #ffffff;
+  color: var(--color-gold);
 
   box-shadow: 0 34px 90px rgba(0, 0, 0, 0.28);
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.36) transparent;
+  scrollbar-color: rgba(137, 118, 85, 0.36) transparent;
 
   will-change: transform, opacity;
 }
@@ -60,7 +60,7 @@
 }
 
 .dialog::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.34);
+  background: rgba(137, 118, 85, 0.34);
   border-radius: 20px;
 }
 
@@ -84,7 +84,7 @@
   border: 0;
 
   background: transparent;
-  color: #ffffff;
+  color: var(--color-gold);
 
   cursor: pointer;
 }
@@ -123,7 +123,7 @@
 }
 
 .closeButton:focus-visible {
-  outline: 1px solid #ffffff;
+  outline: 1px solid var(--color-gold);
   outline-offset: 4px;
 }
 
@@ -145,24 +145,25 @@
 .eyebrow {
   margin: 0 0 5px;
 
-  font-family: var(--font-curve);
-  font-size: 32px;
-  font-weight: 400;
+  font-family: var(--font-noto-sans);
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
 
-  color: #ffffff;
+  color: var(--color-cta-red);
 }
 
 .heading {
   margin: 0;
 
-  font-family: var(--font-heading);
+  font-family: var(--font-gloock);
   font-size: 36px;
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.015em;
+  line-height: 1.2;
 
-  color: #ffffff;
+  color: var(--color-gold);
 }
 
 /* =========================================================
@@ -233,14 +234,14 @@
   padding: 0 0 11px;
 
   border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+  border-bottom: 1px solid rgba(137, 118, 85, 0.4);
   border-radius: 0;
   outline: 0;
 
   background: transparent;
-  color: #ffffff;
+  color: var(--color-gold);
 
-  font-family: var(--font-heading);
+  font-family: var(--font-gloock);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.3;
@@ -256,15 +257,15 @@
 }
 
 .input::placeholder {
-  color: rgba(255, 255, 255, 0.94);
+  color: rgba(137, 118, 85, 0.6);
   opacity: 1;
 }
 
 .input:focus,
 .select:focus {
-  border-bottom-color: #ffffff;
+  border-bottom-color: var(--color-gold);
 
-  box-shadow: 0 1px 0 #ffffff;
+  box-shadow: 0 1px 0 var(--color-gold);
 }
 
 /* =========================================================
@@ -336,22 +337,22 @@
 .consent {
   margin: 30px 0 0;
 
-  font-family: var(--font-body);
+  font-family: var(--font-noto-sans);
   font-size: 12.5px;
   line-height: 1.5;
 
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(137, 118, 85, 0.65);
 }
 
 .consentLink {
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--color-gold);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .consentLink:hover,
 .consentLink:focus-visible {
-  color: #ffffff;
+  color: var(--color-cta-red);
 }
 
 @media (max-width: 480px) {
@@ -393,8 +394,8 @@
   width: 8px;
   height: 8px;
 
-  border-right: 1px solid rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+  border-right: 1px solid rgba(137, 118, 85, 0.7);
+  border-bottom: 1px solid rgba(137, 118, 85, 0.7);
 
   transform: rotate(45deg);
 
@@ -402,8 +403,8 @@
 }
 
 .select option {
-  background: #073d61;
-  color: #ffffff;
+  background: var(--color-cream);
+  color: var(--color-gold);
 
   font-family: Arial, sans-serif;
 }
@@ -423,7 +424,7 @@
 
   padding: 0 0 11px;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+  border-bottom: 1px solid rgba(137, 118, 85, 0.4);
 
   transition:
     border-color 350ms ease,
@@ -431,9 +432,9 @@
 }
 
 .phoneInput:focus-within {
-  border-bottom-color: #ffffff;
+  border-bottom-color: var(--color-gold);
 
-  box-shadow: 0 1px 0 #ffffff;
+  box-shadow: 0 1px 0 var(--color-gold);
 }
 
 /* Country selector */
@@ -492,8 +493,8 @@
 
   margin-left: 10px;
 
-  border-right: 1px solid rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+  border-right: 1px solid rgba(137, 118, 85, 0.7);
+  border-bottom: 1px solid rgba(137, 118, 85, 0.7);
 
   opacity: 1;
 
@@ -514,16 +515,16 @@
   outline: 0;
 
   background: transparent;
-  color: #ffffff;
+  color: var(--color-gold);
 
-  font-family: var(--font-heading);
+  font-family: var(--font-gloock);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.3;
 }
 
 .phoneInput :global(.PhoneInputInput::placeholder) {
-  color: rgba(255, 255, 255, 0.94);
+  color: rgba(137, 118, 85, 0.6);
   opacity: 1;
 }
 
@@ -544,41 +545,31 @@
   margin-top: 2px;
   padding: 0 30px;
 
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-cta-red);
+  border-radius: 999px;
 
   background: transparent;
-  color: #ffffff;
+  color: var(--color-cta-red);
 
-  font-family: var(--font-heading);
-  font-size: 16px;
-  font-weight: 400;
+  font-family: var(--font-noto-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   line-height: 1;
 
   cursor: pointer;
   overflow: hidden;
 
   transition:
-    color 450ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 300ms ease,
+    background-color 300ms ease,
     opacity 300ms ease;
 }
 
 .submitButton:disabled {
   cursor: wait;
   opacity: 0.65;
-}
-
-.submitButton::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background: #ffffff;
-
-  transform: translateY(101%);
-
-  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .submitButton span {
@@ -588,16 +579,12 @@
 
 .submitButton:hover:not(:disabled),
 .submitButton:focus-visible:not(:disabled) {
-  color: #073d61;
-}
-
-.submitButton:hover:not(:disabled)::before,
-.submitButton:focus-visible:not(:disabled)::before {
-  transform: translateY(0);
+  background: var(--color-cta-red);
+  color: var(--color-cream);
 }
 
 .submitButton:focus-visible {
-  outline: 1px solid #ffffff;
+  outline: 1px solid var(--color-cta-red);
   outline-offset: 5px;
 }
 
@@ -609,19 +596,19 @@
   min-height: 20px;
   margin: 15px 0 0;
 
-  font-family: var(--font-body);
+  font-family: var(--font-noto-sans);
   font-size: 13px;
   line-height: 1.4;
 
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(137, 118, 85, 0.85);
 }
 
 .status[data-status="error"] {
-  color: #ffd8d8;
+  color: var(--color-cta-red);
 }
 
 .status[data-status="success"] {
-  color: #ffffff;
+  color: var(--color-gold);
 }
 
 /* =========================================================
@@ -744,9 +731,9 @@
 .phoneInput :global(.PhoneInputInput:-webkit-autofill),
 .phoneInput :global(.PhoneInputInput:-webkit-autofill:hover),
 .phoneInput :global(.PhoneInputInput:-webkit-autofill:focus) {
-  -webkit-text-fill-color: #ffffff;
+  -webkit-text-fill-color: var(--color-gold);
 
-  caret-color: #ffffff;
+  caret-color: var(--color-gold);
 
   box-shadow: 0 0 0 1000px transparent inset;
 
@@ -767,7 +754,7 @@
     transform: none !important;
   }
 
-  .submitButton::before,
+  .submitButton,
   .closeIcon {
     transition: none;
   }

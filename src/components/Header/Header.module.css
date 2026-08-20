@@ -64,10 +64,10 @@
    ========================================================= */
 
 .header[data-scrolled="true"] {
-  background: rgba(var(--color-cream-rgb), 0.72);
+  background: rgba(var(--color-cream-rgb), 0.88);
 
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(44px) saturate(160%);
+  -webkit-backdrop-filter: blur(44px) saturate(160%);
 
   box-shadow:
     0 1px 0 rgba(137, 118, 85, 0.12),
@@ -97,7 +97,7 @@
   width: 100%;
   height: 90px;
 
-  padding-inline: clamp(28px, 3.1vw, 60px);
+  padding-inline: var(--page-gutter);
 
   box-sizing: border-box;
 }
@@ -185,8 +185,8 @@
 .logoMark {
   display: block;
 
-  width: 250px;
-  height: 70px;
+  width: 128px;
+  height: 45px;
 
   background-color: currentColor;
 
@@ -308,7 +308,7 @@
   margin: 0;
   padding: 0;
 
-  color: #ffffff;
+  color: var(--color-gold);
   background: transparent;
 
   visibility: hidden;
@@ -342,7 +342,7 @@
 
   box-sizing: border-box;
 
-  background: linear-gradient(180deg, #0d78a6 0%, #073d61 100%);
+  background: var(--color-cream);
 
   overflow: hidden;
 }
@@ -430,7 +430,7 @@
   border: 0;
 
   background: transparent;
-  color: #ffffff;
+  color: var(--color-gold);
 
   cursor: pointer;
 
@@ -479,7 +479,7 @@
   align-items: center;
   justify-content: center;
 
-  color: #ffffff;
+  color: var(--color-gold);
   text-decoration: none;
 
   transform: translateX(-50%);
@@ -491,7 +491,7 @@
   display: block;
 
   width: clamp(120px, 10.5vw, 165px);
-  aspect-ratio: 250 / 70;
+  aspect-ratio: 128 / 45;
 
   background-color: currentColor;
 
@@ -547,7 +547,7 @@
   line-height: 1.05;
   letter-spacing: -0.025em;
 
-  color: rgba(255, 255, 255, 0.24);
+  color: rgba(137, 118, 85, 0.35);
   text-decoration: none;
 
   transition:
@@ -579,7 +579,7 @@
 
 .menuLink:hover,
 .menuLink:focus-visible {
-  color: #ffffff;
+  color: var(--color-gold);
 
   transform: translateX(8px);
 }
@@ -602,7 +602,7 @@
     width: 100%;
     height: 100dvh;
 
-    background: #073d61;
+    background: var(--color-cream);
   }
 
   .menuBluePanel {
@@ -611,7 +611,7 @@
 
     padding: 28px 24px max(56px, env(safe-area-inset-bottom));
 
-    background: linear-gradient(180deg, #0d78a6 0%, #073d61 100%);
+    background: var(--color-cream);
   }
 
   .menuImagePanel {
@@ -685,7 +685,7 @@
     width: 100px;
     height: auto;
 
-    aspect-ratio: 250 / 70;
+    aspect-ratio: 128 / 45;
   }
 
   .callback {

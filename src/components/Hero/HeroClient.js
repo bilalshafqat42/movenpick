@@ -18,25 +18,45 @@ export default function HeroClient({
   const sectionRef = useRef(null);
   const contentRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
-  const imageBlockRef = useRef(null);
+  const imageSectionRef = useRef(null);
+  const patternRef = useRef(null);
+  const imageFrameRef = useRef(null);
 
   /*
-   * Clicking Scroll Down reveals the rest of the Hero itself — the framed
-   * building photo and the pattern behind it — rather than jumping straight
-   * into the About section below. `block: "end"` aligns the bottom of the
-   * image block with the bottom of the viewport, so the whole composition
-   * becomes visible without scrolling past it.
+   * Clicking Scroll Down reveals the full-height pattern + building photo
+   * panel below the text, rather than jumping straight into the About
+   * section after it. The target aligns the bottom of that panel with the
+   * bottom of the viewport, so the whole composition becomes visible
+   * without scrolling past it.
+   *
+   * Driven by GSAP's ScrollToPlugin rather than the native
+   * scrollIntoView(): the browser's own smooth scroll uses a fixed, fairly
+   * quick easing that isn't adjustable, whereas this gives the motion the
+   * same longer, gentler ease used for the header's own scroll-to-section
+   * jumps.
    */
   const revealImage = useCallback((event) => {
     event.preventDefault();
 
-    const imageBlock = imageBlockRef.current;
+    const imageSection = imageSectionRef.current;
 
-    if (!imageBlock) {
+    if (!imageSection) {
       return;
     }
 
-    imageBlock.scrollIntoView({ behavior: "smooth", block: "end" });
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const rect = imageSection.getBoundingClientRect();
+    const targetY = window.scrollY + rect.bottom - window.innerHeight;
+
+    gsap.to(window, {
+      scrollTo: { y: targetY, autoKill: false },
+      duration: reduceMotion ? 0 : 1.4,
+      ease: "power2.inOut",
+      overwrite: true,
+    });
   }, []);
 
   useGSAP(
@@ -44,7 +64,8 @@ export default function HeroClient({
       const section = sectionRef.current;
       const content = contentRef.current;
       const scrollIndicator = scrollIndicatorRef.current;
-      const imageBlock = imageBlockRef.current;
+      const patternEl = patternRef.current;
+      const imageFrameEl = imageFrameRef.current;
 
       if (!section || !content) {
         return;
@@ -53,8 +74,6 @@ export default function HeroClient({
       const eyebrowEl = content.querySelector(`.${styles.eyebrow}`);
       const titleEl = content.querySelector(`.${styles.title}`);
       const subtitleEl = content.querySelector(`.${styles.subtitle}`);
-      const imageFrameEl = imageBlock?.querySelector(`.${styles.imageFrame}`);
-      const patternEl = imageBlock?.querySelector(`.${styles.patternShape}`);
 
       if (!eyebrowEl || !titleEl || !subtitleEl) {
         return;
@@ -137,9 +156,13 @@ export default function HeroClient({
         <p className={styles.eyebrow}>Duis aute irure</p>
 
         <h1 id="hero-title" className={styles.title}>
-The home of active wellness        </h1>
+          The home of active wellness
+        </h1>
 
-        <p className={styles.subtitle}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+        <p className={styles.subtitle}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </p>
       </div>
 
       <a
@@ -153,8 +176,9 @@ The home of active wellness        </h1>
         <span className={styles.scrollText}>Scroll Down</span>
       </a>
 
-      <div ref={imageBlockRef} id="hero-image" className={styles.imageBlock}>
+      <div ref={imageSectionRef} id="hero-image" className={styles.imageSection}>
         <Image
+          ref={patternRef}
           src="/images/hero/pattern.avif"
           alt=""
           aria-hidden="true"
@@ -164,14 +188,14 @@ The home of active wellness        </h1>
           className={styles.patternShape}
         />
 
-        <div className={styles.imageFrame}>
+        <div ref={imageFrameRef} className={styles.imageFrame}>
           <SafeImage
             src={mainImage}
             fallbackSrc={mainImageFallback}
             alt="[Add Movenpick hero image description]"
             fill
             quality={85}
-            sizes="(max-width: 1024px) 88vw, 904px"
+            sizes="(max-width: 1024px) 88vw, 66.667vw"
             className={styles.image}
           />
         </div>

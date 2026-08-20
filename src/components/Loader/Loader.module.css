@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
 
-  background: linear-gradient(180deg, #0d78a6 0%, #073d61 100%);
+  background: var(--color-cream);
 
   will-change: opacity;
 }
@@ -16,11 +16,11 @@
    Logo
 
    350px desktop / 210px mobile (30% smaller than the original
-   500px / 300px). Forced to solid white regardless of whatever
-   colour is baked into the source SVG: brightness(0) flattens
-   all non-transparent pixels to black, invert(1) then flips
-   that to white, so this works correctly no matter what colour
-   the logo file itself actually is.
+   500px / 300px). Rendered as a CSS mask (background-color:
+   currentColor + mask-image) rather than an <img>, so it takes
+   the brand gold regardless of whatever colour is baked into
+   the source SVG — the mask only cares about the shape's alpha
+   channel, same technique used for the header/footer logo.
    ========================================================= */
 
 .logoWrapper {
@@ -28,6 +28,9 @@
 
   width: 350px;
   max-width: 80vw;
+  aspect-ratio: 128 / 45;
+
+  color: var(--color-gold);
 
   will-change: transform, opacity;
 }
@@ -36,9 +39,21 @@
   display: block;
 
   width: 100%;
-  height: auto;
+  height: 100%;
 
-  filter: brightness(0) invert(1);
+  background-color: currentColor;
+
+  -webkit-mask-image: var(--logo-mask-url);
+  mask-image: var(--logo-mask-url);
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-position: center;
+  mask-position: center;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 /* =========================================================

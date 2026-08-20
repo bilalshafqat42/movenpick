@@ -20,8 +20,7 @@
 
   width: 100%;
 
-  padding: clamp(60px, 8vw, 110px) clamp(20px, 5vw, 60px)
-    clamp(40px, 6vw, 70px);
+  padding: clamp(60px, 8vw, 110px) var(--page-gutter) clamp(40px, 6vw, 70px);
 
   text-align: center;
 }

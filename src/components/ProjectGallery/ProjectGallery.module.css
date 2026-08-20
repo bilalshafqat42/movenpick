@@ -97,9 +97,9 @@
 
 .content {
   position: absolute;
-  right: clamp(20px, 5vw, 60px);
+  right: var(--page-gutter);
   bottom: clamp(36px, 6vw, 72px);
-  left: clamp(20px, 5vw, 60px);
+  left: var(--page-gutter);
   z-index: 4;
 
   display: flex;

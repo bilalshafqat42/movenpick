@@ -132,9 +132,7 @@ export default function ProjectOverviewClient({
           className={styles.ctaButton}
         >
           <span>{cta2Label}</span>
-          <span className={styles.ctaIcon} aria-hidden="true">
-            ↓
-          </span>
+          <span className={styles.downloadIcon} aria-hidden="true" />
         </a>
       </div>
     </section>

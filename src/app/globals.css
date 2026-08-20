@@ -12,6 +12,14 @@
   --color-gold-rgb: 137, 118, 85;
   --color-red: #f95331;
   --color-cta-red: #ff4016;
+
+  /*
+   * Standard side padding for every section: 1 column of a 12-column grid
+   * on each side (2/12 total), per the approved design spec. 8.3334vw is
+   * 1/12 of the viewport width; clamped so it never collapses too tight
+   * on small screens or grows excessively wide on large monitors.
+   */
+  --page-gutter: clamp(20px, 8.3334vw, 140px);
 }
 
 *,

@@ -73,7 +73,7 @@ export default async function Home() {
           destinations={locationContent.items}
         />
 
-        <SeaSection />
+        {/* <SeaSection /> */}
 
         <Payment />
 

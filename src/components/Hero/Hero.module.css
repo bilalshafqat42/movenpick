@@ -12,8 +12,7 @@
 
   width: 100%;
 
-  padding: calc(90px + clamp(48px, 6vw, 96px)) clamp(20px, 5vw, 60px)
-    clamp(70px, 9vw, 130px);
+  padding: calc(90px + clamp(48px, 6vw, 96px)) var(--page-gutter) 0;
 
   background: var(--color-cream);
   color: var(--color-gold);
@@ -26,6 +25,9 @@
    ========================================================= */
 
 .content {
+  position: relative;
+  z-index: 1;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,6 +80,9 @@
    ========================================================= */
 
 .scrollIndicator {
+  position: relative;
+  z-index: 1;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -143,14 +148,21 @@
 }
 
 /* =========================================================
-   Decorative shape + framed image
+   Image section — full-bleed, full-height panel holding the
+   pattern and the framed building photo together. The pattern
+   is scoped to this panel only, never behind the text above it.
    ========================================================= */
 
-.imageBlock {
+.imageSection {
   position: relative;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 100vw;
-  height: 780px;
+  min-height: 100vh;
+  min-height: 100svh;
 
   margin-top: clamp(50px, 7vw, 100px);
   margin-right: calc(50% - 50vw);
@@ -158,24 +170,28 @@
 }
 
 .patternShape {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
   object-fit: cover;
 
   pointer-events: none;
   user-select: none;
 }
 
+/* =========================================================
+   Framed image — 8 of the page's 12 columns wide.
+   ========================================================= */
+
 .imageFrame {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: relative;
   z-index: 1;
 
-  width: 904px;
-  height: 624px;
+  width: min(66.667vw, 1100px);
+  aspect-ratio: 904 / 624;
 
   overflow: hidden;
-
-  transform: translate(-50%, -50%);
 }
 
 .image {
@@ -192,14 +208,8 @@
     max-width: 560px;
   }
 
-  .imageBlock {
-    height: 620px;
-  }
-
   .imageFrame {
-    width: min(680px, 74%);
-    height: auto;
-    aspect-ratio: 904 / 624;
+    width: min(74vw, 680px);
   }
 }
 
@@ -209,7 +219,7 @@
 
 @media (max-width: 767px) {
   .hero {
-    padding: calc(90px + 36px) 18px 64px;
+    padding: calc(90px + 36px) var(--page-gutter) 0;
   }
 
   .eyebrow {
@@ -224,14 +234,13 @@
     font-size: 14px;
   }
 
-  .imageBlock {
-    height: 420px;
+  .imageSection {
+    min-height: 70vh;
+    min-height: 70svh;
   }
 
   .imageFrame {
-    width: 88%;
-    height: auto;
-    aspect-ratio: 904 / 624;
+    width: 88vw;
   }
 }
 
@@ -242,7 +251,7 @@
 @media (prefers-reduced-motion: reduce) {
   .content > *,
   .scrollIndicator,
-  .imageBlock {
+  .imageFrame {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
