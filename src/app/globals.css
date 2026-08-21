@@ -48,12 +48,17 @@ body {
 }
 
 /*
- * "proximity" (not "mandatory") is what keeps this scoped: the browser
- * only snaps to elements that opt in with scroll-snap-align, and even
- * then only when a scroll gesture naturally comes to rest near one. No
- * other section declares scroll-snap-align, so this has no effect on
- * them — it only engages around Amenities' pinned scroll journey (see
- * Amenities.module.css and ProjectGallery.module.css).
+ * Section thresholds — a scroll gesture comes to rest at a section
+ * boundary rather than half way through one.
+ *
+ * "proximity", not "mandatory". Mandatory would force a snap after
+ * EVERY gesture, and two sections here are deliberately several
+ * viewports tall (Amenities' four-stage journey, Project Gallery's
+ * horizontal one). Forcing a snap inside those would fight the scroll
+ * that drives them and can leave a visitor unable to stop where they
+ * want. Proximity only engages when a gesture already comes to rest
+ * near a boundary, which is the "threshold" behaviour without the
+ * hijacking.
  */
 html {
   scroll-snap-type: y proximity;
@@ -62,6 +67,43 @@ html {
      fully below it, not partially hidden underneath. */
   scroll-padding-top: 90px;
 }
+
+/*
+ * The snap targets, listed here rather than scattered across each
+ * section's own module: which sections act as thresholds is a
+ * page-level decision, and one list is far easier to reason about than
+ * seven separate declarations.
+ *
+ * Two sections are deliberately absent because they own their own snap
+ * points already, placed on their inner scroll wrappers so the anchor
+ * stays still while their journeys play: Amenities
+ * (.stageWrapper) and Project Gallery (.scrollWrapper).
+ */
+#project-overview,
+#trusted-partner,
+#gallery,
+#location-map,
+#payment-plan,
+#contact {
+  scroll-snap-align: start;
+}
+
+/*
+ * The hero deliberately has NO snap point.
+ *
+ * It was given one (`end` on #hero-image, so a rest would land the
+ * panel's bottom edge on the viewport's) and it wrecked the section.
+ * Scroll Down animates the scroll position with GSAP frame by frame,
+ * and the browser re-snapped after each of those frames, so the tween
+ * and the snap took turns dragging the page: measured 276px of scroll
+ * movement in a single frame against 12px with no snap point, and the
+ * frame's growth animation stuttered with it.
+ *
+ * Nothing is lost by leaving it out. Scroll Down already lands exactly
+ * on that composition, and the frame's growth is scrubbed across the
+ * same range, so free scrolling through it is the point — a snap point
+ * mid-animation works against the animation.
+ */
 
 .font-heading {
   font-family: var(--font-heading);

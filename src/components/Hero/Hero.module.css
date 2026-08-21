@@ -181,17 +181,38 @@
 }
 
 /* =========================================================
-   Framed image — 8 of the page's 12 columns wide.
+   Framed image — 10 of the page's 12 columns wide.
+
+   This is the size the photo ENDS at. On desktop HeroClient holds it
+   at 8/10 of this until the panel is fully in view and releases it to
+   full size as the panel arrives, so the growth is a released
+   down-scale rather than a stretch past 1: the photo is rasterised at
+   the size it finishes at and sharpens into place instead of being
+   blown up from an 8-column raster. Reserving the finished size in
+   layout from the start also means the panel's height never shifts
+   mid-growth.
    ========================================================= */
 
 .imageFrame {
   position: relative;
   z-index: 1;
 
-  width: min(66.667vw, 1100px);
+  /*
+   * 83.333vw is 10 of 12 columns; 1375px is the old 1100px cap scaled
+   * by the same 10/8. The third term is a guard for short, wide
+   * screens: at 10 columns the frame is tall enough to outgrow a
+   * 100svh panel somewhere around a 1920x900 window, and this caps the
+   * width by the height available instead (904/624 is the aspect ratio
+   * below, so this converts a height budget into a width). It is
+   * inactive at ordinary desktop proportions.
+   */
+  width: min(83.333vw, 1375px, calc((100svh - 64px) * 904 / 624));
   aspect-ratio: 904 / 624;
 
   overflow: hidden;
+
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .image {

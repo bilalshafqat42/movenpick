@@ -152,6 +152,30 @@ export default function ProjectGalleryClient({ slides }) {
           scrub: 0.7,
           invalidateOnRefresh: true,
 
+          /*
+           * One gesture, one whole slide - never resting half way
+           * between two photos.
+           *
+           * snapTo lands progress on 0, 0.5, 1 for three slides, which
+           * are exactly the positions where a slide fills the viewport.
+           * `directional` is what makes a single flick advance rather
+           * than fall back: the snap resolves in the direction the
+           * visitor was already scrolling, so even a short scroll down
+           * commits to the next slide instead of settling back onto the
+           * one they were leaving.
+           *
+           * The delay is deliberately short. It is the pause after
+           * scrolling stops before the snap takes over, and anything
+           * longer reads as the page hesitating.
+           */
+          snap: {
+            snapTo: 1 / (slideCount - 1),
+            duration: { min: 0.25, max: 0.6 },
+            delay: 0.06,
+            ease: "power2.inOut",
+            directional: true,
+          },
+
           onUpdate: (self) => {
             positionTrackFill(self.progress);
             setActive(Math.round(self.progress * (slideCount - 1)));
