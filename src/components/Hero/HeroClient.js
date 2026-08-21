@@ -15,22 +15,20 @@ import {
 import styles from "./Hero.module.css";
 
 /*
- * The framed photo grows from 8 of the page's 12 columns to 10 as its
- * panel arrives on screen.
+ * The framed photo grows from its framed size to the full width and
+ * height of its panel as that panel arrives on screen: it starts as a
+ * picture sitting on the pattern and ends as the whole section.
  *
- * Held at 8/10 of the finished size and released to 1, rather than
- * animating `width` from one column count to the other. Animating width
- * would reflow a 1200px-wide image and its panel on every scroll frame,
- * and it would upscale a raster captured at the 8-column size on the way
- * up. See the .imageFrame comment in Hero.module.css - the CSS width is
- * the 10-column size, so scale 1 IS 10 columns.
+ * width and height, not scale. Scale cannot get from a 904:624 frame to
+ * the screen's own proportions without stretching the building, and the
+ * photo is the subject — a non-uniform scale would distort it on every
+ * frame of the way up. Sizing the box instead lets object-fit: cover
+ * reframe the photograph at each step, which is what keeps it
+ * undistorted.
  *
  * Desktop only: tablet and mobile have their own frame widths and are
  * short enough that the panel arrives all at once anyway.
  */
-const FRAME_COLUMNS_FROM = 8;
-const FRAME_COLUMNS_TO = 10;
-const FRAME_START_SCALE = FRAME_COLUMNS_FROM / FRAME_COLUMNS_TO;
 
 /*
  * Where the image panel comes to rest: the scroll position that puts
@@ -308,20 +306,52 @@ export default function HeroClient({
 
           /*
            * Below 1025px the frame has its own width (see
-           * Hero.module.css), and reduced motion gets the finished
-           * 10-column size with no growth at all.
+           * Hero.module.css), and reduced motion gets the framed size
+           * with no growth at all.
            */
           if (!desktop || reduceMotion) {
-            gsap.set(imageFrameEl, { clearProps: "scale" });
+            gsap.set(imageFrameEl, { clearProps: "width,height" });
 
             return undefined;
           }
 
+          /*
+           * The framed size is read from the CSS rather than restated
+           * here, so the two cannot drift: the inline width and height
+           * this tween writes are cleared first, which drops the
+           * element back to the rule in Hero.module.css, and then it is
+           * measured.
+           *
+           * Re-run on every refresh, before ScrollTrigger evaluates the
+           * function-based values below, so a resized window is
+           * measured again instead of animating from a size that
+           * belonged to the old viewport.
+           */
+          const restingSize = { width: 0, height: 0 };
+
+          const measureRestingSize = () => {
+            gsap.set(imageFrameEl, { clearProps: "width,height" });
+
+            restingSize.width = imageFrameEl.offsetWidth;
+            restingSize.height = imageFrameEl.offsetHeight;
+          };
+
+          measureRestingSize();
+
           const growth = gsap.fromTo(
             imageFrameEl,
-            { scale: FRAME_START_SCALE },
             {
-              scale: 1,
+              width: () => restingSize.width,
+              height: () => restingSize.height,
+            },
+            {
+              /*
+               * The panel's own box, so the photo finishes as the
+               * section rather than at a number that happens to match
+               * it today.
+               */
+              width: () => imageSection.clientWidth,
+              height: () => imageSection.clientHeight,
 
               /*
                * Linear, with the smoothing left to scrub. An ease here
@@ -335,9 +365,9 @@ export default function HeroClient({
                 trigger: section,
 
                 /*
-                 * Ranged over exactly the Scroll Down journey: 8 columns
-                 * at the page's own resting position, 10 columns at the
-                 * point where the panel's bottom edge meets the
+                 * Ranged over exactly the Scroll Down journey: framed
+                 * at the page's own resting position, filling the panel
+                 * at the point where the panel's bottom edge meets the
                  * viewport's.
                  *
                  * Anchored to the hero section rather than the panel
@@ -345,11 +375,12 @@ export default function HeroClient({
                  * load. Triggering on the panel's own top edge crossing
                  * the viewport bottom would put progress at about a
                  * third before the visitor had touched anything, so the
-                 * sliver they first see would already be 8.7 columns
-                 * instead of 8.
+                 * sliver they first see would already be part-grown.
                  */
                 start: "top top",
                 end: () => `+=${Math.max(1, panelRestScrollY(imageSection))}`,
+
+                onRefreshInit: measureRestingSize,
 
                 /*
                  * A little weight, so the frame glides to the scroll
@@ -439,7 +470,7 @@ export default function HeroClient({
             alt="[Add Movenpick hero image description]"
             fill
             quality={85}
-            sizes="(max-width: 767px) 88vw, (max-width: 1024px) 74vw, 83.333vw"
+            sizes="(max-width: 767px) 88vw, (max-width: 1024px) 74vw, 100vw"
             className={styles.image}
           />
         </div>

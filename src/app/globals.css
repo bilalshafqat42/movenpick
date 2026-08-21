@@ -125,21 +125,34 @@ html {
 }
 
 /*
- * The hero deliberately has NO snap point on desktop.
+ * The hero's photo panel snaps on desktop, at the position where it
+ * fills the screen — which is also where its growth finishes and where
+ * Scroll Down lands, so all three agree on one resting composition.
  *
- * It was given one (`end` on #hero-image, so a rest would land the
- * panel's bottom edge on the viewport's) and it wrecked the section.
- * Scroll Down animates the scroll position with GSAP frame by frame,
- * and the browser re-snapped after each of those frames, so the tween
- * and the snap took turns dragging the page: measured 276px of scroll
- * movement in a single frame against 12px with no snap point, and the
- * frame's growth animation stuttered with it.
+ * The negative scroll-margin cancels the scroll-padding above. That
+ * padding keeps an ordinary section clear of the fixed header, but this
+ * panel is full-bleed and the header is meant to float over it; without
+ * the cancellation it would rest 90px short of covering the screen.
  *
- * Nothing is lost by leaving it out. Scroll Down already lands exactly
- * on that composition, and the frame's growth is scrubbed across the
- * same range, so free scrolling through it is the point — a snap point
- * mid-animation works against the animation.
+ * This section carried a warning for a while that it must NOT have a
+ * snap point, after an earlier attempt wrecked it: Scroll Down animates
+ * the scroll position with GSAP frame by frame, the browser re-snapped
+ * after each of those frames, and the two took turns dragging the page
+ * — 276px of movement in a single frame against 12px without it. That
+ * cause is gone. The button's handler now suspends snapping for the
+ * duration of its tween and restores it on completion and on interrupt
+ * (see revealImage in HeroClient), so there is nothing left to fight.
+ * If this section ever stutters again, that suspension is the first
+ * thing to check.
  */
+
+@media (min-width: 1025px) {
+  #hero-image {
+    scroll-snap-align: start;
+    scroll-margin-top: calc(-1 * var(--header-height, 90px));
+  }
+}
+
 
 .font-heading {
   font-family: var(--font-heading);

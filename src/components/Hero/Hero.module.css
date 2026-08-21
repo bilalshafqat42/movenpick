@@ -196,14 +196,13 @@
 /* =========================================================
    Framed image — 10 of the page's 12 columns wide.
 
-   This is the size the photo ENDS at. On desktop HeroClient holds it
-   at 8/10 of this until the panel is fully in view and releases it to
-   full size as the panel arrives, so the growth is a released
-   down-scale rather than a stretch past 1: the photo is rasterised at
-   the size it finishes at and sharpens into place instead of being
-   blown up from an 8-column raster. Reserving the finished size in
-   layout from the start also means the panel's height never shifts
-   mid-growth.
+   On desktop this is the size the photo STARTS at, not the size it
+   ends at: HeroClient grows it from here to the full width and height
+   of its panel as the panel arrives, so the pattern around it is
+   gradually covered until the photograph is the whole section. The
+   growth reads this rule for its starting size rather than restating
+   it, so there is one definition of "framed".
+
    ========================================================= */
 
 .imageFrame {
