@@ -350,7 +350,15 @@
 
   overflow: hidden;
 
-  will-change: mask-image;
+  /*
+   * Deliberately no `will-change: mask-image`.
+   *
+   * will-change only helps properties the compositor can animate on its
+   * own, and mask-image is not one of them — every change still costs a
+   * repaint. All the hint bought was four permanently promoted
+   * full-size layers, one per item, each holding its own texture for
+   * the whole life of the page.
+   */
 }
 
 .image {
