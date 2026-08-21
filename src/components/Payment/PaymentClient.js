@@ -22,6 +22,7 @@ export default function PaymentClient({
   const imagePanelRef = useRef(null);
   const imageLayerRef = useRef(null);
   const tableRef = useRef(null);
+  const tableHeaderRef = useRef(null);
 
   useGSAP(
     () => {
@@ -31,6 +32,7 @@ export default function PaymentClient({
       const imagePanel = imagePanelRef.current;
       const imageLayer = imageLayerRef.current;
       const table = tableRef.current;
+      const tableHeader = tableHeaderRef.current;
 
       if (
         !section ||
@@ -38,7 +40,8 @@ export default function PaymentClient({
         !textEl ||
         !imagePanel ||
         !imageLayer ||
-        !table
+        !table ||
+        !tableHeader
       ) {
         return;
       }
@@ -48,7 +51,11 @@ export default function PaymentClient({
       ).matches;
 
       if (reduceMotion) {
-        gsap.set([headingEl, textEl, table], { autoAlpha: 1, y: 0 });
+        gsap.set([headingEl, textEl, tableHeader, table], {
+          autoAlpha: 1,
+          y: 0,
+        });
+        gsap.set(table.querySelectorAll(`.${styles.rowRule}`), { scaleX: 1 });
         clearVenetianMask(imagePanel);
         gsap.set(imageLayer, { clearProps: "transform" });
 
@@ -130,11 +137,28 @@ export default function PaymentClient({
       });
 
       /*
-       * Milestone rows, staggered in once the table scrolls into view.
+       * The milestone list arrives one beat at a time, alternating
+       * between a milestone and the rule beneath it: the column
+       * headings, then Booking, then Booking's rule, then the first
+       * instalment, then its rule, and so on down the list.
+       *
+       * Beats are placed on an explicit clock rather than chained end to
+       * end. Strictly sequential, each waiting for the last to finish,
+       * the fifteen beats would take over seven seconds to play out;
+       * starting each one BEAT_STEP after the previous started keeps it
+       * legibly one-at-a-time while landing in about two.
        */
       const rows = Array.from(table.children);
+      const rules = rows.map((row) =>
+        row.querySelector(`.${styles.rowRule}`),
+      );
 
+      const BEAT_STEP = ENTRANCE_STAGGER * 0.8;
+      const BEAT_DURATION = ENTRANCE_DURATION * 0.55;
+
+      gsap.set(tableHeader, { autoAlpha: 0, y: 12 });
       gsap.set(rows, { autoAlpha: 0, y: 18 });
+      gsap.set(rules.filter(Boolean), { scaleX: 0 });
 
       const rowsTrigger = ScrollTrigger.create({
         trigger: table,
@@ -142,12 +166,25 @@ export default function PaymentClient({
         once: true,
 
         onEnter: () => {
-          gsap.to(rows, {
-            autoAlpha: 1,
-            y: 0,
-            duration: ENTRANCE_DURATION,
-            stagger: ENTRANCE_STAGGER * 0.6,
-            ease: ENTRANCE_EASE,
+          const timeline = gsap.timeline({
+            defaults: { duration: BEAT_DURATION, ease: ENTRANCE_EASE },
+          });
+
+          let at = 0;
+
+          timeline.to(tableHeader, { autoAlpha: 1, y: 0 }, at);
+          at += BEAT_STEP;
+
+          rows.forEach((row, index) => {
+            timeline.to(row, { autoAlpha: 1, y: 0 }, at);
+            at += BEAT_STEP;
+
+            const rule = rules[index];
+
+            if (rule) {
+              timeline.to(rule, { scaleX: 1 }, at);
+              at += BEAT_STEP;
+            }
           });
         },
       });
@@ -194,7 +231,7 @@ export default function PaymentClient({
         </div>
 
         <div className={styles.tablePanel}>
-          <div className={styles.tableHeader}>
+          <div ref={tableHeaderRef} className={styles.tableHeader}>
             <span>Milestone</span>
             <span>%</span>
           </div>
@@ -208,6 +245,15 @@ export default function PaymentClient({
                 </div>
 
                 <p className={styles.rowSublabel}>{milestone.sublabel}</p>
+
+                {/*
+                  * Omitted on the last milestone: the rule separates one
+                  * from the next, so there is nothing for it to separate
+                  * after the final one.
+                  */}
+                {index < milestones.length - 1 ? (
+                  <span className={styles.rowRule} aria-hidden="true" />
+                ) : null}
               </div>
             ))}
           </div>

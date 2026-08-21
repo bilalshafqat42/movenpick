@@ -32,6 +32,15 @@
    * on small screens or grows excessively wide on large monitors.
    */
   --page-gutter: clamp(20px, 8.3334vw, 140px);
+
+  /*
+   * The fixed header's height. It is currently also written literally
+   * in Header.module.css, in Amenities' sticky offset, and in the
+   * scroll-padding below — worth pointing those at this name next time
+   * one of them is touched, so a change to the header does not have to
+   * be chased through four files.
+   */
+  --header-height: 90px;
 }
 
 *,
