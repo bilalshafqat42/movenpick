@@ -5,27 +5,8 @@ import { useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Amenities.module.css";
-
-/*
- * Each item's photo wipes open from a different edge — matching the
- * approved design spec (item 1 right-to-left, item 2 top-to-bottom,
- * item 3 left-to-right, item 4 top-to-bottom). Expressed as the
- * clip-path inset() an item's image starts fully hidden at, since it
- * always animates to inset(0% 0% 0% 0%) (fully revealed) from there —
- * the hidden edge is simply the one the reveal grows outward from.
- */
-const WIPE_START_CLIP_PATHS = [
-  "inset(0% 0% 0% 100%)", // right to left
-  "inset(0% 0% 100% 0%)", // top to bottom
-  "inset(0% 100% 0% 0%)", // left to right
-  "inset(0% 0% 100% 0%)", // top to bottom
-];
-const WIPE_END_CLIP_PATH = "inset(0% 0% 0% 0%)";
-
-function wipeStartClipPath(index) {
-  return WIPE_START_CLIP_PATHS[index % WIPE_START_CLIP_PATHS.length];
-}
 
 export default function AmenitiesClient({ heading, introText, items, ctaLabel }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -51,10 +32,11 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
    * what made the transition feel janky rather than smooth. Keeping
    * all four mounted and simply re-ordering/animating their clip-paths
    * fixes both: the previous photo stays put underneath, so the new
-   * one visibly wipes over it, and nothing ever re-loads.
+   * one visibly opens over it, and nothing ever re-loads.
    */
   const imageLayersRef = useRef([]);
   const layerZIndexRef = useRef(0);
+  const layerBlindRef = useRef([]);
 
   const isFirstSwapRef = useRef(true);
   const activeIndexRef = useRef(0);
@@ -97,9 +79,20 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
             context.conditions ?? {};
 
           if (reduceMotion) {
-            gsap.set(imagePanel, { clipPath: "none" });
+            clearVenetianMask(imagePanel);
             gsap.set(imageLayer, { clearProps: "transform" });
             gsap.set(contentReveal, { autoAlpha: 1, y: 0 });
+
+            imageLayersRef.current.forEach((layer, index) => {
+              if (!layer) return;
+
+              clearVenetianMask(layer);
+              gsap.set(layer, {
+                zIndex: index === 0 ? imageLayersRef.current.length : index,
+              });
+            });
+
+            layerZIndexRef.current = imageLayersRef.current.length;
 
             return;
           }
@@ -131,13 +124,14 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
           });
 
           /*
-           * Image: right-to-left clip-path wipe scrubbed to scroll
-           * position, same technique as the Payment section's photo.
-           * This is the FIRST reveal only — the pinned, stage-by-stage
-           * journey below is a separate, later scroll range. It wipes
-           * .imagePanel itself (revealing whichever item layer is on
-           * top — item 0 — beneath it); the item layers' own clip-paths
-           * below are for swapping between items, not this entrance.
+           * Image: venetian blind reveal (see @/lib/venetianMask)
+           * scrubbed to scroll position, the same move the Payment
+           * section's photo makes. This is the FIRST reveal only — the
+           * pinned, stage-by-stage journey below is a separate, later
+           * scroll range. It masks .imagePanel itself (revealing
+           * whichever item layer is on top — item 0 — beneath it); the
+           * item layers' own clip-paths below are for swapping between
+           * items, not this entrance.
            */
           const layers = imageLayersRef.current;
 
@@ -145,16 +139,24 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
             if (!layer) return;
 
             gsap.set(layer, {
-              clipPath: index === 0 ? WIPE_END_CLIP_PATH : wipeStartClipPath(index),
               zIndex: index === 0 ? layers.length : index,
             });
+
+            /*
+             * Item 0 is what the panel's own entrance blind reveals,
+             * so it sits open underneath. The rest wait fully closed
+             * for their turn in the pinned journey.
+             */
+            if (index === 0) {
+              clearVenetianMask(layer);
+            } else {
+              applyVenetianMask(layer, 0);
+            }
           });
 
           layerZIndexRef.current = layers.length;
 
-          gsap.set(imagePanel, {
-            clipPath: wipeStartClipPath(0),
-          });
+          applyVenetianMask(imagePanel, 0);
 
           gsap.set(imageLayer, {
             scale: mobile ? 1.035 : 1.055,
@@ -167,15 +169,42 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
 
             scrollTrigger: {
               trigger: section,
-              start: "top bottom",
-              end: "top top",
+              /*
+               * Ranged against when the PHOTO is on screen, not when
+               * the section is.
+               *
+               * .imagePanel is absolutely positioned well below the
+               * section's own top edge, so the original "top bottom"
+               * to "top top" window was almost entirely spent while
+               * the photo was still below the fold. The blind was
+               * already a fifth open before any of it was visible and
+               * finished as the panel settled, so all a visitor saw
+               * was the tail. Starting at "top 62%" puts progress 0
+               * at the moment the panel's top edge reaches the
+               * viewport bottom, and "top -20%" lands the last slat
+               * just before the pinned stage journey below takes
+               * over - roughly a full viewport height of scroll to
+               * play out across, the same as Payment's.
+               */
+              start: "top 62%",
+              end: "top -20%",
               scrub: mobile ? 0.55 : 0.8,
               invalidateOnRefresh: true,
             },
           });
 
+          const blind = { progress: 0 };
+
           imageTimeline
-            .to(imagePanel, { clipPath: WIPE_END_CLIP_PATH, duration: 1 }, 0)
+            .to(
+              blind,
+              {
+                progress: 1,
+                duration: 1,
+                onUpdate: () => applyVenetianMask(imagePanel, blind.progress),
+              },
+              0,
+            )
             .to(imageLayer, { scale: 1, xPercent: 0, duration: 1 }, 0);
 
           let stageTrigger;
@@ -259,9 +288,12 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
   );
 
   /*
-   * Swapping the active item: a separate animation from the entrance
-   * above, driven by the pinned scroll journey on desktop (or by
-   * hover/focus/click as a fallback everywhere the pin is disabled).
+   * Swapping the active item: the same venetian blind the panel's
+   * entrance uses (see @/lib/venetianMask), but played over a fixed
+   * duration rather than scrubbed, since a swap is a discrete event
+   * rather than a scroll range. Driven by the pinned scroll journey on
+   * desktop, or by hover/focus/click as a fallback everywhere the pin
+   * is disabled.
    * Skipped only on this component's very first render — every change
    * after that runs it, regardless of whether the entrance timeline
    * above has fired yet. (An earlier version gated this on the entrance
@@ -296,13 +328,20 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
       gsap.set(layer, { zIndex: layerZIndexRef.current });
 
       if (reduceMotion) {
-        gsap.set([description, layer], { autoAlpha: 1, clipPath: "none" });
+        gsap.set([description, layer], { autoAlpha: 1 });
+        clearVenetianMask(layer);
 
         return;
       }
 
+      if (!layerBlindRef.current[activeIndex]) {
+        layerBlindRef.current[activeIndex] = { progress: 0 };
+      }
+
+      const blind = layerBlindRef.current[activeIndex];
+
       gsap.set(description, { autoAlpha: 0, y: 16 });
-      gsap.set(layer, { clipPath: wipeStartClipPath(activeIndex) });
+      applyVenetianMask(layer, 0);
 
       gsap.to(description, {
         autoAlpha: 1,
@@ -311,12 +350,24 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
         ease: ENTRANCE_EASE,
       });
 
-      gsap.to(layer, {
-        clipPath: WIPE_END_CLIP_PATH,
-        duration: ENTRANCE_DURATION,
-        ease: ENTRANCE_EASE,
-        overwrite: "auto",
-      });
+      gsap.fromTo(
+        blind,
+        { progress: 0 },
+        {
+          progress: 1,
+          duration: ENTRANCE_DURATION,
+          /*
+           * Linear, unlike the text beside it. The blind's 30 slats
+           * are already staggered across progress, so an eased
+           * progress would bunch most of them into the opening
+           * moments and leave the last few crawling. Even progress is
+           * what makes it read as a blind rather than a smear.
+           */
+          ease: "none",
+          overwrite: true,
+          onUpdate: () => applyVenetianMask(layer, blind.progress),
+        },
+      );
     },
     { scope: sectionRef, dependencies: [activeIndex] },
   );

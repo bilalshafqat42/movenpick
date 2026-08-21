@@ -1,8 +1,14 @@
 /*
- * Field definitions for the Project Gallery — a full-bleed, auto-advancing,
- * drag-to-navigate slideshow. Like Amenities and Gallery, the slide count
- * is fixed (the autoplay/loop math depends on a stable count); the admin
- * can edit each slide's photo and caption but not add or remove slides.
+ * Field definitions for the Project Gallery — a full-bleed sequence the
+ * visitor scrolls through horizontally. Like Amenities and Gallery, the
+ * slide count here is fixed; the admin can edit each slide's photo and
+ * caption but not add or remove slides.
+ *
+ * Note that only the first SCROLL_SLIDE_COUNT of these appear on the
+ * page (see ProjectGalleryClient) — the horizontal journey is
+ * deliberately capped so it does not hold the visitor in place for a
+ * viewport height per slide. The rest stay defined and editable here so
+ * raising that cap needs no content work.
  */
 const SLIDES = [
   {

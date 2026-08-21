@@ -5,63 +5,8 @@ import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Payment.module.css";
-
-/*
- * Venetian blind reveal: 30 horizontal bands, each with its own
- * "slat" — a hard-edged stripe centred in the band that starts as a
- * hairline and widens to fill the band's full 3.3333% (100/30)
- * height. Bands stagger their start bottom-to-top, so the blind reads
- * as opening upward as the visitor scrolls, rather than every slat
- * opening in lockstep. Built as a plain mask-image string recomputed
- * every scroll frame from `progress` (0-1) — no GSAP tween/duration
- * involved, so it's pinned exactly to scroll position rather than
- * timed.
- */
-const VENETIAN_BAND_COUNT = 30;
-const VENETIAN_BAND_HEIGHT = 100 / VENETIAN_BAND_COUNT;
-const VENETIAN_WINDOW = 0.3;
-const VENETIAN_SPREAD = 1 - VENETIAN_WINDOW;
-
-function buildVenetianMask(progress) {
-  const stops = [];
-
-  for (let i = 0; i < VENETIAN_BAND_COUNT; i += 1) {
-    const bandStart = (i / (VENETIAN_BAND_COUNT - 1)) * VENETIAN_SPREAD;
-    const local = Math.min(
-      1,
-      Math.max(0, (progress - bandStart) / VENETIAN_WINDOW),
-    );
-
-    const bandBottom = i * VENETIAN_BAND_HEIGHT;
-    const bandTop = bandBottom + VENETIAN_BAND_HEIGHT;
-    const bandCenter = bandBottom + VENETIAN_BAND_HEIGHT / 2;
-    const half = (local * VENETIAN_BAND_HEIGHT) / 2;
-    const revealBottom = bandCenter - half;
-    const revealTop = bandCenter + half;
-
-    /*
-     * White, not black, for the "revealed" stops: mask-image defaults
-     * to luminance mode in modern spec-compliant browsers (mask value
-     * = luminance × alpha), and black has zero luminance — so black
-     * reads as fully MASKED OUT there, not revealed, leaving only
-     * anti-aliased slivers at the hard-stop edges visible. White has
-     * full luminance, so it reads as revealed under luminance mode,
-     * and under the older alpha-only mode it's still fully opaque
-     * (alpha 1) either way — correct under both.
-     */
-    stops.push(
-      `transparent ${bandBottom}%`,
-      `transparent ${revealBottom}%`,
-      `white ${revealBottom}%`,
-      `white ${revealTop}%`,
-      `transparent ${revealTop}%`,
-      `transparent ${bandTop}%`,
-    );
-  }
-
-  return `linear-gradient(0deg, ${stops.join(", ")})`;
-}
 
 export default function PaymentClient({
   heading,
@@ -104,8 +49,7 @@ export default function PaymentClient({
 
       if (reduceMotion) {
         gsap.set([headingEl, textEl, table], { autoAlpha: 1, y: 0 });
-        imagePanel.style.maskImage = "none";
-        imagePanel.style.webkitMaskImage = "none";
+        clearVenetianMask(imagePanel);
         gsap.set(imageLayer, { clearProps: "transform" });
 
         return;
@@ -135,7 +79,7 @@ export default function PaymentClient({
       });
 
       /*
-       * Photo: venetian blind reveal (see buildVenetianMask above),
+       * Photo: venetian blind reveal (see @/lib/venetianMask),
        * driven directly by scroll progress rather than a GSAP tween —
        * the mask-image is recomputed every scroll frame, so it's
        * pinned exactly to scroll position instead of playing out over
@@ -146,20 +90,13 @@ export default function PaymentClient({
       const layerStartScale = mobile ? 1.035 : 1.055;
       const layerStartXPercent = mobile ? 2 : 4;
 
-      const applyVenetianMask = (progress) => {
-        const mask = buildVenetianMask(progress);
-
-        imagePanel.style.maskImage = mask;
-        imagePanel.style.webkitMaskImage = mask;
-      };
-
       gsap.set(imageLayer, {
         scale: layerStartScale,
         xPercent: layerStartXPercent,
         transformOrigin: "center center",
       });
 
-      applyVenetianMask(0);
+      applyVenetianMask(imagePanel, 0);
 
       const imageTrigger = ScrollTrigger.create({
         trigger: section,
@@ -179,7 +116,7 @@ export default function PaymentClient({
         invalidateOnRefresh: true,
 
         onUpdate: (self) => {
-          applyVenetianMask(self.progress);
+          applyVenetianMask(imagePanel, self.progress);
 
           gsap.set(imageLayer, {
             scale: gsap.utils.interpolate(layerStartScale, 1, self.progress),

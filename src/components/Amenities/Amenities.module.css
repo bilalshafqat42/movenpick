@@ -337,12 +337,12 @@
 
 /*
  * One of these per item, all stacked in the same box — separate from
- * .imagePanel above them (whose own clip-path is reserved for the
- * scroll-scrubbed entrance wipe). AmenitiesClient keeps every item's
- * layer mounted permanently and animates only the active one's
- * clip-path + stacking order, so the previous photo stays visible
- * underneath as the new one wipes over it instead of the page
- * background showing through.
+ * .imagePanel above them (whose own mask-image drives the
+ * scroll-scrubbed entrance). AmenitiesClient keeps every item's layer
+ * mounted permanently and animates only the active one's mask-image +
+ * stacking order, so the previous photo stays visible underneath as
+ * the new one opens over it instead of the page background showing
+ * through.
  */
 .imageWipe {
   position: absolute;
@@ -350,7 +350,7 @@
 
   overflow: hidden;
 
-  will-change: clip-path;
+  will-change: mask-image;
 }
 
 .image {
