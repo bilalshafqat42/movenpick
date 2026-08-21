@@ -11,6 +11,21 @@ const DRAG_DISTANCE_THRESHOLD = 64;
 const DRAG_VELOCITY_THRESHOLD = 0.45;
 const DRAG_RESISTANCE = 0.72;
 
+/*
+ * The centre photo's own proportions (900 x 600) and the side cards'
+ * (210 x 446), as ratios rather than as the pixel pairs they are
+ * derived from, so the geometry below can be driven from either
+ * dimension.
+ */
+const CENTRE_ASPECT = 900 / 600;
+const SIDE_ASPECT = 446 / 210;
+
+/*
+ * Floor on the centre photo, so an unusually short window shrinks the
+ * composition rather than collapsing it to a letterbox.
+ */
+const MIN_CENTRE_HEIGHT = 300;
+
 const getLoopedIndex = (index) => {
   return (index + GALLERY_ITEM_COUNT) % GALLERY_ITEM_COUNT;
 };
@@ -56,12 +71,27 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
    * image can render, so a real element positioned under the pointer is
    * the only way to show this icon at full size in every browser.
    *
-   * Visibility is driven by a global pointermove listener checked against
-   * the carousel's bounding box, rather than onMouseEnter/onMouseLeave on
-   * the carousel itself — this carousel calls setPointerCapture during a
-   * drag (see handlePointerDown below), and a captured pointer can leave
-   * the visible area without ever firing mouseleave, which would leave
-   * the icon stuck on screen after a drag ends outside the carousel.
+   * Visibility is decided by testing the pointer's position against the
+   * PHOTOGRAPHS, not against the carousel's box. The icon invites a
+   * drag, and only the photos are draggable — over the cream space
+   * around them, or the caption beneath, the ordinary arrow is the
+   * honest cursor.
+   *
+   * Tested by hit-testing each visible card's image rather than by
+   * onMouseEnter/onMouseLeave on them — this carousel calls
+   * setPointerCapture during a drag (see handlePointerDown below), and a
+   * captured pointer can leave the visible area without ever firing
+   * mouseleave, which would leave the icon stuck on screen after a drag
+   * ends elsewhere.
+   *
+   * The crucial part is WHEN that test runs. It used to run only on
+   * pointermove, which meant the pointer had to move for anything to
+   * change — and scrolling does not move the pointer. Scrolling the
+   * carousel up under a stationary pointer left the icon hidden until
+   * the mouse was jiggled or clicked, and scrolling the carousel away
+   * left the icon stranded on screen over the rest of the page. So the
+   * same test also runs whenever the page scrolls or resizes, against
+   * the last position the pointer was seen at.
    */
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -82,22 +112,73 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
 
     let wasInside = false;
 
-    const handlePointerMove = (event) => {
-      const carousel = carouselRef.current;
+    /*
+     * Where the pointer was last seen. Needed because a scroll has to be
+     * judged against a position it cannot itself report.
+     */
+    let pointerX = 0;
+    let pointerY = 0;
+    let pointerKnown = false;
 
-      if (!carousel || event.pointerType !== "mouse") {
+    /*
+     * True while the pointer is over one of the photographs on screen.
+     *
+     * Only the cards at centre/left/right are on screen — the rest are
+     * parked at data-position="hidden" — and it is the image wrapper
+     * that is tested, not the card, because a card's box also contains
+     * the caption below the photo.
+     */
+    const isOverAPhoto = () => {
+      const cards = cardRefs.current;
+
+      for (let index = 0; index < cards.length; index += 1) {
+        const card = cards[index];
+
+        if (!card || card.dataset.position === "hidden") {
+          continue;
+        }
+
+        const image = imageWrapperRefs.current[index];
+
+        if (!image) {
+          continue;
+        }
+
+        const rect = image.getBoundingClientRect();
+
+        if (
+          pointerX >= rect.left &&
+          pointerX <= rect.right &&
+          pointerY >= rect.top &&
+          pointerY <= rect.bottom
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    const evaluate = () => {
+      if (!pointerKnown) {
         return;
       }
 
-      const rect = carousel.getBoundingClientRect();
-      const isInside =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
+      /*
+       * A drag in progress keeps the icon regardless of where the
+       * pointer has travelled to. The gesture started on a photo and
+       * still owns the pointer, so losing the icon part way through it
+       * would read as the drag having been dropped.
+       */
+      const isInside = dragStateRef.current.isDragging || isOverAPhoto();
 
+      /*
+       * Placed instantly on the way in, so it does not glide across the
+       * screen from wherever it was last left. Only the following moves
+       * are smoothed.
+       */
       if (isInside && !wasInside) {
-        gsap.set(cursor, { x: event.clientX, y: event.clientY });
+        gsap.set(cursor, { x: pointerX, y: pointerY });
       }
 
       wasInside = isInside;
@@ -105,25 +186,159 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
       setCursorVisible(isInside);
 
       if (isInside) {
-        cursorMoveXRef.current?.(event.clientX);
-        cursorMoveYRef.current?.(event.clientY);
+        cursorMoveXRef.current?.(pointerX);
+        cursorMoveYRef.current?.(pointerY);
       }
+    };
+
+    const handlePointerMove = (event) => {
+      if (event.pointerType !== "mouse") {
+        return;
+      }
+
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      pointerKnown = true;
+
+      evaluate();
+    };
+
+    /*
+     * Coalesced to one check per frame: this runs on scroll, and reading
+     * a bounding box is a layout read — doing it per scroll event on a
+     * page this animation-heavy would be a needless cost.
+     */
+    let queued = false;
+
+    const handleReflow = () => {
+      if (queued) {
+        return;
+      }
+
+      queued = true;
+
+      window.requestAnimationFrame(() => {
+        queued = false;
+        evaluate();
+      });
     };
 
     const handlePointerLeaveWindow = () => {
       wasInside = false;
+      pointerKnown = false;
       setCursorVisible(false);
     };
 
     window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("scroll", handleReflow, { passive: true });
+    window.addEventListener("resize", handleReflow);
+    /*
+     * The end of a drag has to be re-tested too. A drag keeps the icon
+     * wherever the pointer travels, so releasing over the caption or the
+     * cream space left the icon showing with nothing under it to justify
+     * it. handleReflow defers to the next frame, which is what makes
+     * this correct regardless of whether this listener or the
+     * carousel's own pointerup handler runs first — by then the drag
+     * flag has been cleared either way.
+     */
+    window.addEventListener("pointerup", handleReflow);
+    window.addEventListener("pointercancel", handleReflow);
     window.addEventListener("pointerleave", handlePointerLeaveWindow);
     window.addEventListener("blur", handlePointerLeaveWindow);
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("scroll", handleReflow);
+      window.removeEventListener("resize", handleReflow);
+      window.removeEventListener("pointerup", handleReflow);
+      window.removeEventListener("pointercancel", handleReflow);
       window.removeEventListener("pointerleave", handlePointerLeaveWindow);
       window.removeEventListener("blur", handlePointerLeaveWindow);
     };
+  }, []);
+
+  /*
+   * Desktop dimensions:
+   *
+   * Centre: 8 of 12 page columns wide (see the desktop tier below),
+   *         900 × 600's own 3:2 aspect ratio preserved at any width
+   * Side:   210 × 446
+   *
+   * Mobile (≤767px) is driven by viewport height instead: the centre
+   * card is a tall 50vh portrait card rather than a short landscape
+   * strip, so it reads as "vertical" and fills most of the screen.
+   */
+  /*
+   * The caption's own footprint: its height plus the gap above it. The
+   * carousel has to reserve this under the photo, and the height budget
+   * has to subtract it.
+   */
+  const getCaptionBlock = useCallback(() => {
+    const content = contentRefs.current.find(Boolean);
+
+    if (!content) {
+      return 0;
+    }
+
+    const style = window.getComputedStyle(content);
+
+    return content.offsetHeight + (parseFloat(style.marginTop) || 0);
+  }, []);
+
+  /*
+   * Everything stacked ABOVE the photo: the fixed header's clearance,
+   * the section's own top padding, and the heading block with its
+   * margins. Subtracting this from the viewport gives the height the
+   * photo can actually occupy and still be seen whole.
+   *
+   * Measured from the DOM rather than written down as a number. This
+   * section has already been broken twice by a hand-tuned pixel figure
+   * drifting out of step with the CSS around it — the .carousel comment
+   * in the module CSS documents one of those repairs, replacing a 740px
+   * guess with a 960px one. A measured value cannot drift. The heading's
+   * MARGINS are part of it too: reading offsetHeight alone missed its
+   * 72px bottom margin and left the budget 72px optimistic.
+   *
+   * Deliberately excludes the caption. Reserving that as well left the
+   * photo under 420px tall on an ordinary laptop, which is a large
+   * change to an approved composition; the photo is the content, so it
+   * is what gets guaranteed, and the caption sits just under the fold a
+   * nudge away.
+   */
+  const getSpaceAbovePhoto = useCallback(() => {
+    const section = sectionRef.current;
+
+    if (!section) {
+      return 0;
+    }
+
+    const paddingTop =
+      parseFloat(window.getComputedStyle(section).paddingTop) || 0;
+
+    const heading = headingRef.current;
+    let headingOuter = 0;
+
+    if (heading) {
+      const headingStyle = window.getComputedStyle(heading);
+
+      headingOuter =
+        heading.offsetHeight +
+        (parseFloat(headingStyle.marginTop) || 0) +
+        (parseFloat(headingStyle.marginBottom) || 0);
+    }
+
+    /*
+     * Read from the scroll-padding the page already sets for the fixed
+     * header (see globals.css) rather than restating its height here.
+     * This section carries one of the page's scroll-snap points, so it
+     * comes to rest that far down the viewport rather than at the top.
+     */
+    const headerClearance =
+      parseFloat(
+        window.getComputedStyle(document.documentElement).scrollPaddingTop,
+      ) || 0;
+
+    return headerClearance + paddingTop + headingOuter;
   }, []);
 
   /*
@@ -180,55 +395,67 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
       };
     }
 
+    /*
+     * Tablet and desktop: the photo's width is chosen from the
+     * viewport's WIDTH, then capped by the height actually left over
+     * once the heading, caption and padding are accounted for.
+     *
+     * Without that cap the height fell out of the width alone, and on
+     * any ordinary laptop the result did not fit: on a 1600x900 screen
+     * the photo came out 711px tall inside a 385px budget, which put
+     * the caption naming the amenity 206px below the fold, and the
+     * photograph itself ran 158px past the bottom of the screen. The
+     * cap only bites when the window is too short for the full width,
+     * so a tall display still gets the intended 8-of-12 columns.
+     */
+    let widthCap;
+    let sideWidth;
+
     if (viewportWidth <= 1024) {
-      const centreWidth = Math.min(560, viewportWidth * 0.58);
-      const centreHeight = centreWidth * (600 / 900);
-
-      const sideWidth = 138;
-      const sideHeight = sideWidth * (446 / 210);
-
-      return {
-        centreWidth,
-        centreHeight,
-        sideWidth,
-        sideHeight,
-        sideYOffset: centreHeight - sideHeight,
-      };
+      widthCap = Math.min(560, viewportWidth * 0.58);
+      sideWidth = 138;
+    } else if (viewportWidth <= 1350) {
+      widthCap = Math.min(620, viewportWidth * 0.5);
+      sideWidth = 175;
+    } else {
+      /*
+       * 8 of the page's 12 columns wide, same technique as Hero's
+       * framed building photo (Hero.module.css .imageFrame): 66.667vw
+       * is 8/12 of the viewport, capped so it doesn't grow
+       * unreasonably large on very wide screens.
+       */
+      widthCap = Math.min(viewportWidth * 0.66667, 1100);
+      sideWidth = 210;
     }
 
-    if (viewportWidth <= 1350) {
-      const centreWidth = Math.min(620, viewportWidth * 0.5);
-      const centreHeight = centreWidth * (600 / 900);
+    const heightBudget = Math.max(
+      MIN_CENTRE_HEIGHT,
+      window.innerHeight - getSpaceAbovePhoto(),
+    );
 
-      const sideWidth = 175;
-      const sideHeight = sideWidth * (446 / 210);
-
-      return {
-        centreWidth,
-        centreHeight,
-        sideWidth,
-        sideHeight,
-        sideYOffset: centreHeight - sideHeight,
-      };
-    }
+    const centreHeight = Math.min(widthCap / CENTRE_ASPECT, heightBudget);
+    const centreWidth = centreHeight * CENTRE_ASPECT;
 
     /*
-     * 8 of the page's 12 columns wide, same technique as Hero's framed
-     * building photo (Hero.module.css .imageFrame): 66.667vw is 8/12
-     * of the viewport, capped so it doesn't grow unreasonably large
-     * on very wide screens.
+     * The side cards are bottom-aligned against the centre photo, so a
+     * side card taller than the centre would hang above it. Scaled down
+     * proportionally rather than clipped, so its own crop is preserved.
      */
-    const centreWidth = Math.min(viewportWidth * 0.66667, 1100);
-    const centreHeight = centreWidth * (600 / 900);
+    let sideHeight = sideWidth * SIDE_ASPECT;
+
+    if (sideHeight > centreHeight) {
+      sideWidth *= centreHeight / sideHeight;
+      sideHeight = centreHeight;
+    }
 
     return {
       centreWidth,
       centreHeight,
-      sideWidth: 210,
-      sideHeight: 446,
-      sideYOffset: centreHeight - 446,
+      sideWidth,
+      sideHeight,
+      sideYOffset: centreHeight - sideHeight,
     };
-  }, []);
+  }, [getSpaceAbovePhoto]);
 
   const getCardPosition = useCallback((cardIndex, nextActiveIndex) => {
     if (cardIndex === nextActiveIndex) {
@@ -346,6 +573,25 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
 
       animationRef.current?.kill();
       animationRef.current = null;
+
+      /*
+       * The stage's own height. Cards are absolutely positioned, so
+       * they contribute nothing to it, and the CSS used to carry a
+       * hard-coded 960px for the whole thing to size around — a figure
+       * that had already been re-tuned once and was reserving 91px of
+       * dead space below the caption at the same time as the caption
+       * itself sat off screen.
+       *
+       * Set from the geometry that was just calculated instead, so the
+       * section is exactly as tall as its contents on every viewport.
+       */
+      const stage = carouselRef.current;
+
+      if (stage) {
+        const { centreHeight } = getResponsiveSizes();
+
+        stage.style.height = `${Math.round(centreHeight + getCaptionBlock())}px`;
+      }
 
       if (immediate) {
         cards.forEach((card, index) => {
@@ -580,7 +826,7 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
      * their content is editable). Listed anyway because it is genuinely read
      * here, and as a stable primitive it never re-creates the callback.
      */
-    [getCardState, galleryItems.length],
+    [getCardState, galleryItems.length, getCaptionBlock, getResponsiveSizes],
   );
 
   const selectSlide = useCallback(

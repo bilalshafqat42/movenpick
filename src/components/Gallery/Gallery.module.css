@@ -6,9 +6,17 @@
 
   width: 100%;
 
-  min-height: 1120px;
-
-  padding: 140px 0 82px;
+  /*
+   * Padding scales with the viewport rather than sitting at a fixed
+   * 140px/82px. On a 900px-tall laptop those two alone were 222px of
+   * the 900 available, which is a quarter of the screen spent on
+   * whitespace while the caption was pushed off the bottom.
+   *
+   * The old `min-height: 1120px` is gone with them: it forced the
+   * section taller than its contents on every screen, and the height
+   * budget in GalleryClient now sizes the composition to fit instead.
+   */
+  padding: clamp(56px, 8vh, 140px) 0 clamp(40px, 5vh, 82px);
 
   overflow: hidden;
 
@@ -27,7 +35,12 @@
   flex: 0 0 auto;
 
   width: min(calc(100% - 48px), 760px);
-  margin: 0 auto 72px;
+  /*
+   * The gap below the heading scales with the viewport. A flat 72px is
+   * 72px the photograph does not get, and on a short screen the
+   * photograph is what the height budget has to take it from.
+   */
+  margin: 0 auto clamp(32px, 5.5vh, 72px);
 
   text-align: center;
 }
@@ -66,17 +79,20 @@
   flex: 0 0 auto;
 
   width: 100vw;
+
   /*
-   * The centre card is absolutely positioned, so it doesn't
-   * contribute to this element's own height — this fixed value is
-   * what .gallery's flex layout (and its own overflow: hidden) sizes
-   * around. 740px was tuned for the old fixed 600px-tall centre image
-   * plus a 28px caption margin; the centre image can now be up to
-   * ~733px tall (8-of-12-columns wide, capped at 1100px, at its
-   * original 3:2 aspect ratio) and the caption margin is 48px, so the
-   * old value was clipping the caption underneath.
+   * The centre card is absolutely positioned, so it contributes nothing
+   * to this element's own height, and .gallery's flex layout sizes
+   * around whatever is set here.
+   *
+   * GalleryClient writes the real figure inline on every layout pass,
+   * measured from the photo it just sized plus the caption block. This
+   * value is only the pre-hydration fallback. It used to be the actual
+   * source of truth, hand-tuned twice — first 740px, then 960px — and
+   * wrong both times, because a fixed number cannot track a photo whose
+   * height depends on the viewport.
    */
-  height: 960px;
+  height: 720px;
 
   margin: 0;
 
@@ -89,8 +105,25 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.carousel,
-.carousel * {
+/*
+ * The native cursor is hidden ONLY over the photographs themselves, not
+ * across the whole stage. The drag icon is an invitation to drag a
+ * photo, so it belongs on the photos; the cream space around them, and
+ * the caption beneath, are not draggable and keep the ordinary arrow.
+ *
+ * The dragging case is separate on purpose: a drag that starts on a
+ * photo and travels off it still owns the pointer (setPointerCapture),
+ * so the icon has to stay and the native arrow has to stay hidden until
+ * the gesture ends. Without this the two would swap back and forth
+ * mid-drag.
+ */
+.imageWrapper,
+.imageWrapper * {
+  cursor: none !important;
+}
+
+.carousel[data-dragging="true"],
+.carousel[data-dragging="true"] * {
   cursor: none !important;
 }
 
@@ -136,7 +169,13 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 
-  will-change: width, transform, opacity;
+  /*
+   * `width` is deliberately absent. will-change only helps properties
+   * the compositor can handle on its own, and width is not one — every
+   * change relayouts the card and the photo inside it regardless. All
+   * the hint bought was five permanently promoted layers.
+   */
+  will-change: transform, opacity;
 }
 
 .card[data-position="centre"] {
@@ -248,7 +287,12 @@
   width: min(100%, 620px);
   min-height: 110px;
 
-  margin: 48px auto 0;
+  /*
+   * The gap above the caption scales with the viewport: on a short
+   * screen a flat 48px is 48px the photograph does not get, and the
+   * photograph is what the section is for.
+   */
+  margin: clamp(22px, 3.5vh, 48px) auto 0;
   padding: 0 12px;
 
   opacity: 0;
