@@ -1,18 +1,21 @@
-<svg width="62" height="62" viewBox="0 0 62 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g filter="url(#filter0_d_956_164)">
-<circle cx="31" cy="27" r="27" fill="#F4EEE6"/>
+<svg width="162" height="162" viewBox="-4 -4 162 162" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!--
+  No baked drop shadow.
+
+  The Figma export wrapped the circle in a filter whose region was
+  x="0" y="0" width="162" height="162" - the exact bounds of the old
+  viewBox. The shadow (dy 4, blur 2) ran straight off that region and
+  was sliced flat along the bottom and sides, which read as a broken,
+  faceted border. The shadow now comes from the CSS drop-shadow() in
+  Chat.module.css, which has no region to clip against.
+
+  Circle recentred from cx 81 to cx 77 so this matches chat-light.svg
+  and chat-dark.svg; without that the close state swapped in about 5%
+  smaller than the bubble it replaced. The chevron was authored around
+  x 81, so it is shifted by the same 4 units.
+-->
+<circle cx="77" cy="77" r="77" fill="#897655"/>
+<g transform="translate(-4, 0)">
+<path d="M55.3359 71.2969L80.6018 92.9538C81.372 93.614 82.5145 93.593 83.2599 92.905L106.669 71.2969" stroke="#FFF0E7" stroke-width="2" stroke-linecap="round"/>
 </g>
-<path d="M22 25L29.9823 31.8421C30.7525 32.5023 31.895 32.4813 32.6404 31.7933L40 25" stroke="#090909" stroke-width="2" stroke-linecap="round"/>
-<defs>
-<filter id="filter0_d_956_164" x="0" y="3.8147e-06" width="62" height="62" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="4"/>
-<feGaussianBlur stdDeviation="2"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_956_164"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_956_164" result="shape"/>
-</filter>
-</defs>
 </svg>

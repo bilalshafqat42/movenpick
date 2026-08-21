@@ -58,6 +58,20 @@ import "react-phone-number-input/style.css";
 
 import styles from "./Chat.module.css";
 
+/*
+ * Toggle hover growth is 10%.
+ *
+ * Applied by releasing a down-scale rather than scaling past 1: the
+ * .toggleVisual box is laid out at 110% of the button and held at
+ * 1 / 1.1 at rest, so the SVG is rasterised at its largest on-screen
+ * size and hover only removes the shrink. Growing past 1 instead
+ * would stretch a raster captured at the smaller size and the icon
+ * would go soft on the way up. Matches BackToTop.
+ */
+const TOGGLE_GROWTH = 1.1;
+const TOGGLE_REST_SCALE = 1 / TOGGLE_GROWTH;
+const TOGGLE_HOVER_SCALE = 1;
+
 const WIDGET_STATE = {
   CLOSED: "closed",
   INTRO: "intro",
@@ -209,6 +223,7 @@ export default function Chat({
   const messageInputRef = useRef(null);
 
   const isFirstRenderRef = useRef(true);
+  const previousWidgetStateRef = useRef(WIDGET_STATE.CLOSED);
 
   const isOpen = widgetState !== WIDGET_STATE.CLOSED;
   const showComposer = TEXT_INPUT_STEPS.includes(chatStep);
@@ -399,6 +414,10 @@ export default function Chat({
   }, []);
 
   useLayoutEffect(() => {
+    const previousWidgetState = previousWidgetStateRef.current;
+
+    previousWidgetStateRef.current = widgetState;
+
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
       return;
@@ -417,7 +436,20 @@ export default function Chat({
       return;
     }
 
-    if (widgetState === WIDGET_STATE.CLOSED) {
+    /*
+     * Returning focus to the toggle is only correct when the widget
+     * has just been closed.
+     *
+     * This effect also runs on chatStep and showComposer changes, and
+     * those settle shortly after mount while the widget has never
+     * been opened. Focusing unconditionally left the toggle in
+     * :focus-visible from first paint, so it sat there showing its
+     * hover artwork instead of its resting one.
+     */
+    if (
+      widgetState === WIDGET_STATE.CLOSED &&
+      previousWidgetState !== WIDGET_STATE.CLOSED
+    ) {
       toggleButtonRef.current?.focus();
     }
   }, [widgetState, chatStep, showComposer]);
@@ -558,6 +590,26 @@ export default function Chat({
     },
   );
 
+  /*
+   * Hold the toggle artwork at its rest scale from first paint.
+   *
+   * .toggleVisual is laid out at 110% of the button and scaled back
+   * down here, so hover grows it by removing a down-scale rather than
+   * stretching past 1. The SVG is therefore rasterised once at its
+   * largest on-screen size and stays sharp through the growth.
+   */
+  useGSAP(() => {
+    const visual = toggleVisualRef.current;
+
+    if (!visual) {
+      return;
+    }
+
+    gsap.set(visual, {
+      scale: TOGGLE_REST_SCALE,
+    });
+  }, []);
+
   const handleToggleMouseEnter = useCallback(() => {
     const button = toggleButtonRef.current;
     const visual = toggleVisualRef.current;
@@ -576,7 +628,6 @@ export default function Chat({
 
     gsap.to(button, {
       y: -4,
-      scale: 1.04,
       duration: 0.35,
       ease: "power3.out",
       overwrite: true,
@@ -584,6 +635,7 @@ export default function Chat({
 
     gsap.to(visual, {
       y: -2,
+      scale: TOGGLE_HOVER_SCALE,
       duration: 0.35,
       ease: "power3.out",
       overwrite: true,
@@ -616,6 +668,7 @@ export default function Chat({
 
     gsap.to(visual, {
       y: 0,
+      scale: TOGGLE_REST_SCALE,
       duration: 0.4,
       ease: "power3.out",
       overwrite: true,
@@ -1563,8 +1616,8 @@ export default function Chat({
           className={styles.toggleVisual}
           aria-hidden="true"
         >
-          <span className={styles.darkIcon} />
           <span className={styles.lightIcon} />
+          <span className={styles.darkIcon} />
           <span className={styles.closeIcon} />
         </span>
       </button>

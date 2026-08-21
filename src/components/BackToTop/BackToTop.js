@@ -7,6 +7,20 @@ import styles from "./BackToTop.module.css";
 
 const SHOW_AFTER = 600;
 
+/*
+ * Hover growth is 10%.
+ *
+ * It is applied by scaling the icon UP to 1 rather than past it: the
+ * .icon box is rendered 110% of the button in CSS and held at
+ * 1 / 1.1 at rest, so the SVG is always rasterised at its largest
+ * on-screen size and hover only ever removes a down-scale. Growing
+ * past 1 instead would stretch a raster captured at the smaller size
+ * and the arrow would go soft on the way up.
+ */
+const ICON_GROWTH = 1.1;
+const ICON_REST_SCALE = 1 / ICON_GROWTH;
+const ICON_HOVER_SCALE = 1;
+
 export default function BackToTop() {
   const buttonRef = useRef(null);
   const iconRef = useRef(null);
@@ -54,6 +68,10 @@ export default function BackToTop() {
       ).matches;
 
       gsap.killTweensOf([button, icon]);
+
+      gsap.set(icon, {
+        scale: ICON_REST_SCALE,
+      });
 
       if (reduceMotion) {
         gsap.set(button, {
@@ -123,7 +141,7 @@ export default function BackToTop() {
   /*
    * Premium hover movement.
    *
-   * The dark/light SVG swap is handled by CSS,
+   * The light/dark SVG swap is handled by CSS,
    * while GSAP controls only the physical movement.
    */
   const handleMouseEnter = useCallback(() => {
@@ -144,7 +162,6 @@ export default function BackToTop() {
 
     gsap.to(button, {
       y: -4,
-      scale: 1.04,
       duration: 0.35,
       ease: "power3.out",
       overwrite: true,
@@ -152,6 +169,7 @@ export default function BackToTop() {
 
     gsap.to(icon, {
       y: -3,
+      scale: ICON_HOVER_SCALE,
       duration: 0.35,
       ease: "power3.out",
       overwrite: true,
@@ -184,6 +202,7 @@ export default function BackToTop() {
 
     gsap.to(icon, {
       y: 0,
+      scale: ICON_REST_SCALE,
       duration: 0.4,
       ease: "power3.out",
       overwrite: true,
@@ -217,8 +236,8 @@ export default function BackToTop() {
       </span>
 
       <span ref={iconRef} className={styles.icon} aria-hidden="true">
-        <span className={styles.darkIcon} />
         <span className={styles.lightIcon} />
+        <span className={styles.darkIcon} />
       </span>
     </button>
   );
