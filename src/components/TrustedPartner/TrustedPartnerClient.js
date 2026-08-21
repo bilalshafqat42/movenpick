@@ -7,6 +7,29 @@ import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 import styles from "./TrustedPartner.module.css";
 
+/*
+ * Viewport heights of scrolling the card's expansion plays across.
+ *
+ * It used to be tied to the media block's own geometry, which worked out
+ * to roughly 320px of scroll — two or three wheel notches to take the
+ * card from a small panel to covering the whole photograph. A takeover
+ * that large needs to be watchable, not glimpsed, so the distance is
+ * now stated outright in terms of the viewport rather than falling out
+ * of a chain of relative anchors.
+ */
+const GROW_VIEWPORTS = 0.9;
+
+/*
+ * Viewport heights the photograph is held, centred and untouched,
+ * before the card starts taking it over.
+ *
+ * Same reasoning as the Project Gallery's arrival hold: without it the
+ * takeover begins on the very pixel the photo settles into place, so
+ * arriving and being covered are one motion and the photograph is never
+ * seen on its own.
+ */
+const GROW_ARRIVAL_VIEWPORTS = 0.2;
+
 export default function TrustedPartnerClient({
   logo,
   logoAlt,
@@ -25,12 +48,14 @@ export default function TrustedPartnerClient({
   const labelRef = useRef(null);
   const headingRef = useRef(null);
   const textRef = useRef(null);
+  const mediaScrollRef = useRef(null);
   const mediaRef = useRef(null);
   const cardRef = useRef(null);
 
   useGSAP(
     () => {
       const section = sectionRef.current;
+      const mediaScroll = mediaScrollRef.current;
       const media = mediaRef.current;
       const card = cardRef.current;
 
@@ -85,7 +110,16 @@ export default function TrustedPartnerClient({
        * text block above enters — each reveals on its own arrival instead
        * of both firing together based on the section's top edge.
        */
-      if (media && card) {
+      /*
+       * The takeover is desktop only. Below 1025px .mediaBlock is not
+       * sticky (see the module CSS), so there is no held frame for the
+       * card to grow inside — and holding a phone's scroll still for
+       * most of a viewport to play one expansion is a poor trade on a
+       * small screen. The card simply sits over the photo there.
+       */
+      const desktop = window.matchMedia("(min-width: 1025px)").matches;
+
+      if (media && card && mediaScroll && desktop) {
         gsap.set(media, { autoAlpha: 0, y: 28 });
         gsap.set(card, { autoAlpha: 0, y: 24 });
 
@@ -107,10 +141,9 @@ export default function TrustedPartnerClient({
         });
 
         /*
-         * Once the card's own bottom edge reaches the bottom of the
-         * screen — exactly where it naturally settles after the reveal
-         * above — continuing to scroll grows it from its small centred
-         * card into a full-bleed panel covering the entire photo.
+         * Scrolling on from the settled reveal grows the card from a
+         * small centred panel into a full-bleed one covering the whole
+         * photograph.
          *
          * Pinning all four edges (top/right/bottom/left) as an inset
          * from the media block's own edges, then animating all four
@@ -125,17 +158,48 @@ export default function TrustedPartnerClient({
          * longer traces a straight line to the edges, so growth looked
          * uneven rather than expanding equally on every side.
          */
-        const cardRect = card.getBoundingClientRect();
-        const mediaRect = media.getBoundingClientRect();
 
-        const insetX = (mediaRect.width - cardRect.width) / 2;
-        const insetY = (mediaRect.height - cardRect.height) / 2;
+        /*
+         * The card's natural size, measured with the four animated
+         * edges neutralised so the element falls back to the size its
+         * CSS gives it. Without clearing them first there is nothing to
+         * measure: after the first frame the card's size IS the inset,
+         * so reading it back would just return whatever the animation
+         * last set.
+         *
+         * This is why the insets are recomputed rather than captured
+         * once. Measuring a single time at setup baked pixel values
+         * from one viewport into the tween, and `invalidateOnRefresh`
+         * does not help — it re-derives the trigger's start and end but
+         * not a tween's hard-coded endpoints. Resizing from 1440x900 to
+         * 1100x800 left the old insets applied to a smaller block and
+         * collapsed the card to a 109x349 slither inside a 1085x605
+         * photo.
+         */
+        const measureInsets = () => {
+          const edges = ["top", "right", "bottom", "left"];
+          const saved = edges.map((edge) => card.style[edge]);
+
+          edges.forEach((edge) => {
+            card.style[edge] = "";
+          });
+
+          const cardRect = card.getBoundingClientRect();
+          const mediaRect = media.getBoundingClientRect();
+
+          edges.forEach((edge, index) => {
+            card.style[edge] = saved[index];
+          });
+
+          return {
+            x: Math.max(0, (mediaRect.width - cardRect.width) / 2),
+            y: Math.max(0, (mediaRect.height - cardRect.height) / 2),
+          };
+        };
+
+        let insets = measureInsets();
 
         gsap.set(card, {
-          top: insetY,
-          right: insetX,
-          bottom: insetY,
-          left: insetX,
           xPercent: 0,
           yPercent: 0,
           width: "auto",
@@ -143,23 +207,34 @@ export default function TrustedPartnerClient({
         });
 
         growTrigger = ScrollTrigger.create({
-          trigger: card,
-          start: "bottom bottom",
           /*
-           * Tied to the media block's own geometry (via a separate
-           * endTrigger) rather than a fixed viewport-height distance —
-           * a fixed distance has no relationship to how much of the
-           * section is actually still left to scroll through, so
-           * depending on the card's own height it could easily still
-           * be short of full size by the time the section itself had
-           * nearly scrolled out of view. Ending when the media block's
-           * own bottom edge reaches 80% down the viewport (i.e. the
-           * section has scrolled until only its bottom 20% remains)
-           * guarantees it's fully grown well before the section ends,
-           * regardless of exactly how tall the card started out.
+           * Anchored to the media block sitting centred in the
+           * viewport, which is both where the pin freezes it and a
+           * point the entrance reveal above has comfortably finished
+           * by. The old anchor was the card's own bottom edge reaching
+           * the viewport bottom, which is a moving target: the card's
+           * height depends on its text, so the expansion started at a
+           * different moment on every breakpoint.
            */
-          endTrigger: media,
-          end: "bottom 80%",
+          /*
+           * Anchored to the photo sitting centred in the viewport,
+           * which is exactly where the sticky CSS parks it and a point
+           * the entrance reveal above has comfortably finished by. The
+           * old anchor was the card's own bottom edge reaching the
+           * viewport bottom, which is a moving target: the card's
+           * height depends on its text, so the expansion started at a
+           * different moment on every breakpoint.
+           *
+           * The offset on the start is the arrival hold — the stretch
+           * where the photo is stuck, centred, and nothing is growing
+           * over it yet.
+           */
+          trigger: media,
+          start: () => `center center-=${window.innerHeight * GROW_ARRIVAL_VIEWPORTS}`,
+          end: () =>
+            `center center-=${
+              window.innerHeight * (GROW_ARRIVAL_VIEWPORTS + GROW_VIEWPORTS)
+            }`,
           /*
            * Pins the media block on screen for exactly this scroll
            * range. Without it, the card was only ever centred
@@ -172,18 +247,38 @@ export default function TrustedPartnerClient({
            * duration of the grow keeps it — and the card growing
            * inside it — genuinely centred on screen throughout.
            */
-          pin: media,
-          pinSpacing: true,
-          scrub: 0.5,
+          /*
+           * No `pin`. The photo is held by position: sticky in the CSS
+           * instead, the same pattern Amenities and Project Gallery
+           * use.
+           *
+           * GSAP's pin wraps the element in a pin-spacer, and this
+           * section carries one of the page's scroll-snap points (see
+           * globals.css). The browser trying to snap to a box whose
+           * geometry the pin is rewriting fought the scroll hard:
+           * 7,200px of wheel input moved the page only about 1,570px,
+           * so the section felt heavy and reluctant. Sticky changes no
+           * boxes and the resistance goes away entirely.
+           */
+          scrub: 0.6,
           invalidateOnRefresh: true,
+
+          /*
+           * Re-measure before every refresh, so a resize or an
+           * orientation change rebuilds the expansion against the
+           * block's new size instead of the one it was born in.
+           */
+          onRefreshInit: () => {
+            insets = measureInsets();
+          },
 
           animation: gsap.fromTo(
             card,
             {
-              top: insetY,
-              right: insetX,
-              bottom: insetY,
-              left: insetX,
+              top: () => insets.y,
+              right: () => insets.x,
+              bottom: () => insets.y,
+              left: () => insets.x,
             },
             {
               top: 0,
@@ -242,35 +337,44 @@ export default function TrustedPartnerClient({
         </p>
       </div>
 
-      <div ref={mediaRef} className={styles.mediaBlock}>
-        <Image
-          src={image}
-          alt={imageAlt}
-          fill
-          quality={85}
-          sizes="100vw"
-          className={styles.mediaImage}
-        />
+      <div
+        ref={mediaScrollRef}
+        className={styles.mediaScroll}
+        style={{
+          "--tp-runway": GROW_ARRIVAL_VIEWPORTS + GROW_VIEWPORTS,
+        }}
+      >
+        <div ref={mediaRef} className={styles.mediaBlock}>
+          <Image
+            src={image}
+            alt={imageAlt}
+            fill
+            quality={85}
+            sizes="100vw"
+            className={styles.mediaImage}
+          />
 
-        <div ref={cardRef} className={styles.card}>
-          <h3 className={styles.cardHeading}>{cardHeading}</h3>
+          <div ref={cardRef} className={styles.card}>
+            <h3 className={styles.cardHeading}>{cardHeading}</h3>
 
-          <p className={styles.cardText}>{cardText}</p>
+            <p className={styles.cardText}>{cardText}</p>
 
-          <a
-            href={ctaHref}
-            className={styles.ctaButton}
-            {...(isExternalCta
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-          >
-            <span>{ctaLabel}</span>
-            <span className={styles.ctaIcon} aria-hidden="true">
-              →
-            </span>
-          </a>
+            <a
+              href={ctaHref}
+              className={styles.ctaButton}
+              {...(isExternalCta
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              <span>{ctaLabel}</span>
+              <span className={styles.ctaIcon} aria-hidden="true">
+                →
+              </span>
+            </a>
+          </div>
         </div>
       </div>
+
     </section>
   );
 }

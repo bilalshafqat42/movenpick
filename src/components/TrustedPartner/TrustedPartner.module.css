@@ -9,23 +9,6 @@
   color: var(--color-cream);
 }
 
-/*
- * Two independent 80vh rows on desktop, not one 80vh section split
- * between them — the text block and the photo block each get their
- * own full 80vh, with their content centered within it both ways.
- */
-@media (min-width: 1025px) {
-  .textBlock {
-    justify-content: center;
-
-    height: 80vh;
-  }
-
-  .mediaBlock {
-    height: 80vh;
-  }
-}
-
 /* =========================================================
    Text block
    ========================================================= */
@@ -101,6 +84,63 @@
 
   width: 100%;
   height: clamp(420px, 55vw, 660px);
+}
+
+/*
+ * The runway the photo is held across while the card grows over it.
+ * --tp-runway is set inline by TrustedPartnerClient from the same two
+ * constants the ScrollTrigger uses, so the held distance and the
+ * animated distance cannot drift apart.
+ *
+ * No overflow on this or any ancestor: anything other than `visible`
+ * makes an element a scroll container, which would trap the sticky
+ * child inside it rather than letting it stick to the page.
+ */
+.mediaScroll {
+  position: relative;
+
+  width: 100%;
+}
+
+/*
+ * Two independent 80vh rows on desktop, not one 80vh section split
+ * between them — the text block and the photo block each get their
+ * own full 80vh, with their content centred within it both ways.
+ *
+ * This has to sit AFTER the .mediaBlock rule above, not before it. It
+ * used to lead the file, where the later base rule beat it on source
+ * order at equal specificity, so the photo block was silently 660px on
+ * desktop instead of the 80vh (720px at 900px tall) this describes.
+ */
+@media (min-width: 1025px) {
+  .textBlock {
+    justify-content: center;
+
+    height: 80vh;
+  }
+
+  .mediaScroll {
+    height: calc(80vh + var(--tp-runway, 1.1) * 100vh);
+  }
+
+  /*
+   * Held centred on screen for the whole takeover by position: sticky
+   * rather than by GSAP's pin — 10vh is (100vh - 80vh) / 2, so the
+   * photo parks exactly in the middle of the viewport. Sticky is a
+   * positioned element, so the absolutely positioned .card below still
+   * measures against this box.
+   *
+   * The pin was rewriting this element's geometry while the browser
+   * tried to snap to the section, and the two fought over the scroll
+   * position badly enough to swallow most of a wheel gesture. Sticky
+   * changes no boxes.
+   */
+  .mediaBlock {
+    position: sticky;
+    top: 10vh;
+
+    height: 80vh;
+  }
 }
 
 .mediaImage {
