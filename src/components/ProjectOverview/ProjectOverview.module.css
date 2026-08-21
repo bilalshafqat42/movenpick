@@ -229,15 +229,54 @@
     font-size: 26px;
   }
 
+  /*
+   * A 2 x 2 block: completion and payment plan on the first row, unit
+   * types and starting price on the second.
+   *
+   * The row gap is deliberately larger than the column gap. Each figure
+   * and its label are one unit, and the eye groups by whatever is
+   * closest — a uniform gap makes the four read as a loose cluster,
+   * whereas 20 across and 32 down reads unmistakably as two rows of
+   * two.
+   */
   .stats {
-    grid-template-columns: 1fr;
-    row-gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    column-gap: 20px;
+    row-gap: 32px;
   }
 
+  /*
+   * padding-inline, not just padding-left: the base rule pads both
+   * sides, and leaving the right-hand 16px in place ate into the column
+   * the figure had to fit — which is what was still wrapping
+   * "From 799,000" after the type was sized for the full column width.
+   */
   .stat {
-    padding-left: 0;
+    padding-inline: 0;
 
     border-left: 0;
+  }
+
+  /*
+   * Sized so the longest figure holds on one line in half a phone's
+   * width. When one cell's figure wrapped and its neighbour's did not,
+   * their labels fell out of line and the row looked broken.
+   *
+   * The formula is measured, not guessed. "From 799,000" renders at
+   * 6.57x its font size in Gloock, and each column is
+   * (100vw - 2 gutters - 20px gap) / 2, which reduces to
+   * 0.4167vw - 10px. Dividing one by the other gives ~6.1vw - 1.5px as
+   * the largest size that always fits, with the 26px cap keeping it
+   * from outgrowing the tablet tier above.
+   */
+  .statValue {
+    font-size: clamp(17px, calc(6.1vw - 1.5px), 26px);
+  }
+
+  /* Kept tight to its own figure, so each pair stays one unit. */
+  .statLabel {
+    font-size: 12px;
   }
 
   .ctaRow {

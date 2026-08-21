@@ -408,6 +408,53 @@
    ========================================================= */
 
 @media (max-width: 767px) {
+  /*
+   * Two screens on mobile.
+   *
+   *   Screen 1: the intro at 40svh, the photo at 60svh.
+   *   Screen 2: the milestone table on its own full screen.
+   *
+   * The section's own block padding goes to zero and the header
+   * clearance moves inside each screen instead. Keeping it on .payment
+   * would sit OUTSIDE the two 100svh screens and push the photo's
+   * bottom edge below the fold by exactly that much.
+   */
+  .payment {
+    display: flex;
+    flex-direction: column;
+
+    padding-block: 0;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    min-height: 40svh;
+
+    /* Clears the fixed header, since this screen's top edge is the
+       viewport's top edge. */
+    padding-top: calc(var(--header-height, 90px) + 16px);
+    margin-bottom: 0;
+  }
+
+  .imagePanel {
+    height: 60svh;
+  }
+
+  /*
+   * Screen two. The rows are already centred by the base rule, so the
+   * padding only guarantees clearance on a short handset where the
+   * table nearly fills the screen on its own.
+   */
+  .tablePanel {
+    min-height: 100svh;
+
+    padding-top: var(--header-height, 90px);
+    padding-bottom: clamp(24px, 4svh, 48px);
+  }
+
   .heading {
     font-size: 26px;
   }
@@ -416,7 +463,23 @@
     font-size: 14px;
   }
 
+  /*
+   * Full bleed. `width: 100%` resolved against the padded .body, so the
+   * photo stopped a page-gutter short of each screen edge — measured 37px
+   * of cream either side on a 440px handset.
+   *
+   * The standard break-out: 100vw is the true viewport width whatever any
+   * ancestor's padding is, and margin-left: calc(50% - 50vw) walks the
+   * left edge back to the viewport's from wherever the padded parent put
+   * it. Written against 50% of the parent rather than cancelling a
+   * specific padding value, so it holds however deeply nested it is —
+   * same technique as Amenities' mobile photo.
+   */
   .imagePanel {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+
     min-height: 280px;
   }
 

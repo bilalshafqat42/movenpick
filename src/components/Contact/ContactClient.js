@@ -223,8 +223,22 @@ export default function ContactClient({
 
       const matchMedia = gsap.matchMedia();
 
+      /*
+       * `desktop` is not read below — the branches only care about
+       * `mobile` and `reduceMotion` — but it has to be here.
+       *
+       * gsap.matchMedia() only activates a context while at least one
+       * of its queries matches. With just the two conditions this had,
+       * a desktop visitor with normal motion settings matched NEITHER,
+       * so the callback never ran and this section had no entrance
+       * animation whatsoever above 900px. Below 900px it worked, which
+       * is why it looked like a desktop-only mystery. Measured: 8 of 8
+       * form children carried GSAP styles at 900px wide and 0 of 8 at
+       * 901px.
+       */
       matchMedia.add(
         {
+          desktop: "(min-width: 901px)",
           mobile: "(max-width: 900px)",
           reduceMotion: "(prefers-reduced-motion: reduce)",
         },
@@ -234,7 +248,18 @@ export default function ContactClient({
 
           const introChildren = Array.from(intro.children);
 
-          const formChildren = Array.from(form.children);
+          /*
+           * Only the children that actually show. The form also holds
+           * eleven hidden inputs carrying the utm/gclid attribution,
+           * and staggering across those spent most of the sequence on
+           * nothing: the button and consent line arrived 1.4 seconds
+           * after the last visible field, with a dead pause in
+           * between. They stay in the form, they just take no part in
+           * the animation.
+           */
+          const formChildren = Array.from(form.children).filter(
+            (child) => !(child.tagName === "INPUT" && child.type === "hidden"),
+          );
 
           if (reduceMotion) {
             gsap.set(viewport, {
@@ -309,7 +334,13 @@ export default function ContactClient({
               autoAlpha: 1,
               y: 0,
               duration: 0.8,
-              stagger: 0.07,
+              /*
+               * Wide enough to read as one field after another rather
+               * than the whole form arriving at once. Eight children at
+               * 0.07 spread over half a second, which looked like a
+               * single move.
+               */
+              stagger: 0.12,
               ease: "power3.out",
 
               scrollTrigger: {

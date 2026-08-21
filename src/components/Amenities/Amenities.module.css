@@ -111,6 +111,7 @@
 .itemsWrapper {
   position: relative;
 
+  margin-top: 40px;
   padding-left: 20px;
 }
 
@@ -412,7 +413,26 @@
   }
 
   .imagePanel {
-    position: static;
+    /*
+     * relative, not static. It only needs to come out of the desktop's
+     * absolute placement and back into normal flow — but `static`
+     * removed the positioning context too, and .imageLayer inside is
+     * absolutely positioned at inset: -5% with height: 110%. With no
+     * positioned ancestor it resolved those against a far taller one
+     * instead: measured 1291px of layer inside a 790px panel, so the
+     * photo spilled well past the panel both vertically and
+     * horizontally. `relative` puts the context back; the base rule's
+     * overflow: hidden then clips the intended 5% parallax bleed.
+     */
+    position: relative;
+
+    /*
+     * Clears the desktop rule's top/right/bottom offsets. Under
+     * `absolute` they placed the panel; under `relative` they become a
+     * nudge, and the right offset alone shoved it a whole page-gutter
+     * off the viewport edge.
+     */
+    inset: auto;
 
     width: auto;
     min-height: 380px;
@@ -453,9 +473,10 @@
     margin-right: calc(50% - 50vw);
     margin-bottom: calc(-1 * clamp(60px, 8vw, 110px));
 
-    /* 5 points less than the previous 60vh, so more of the section
-       fits in view at once on mobile. */
-    min-height: 55vh;
+    /* Half the screen, so the photo reads as one part of the section
+       rather than taking it over. */
+    min-height: 50vh;
+    min-height: 50svh;
   }
 }
 

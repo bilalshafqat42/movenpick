@@ -594,10 +594,18 @@ export default function ContactPopupClient({
           onSubmit={handleSubmit}
           noValidate
         >
+          {/*
+            * One line, matching the Contact section: the eyebrow lives
+            * INSIDE the heading rather than above it, so both content
+            * fields are kept and simply read together.
+            *
+            * It also fixes the dialog's accessible name — the h2 is what
+            * aria-labelledby points at, so this used to announce itself
+            * as just "To Us".
+            */}
           <header className={styles.headingGroup}>
-            <p className={styles.eyebrow}>{eyebrow}</p>
-
             <h2 id="contact-popup-title" className={styles.heading}>
+              <span className={styles.eyebrow}>{eyebrow}</span>{" "}
               {heading}
             </h2>
           </header>
@@ -841,6 +849,10 @@ export default function ContactPopupClient({
             aria-busy={isSubmitting}
           >
             <span>{isSubmitting ? "Submitting..." : submitButtonLabel}</span>
+
+            <span className={styles.submitIcon} aria-hidden="true">
+              →
+            </span>
           </button>
 
           <p className={styles.consent}>

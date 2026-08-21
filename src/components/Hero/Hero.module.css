@@ -239,29 +239,96 @@
    ========================================================= */
 
 @media (max-width: 767px) {
+  /*
+   * One screen, shared between the text and the photo panel, so both
+   * are visible without scrolling. .hero is already a flex column, so
+   * the text takes the height it needs and .imageSection below takes
+   * everything left over.
+   */
   .hero {
-    padding: calc(90px + 36px) var(--page-gutter) 0;
+    /*
+     * min-height, not height: on the target handset the content fits
+     * one screen exactly, but a short phone (a 568px-tall SE) cannot
+     * hold this much type and a fixed height would simply clip the
+     * photo. This way it is one screen wherever it fits and grows by
+     * the little it needs to where it does not.
+     */
+    min-height: 100vh;
+    min-height: 100svh;
+
+    /*
+     * Header clearance plus a breath, scaled by screen height so a
+     * short handset gives the space to the composition instead.
+     */
+    padding: calc(90px + clamp(24px, 5svh, 56px)) var(--page-gutter) 0;
   }
 
   .eyebrow {
     font-size: 11px;
   }
 
+  /*
+   * 48px and 18px on the target handset, but bounded by the screen's
+   * HEIGHT as well as its width. Width alone gave a 667px-tall phone
+   * the same 480px of type as a 956px one, which left the photo panel
+   * 186px to hold a 228px frame. The svh term is what keeps the split
+   * roughly even on a short screen.
+   */
   .title {
-    font-size: 30px;
+    font-size: clamp(30px, min(11vw, 5.6svh), 48px);
   }
 
   .subtitle {
-    font-size: 14px;
+    font-size: clamp(14px, min(4.2vw, 2.1svh), 18px);
   }
 
+  /*
+   * Natural height, deliberately NOT stretched to fill a share of the
+   * screen.
+   *
+   * Forcing it to 65% and centring the type inside looked wrong for a
+   * measurable reason: the type only needs 272px of a 956px screen, so
+   * the surplus fell as 108px of dead cream between the body copy and
+   * the scroll cue — a hole in the middle of the composition. Letting
+   * the text be its own size and giving the leftover to the photo panel
+   * puts that space somewhere it does something.
+   */
+  .content {
+    flex: 0 0 auto;
+  }
+
+  /*
+   * Air on both sides. The cue used to sit flush against the pattern
+   * with 0px between them, so the texture cut straight through the
+   * label.
+   */
+  .scrollIndicator {
+    margin-top: clamp(24px, 5svh, 44px);
+    margin-bottom: clamp(20px, 4svh, 36px);
+  }
+
+  /*
+   * Everything the type does not use, with a floor so it is never
+   * squeezed thin. At a fixed 35% the pattern had only 68px of itself
+   * showing around the photo across the whole panel, which is not
+   * enough for a full-bleed texture to read as one.
+   */
   .imageSection {
-    min-height: 70vh;
-    min-height: 70svh;
+    flex: 1;
+
+    min-height: 38svh;
+    margin-top: 0;
   }
 
+  /*
+   * Bounded by the panel's height as well as the screen's width, so the
+   * frame can never outgrow the space it sits in. 904/624 is the aspect
+   * ratio above, converting a height budget into a width; keeping the
+   * budget under the panel's own height is what leaves pattern visible
+   * above and below the photo.
+   */
   .imageFrame {
-    width: 88vw;
+    width: min(88vw, calc(32svh * 904 / 624));
   }
 }
 
