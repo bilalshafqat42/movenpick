@@ -272,6 +272,12 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
    * The caption's own footprint: its height plus the gap above it. The
    * carousel has to reserve this under the photo, and the height budget
    * has to subtract it.
+   *
+   * Any caption will do, because they are all laid out at the same wrap
+   * width — see --gallery-caption-width in the module CSS. Before that
+   * variable existed each caption wrapped to its own card's width, so
+   * this read the first card's, which is only the centre card until the
+   * first swipe moves it out to the side.
    */
   const getCaptionBlock = useCallback(() => {
     const content = contentRefs.current.find(Boolean);
@@ -588,7 +594,17 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
       const stage = carouselRef.current;
 
       if (stage) {
-        const { centreHeight } = getResponsiveSizes();
+        const { centreWidth, centreHeight } = getResponsiveSizes();
+
+        /*
+         * Published before the caption is measured, not after: it is
+         * what the caption wraps at, so the measurement below is only
+         * meaningful once it is current for this viewport.
+         */
+        stage.style.setProperty(
+          "--gallery-caption-width",
+          `${Math.round(centreWidth)}px`,
+        );
 
         stage.style.height = `${Math.round(centreHeight + getCaptionBlock())}px`;
       }

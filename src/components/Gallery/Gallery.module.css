@@ -283,8 +283,26 @@
    Centre-card text
    ========================================================= */
 
+/*
+ * The wrap width comes from --gallery-caption-width, which GalleryClient
+ * sets on .carousel from the centre card's width on every layout pass.
+ * NOT from `100%`.
+ *
+ * `100%` is the width of whichever card the caption happens to sit in,
+ * and the side cards are a fraction of the centre one. Every caption is
+ * laid out, including the hidden ones, so a side card's copy wrapped
+ * into three times as many lines — and the stage height is measured from
+ * a caption (see getCaptionBlock), so once a swipe moved card 0 out to
+ * the side, the section reserved that side card's caption height and
+ * left a few hundred pixels of dead cream under the photo.
+ *
+ * Pinning the wrap width to the centre card's makes every caption
+ * measure the same, so it no longer matters which one is read, and the
+ * visible caption also stops re-wrapping while the card widths tween
+ * through a transition.
+ */
 .cardContent {
-  width: min(100%, 620px);
+  width: min(var(--gallery-caption-width, 100%), 620px);
   min-height: 110px;
 
   /*
@@ -458,7 +476,7 @@
   }
 
   .cardContent {
-    width: min(100%, 560px);
+    width: min(var(--gallery-caption-width, 100%), 560px);
     min-height: 104px;
 
     margin-top: 20px;

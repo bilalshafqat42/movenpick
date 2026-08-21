@@ -111,15 +111,18 @@ export default function TrustedPartnerClient({
        * of both firing together based on the section's top edge.
        */
       /*
-       * The takeover is desktop only. Below 1025px .mediaBlock is not
-       * sticky (see the module CSS), so there is no held frame for the
-       * card to grow inside — and holding a phone's scroll still for
-       * most of a viewport to play one expansion is a poor trade on a
-       * small screen. The card simply sits over the photo there.
+       * The takeover runs wherever the CSS actually holds the photo
+       * still, which is what the card needs to grow inside.
+       *
+       * Asking the element whether it is sticky, rather than repeating
+       * a breakpoint here, means the two can never disagree: desktop
+       * and mobile each give .mediaBlock a sticky frame and a runway
+       * (see the module CSS), while the tablet tier in between leaves
+       * it in normal flow and simply shows the card over the photo.
        */
-      const desktop = window.matchMedia("(min-width: 1025px)").matches;
+      const heldStill = window.getComputedStyle(media).position === "sticky";
 
-      if (media && card && mediaScroll && desktop) {
+      if (media && card && mediaScroll && heldStill) {
         gsap.set(media, { autoAlpha: 0, y: 28 });
         gsap.set(card, { autoAlpha: 0, y: 24 });
 

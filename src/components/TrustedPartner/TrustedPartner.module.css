@@ -294,8 +294,72 @@
    ========================================================= */
 
 @media (max-width: 767px) {
+  /*
+   * Two screens on mobile: the gold Accor panel, then the photo with
+   * its card. Each is a full screen and each is its own snap target, so
+   * a gesture rests on one or the other rather than half way between.
+   *
+   * The snap points go on these two blocks rather than the section,
+   * which only has one edge to offer. The negative scroll-margin
+   * cancels the page's header scroll-padding (see globals.css) — a
+   * block that is deliberately 100svh tall would otherwise rest 90px
+   * down and hang that far below the fold. Each carries its own header
+   * clearance instead.
+   */
+  .textBlock,
+  .mediaScroll {
+    scroll-snap-align: start;
+    scroll-margin-top: calc(-1 * var(--header-height, 90px));
+  }
+
+  .textBlock {
+    justify-content: center;
+
+    min-height: 100svh;
+
+    padding-top: calc(var(--header-height, 90px) + clamp(20px, 4svh, 48px));
+    padding-bottom: clamp(24px, 5svh, 56px);
+  }
+
+  /*
+   * One screen for the photo, plus the runway the card's takeover plays
+   * across — same shape as the desktop rule above, just with the photo
+   * filling the whole screen rather than 80% of it. --tp-runway is set
+   * inline by TrustedPartnerClient from the same two constants its
+   * ScrollTrigger uses, so the held distance and the animated distance
+   * cannot drift apart.
+   */
+  .mediaScroll {
+    min-height: calc(100svh + var(--tp-runway, 1.1) * 100svh);
+  }
+
   .logo {
-    width: 96px;
+    width: 180px;
+  }
+
+  /*
+   * Roomier spacing, to use the screen rather than leave 353px of empty
+   * gold above the mark and 273px below the copy on a 956px screen.
+   *
+   * Deliberately uneven, and NOT space-between. The eyebrow and the
+   * heading are one unit — an even distribution would have put ~170px
+   * between them and broken the pair apart. So the logo, which is a
+   * separate brand mark, takes the large gap; the eyebrow stays tight
+   * to its heading; the body copy takes a middling one. All three scale
+   * with the screen so a short handset tightens rather than overflows.
+   */
+  .logoWrapper {
+    /* 50px, tightening on a short handset so the larger mark plus the
+       copy still fit one screen. */
+    margin-bottom: clamp(28px, 5.3svh, 50px);
+  }
+
+  .label {
+    margin-bottom: clamp(14px, 2.2svh, 22px);
+  }
+
+  .text {
+    margin-top: clamp(20px, 3.6svh, 36px);
   }
 
   .heading {
@@ -306,13 +370,23 @@
     font-size: 14px;
   }
 
+  /*
+   * Held on screen for the whole takeover by position: sticky, the same
+   * mechanism the desktop rule uses. top is 0 rather than 10vh because
+   * here the photo is the full height of the screen, so there is
+   * nothing to centre it within.
+   */
   .mediaBlock {
-    height: clamp(420px, 110vw, 560px);
+    position: sticky;
+    top: 0;
+
+    height: 100svh;
   }
 
   .card {
     width: 88%;
-    padding: 32px 24px;
+    /* padding: 32px 24px; */
+    padding: 48px 36px;
   }
 }
 
