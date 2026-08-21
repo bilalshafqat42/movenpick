@@ -411,7 +411,7 @@
   /*
    * Two screens on mobile.
    *
-   *   Screen 1: the intro at 40svh, the photo at 60svh.
+   *   Screen 1: the intro at 35svh, the photo at 65svh.
    *   Screen 2: the milestone table on its own full screen.
    *
    * The section's own block padding goes to zero and the header
@@ -431,16 +431,25 @@
     flex-direction: column;
     justify-content: center;
 
-    min-height: 40svh;
+    min-height: 35svh;
 
     /* Clears the fixed header, since this screen's top edge is the
        viewport's top edge. */
     padding-top: calc(var(--header-height, 90px) + 16px);
+
+    /*
+     * A stated gap above the photo, not one left over from centring.
+     * Relying on the slack inside 35svh gave 29px on a 956px screen and
+     * nothing at all on a 844px one, because there the copy fills the
+     * box and there is no slack to centre within.
+     */
+    padding-bottom: clamp(24px, 4svh, 44px);
+
     margin-bottom: 0;
   }
 
   .imagePanel {
-    height: 60svh;
+    height: 65svh;
   }
 
   /*

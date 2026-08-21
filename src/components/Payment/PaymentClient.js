@@ -119,7 +119,20 @@ export default function PaymentClient({
          * to complete across.
          */
         start: "top 90%",
-        end: "center center",
+
+        /*
+         * Mobile ends at "top top" — the moment the section's own top
+         * edge reaches the top of the screen, which on mobile is
+         * exactly when the first of its two screens is fully open.
+         *
+         * "center center" is right on desktop, where the section is
+         * about one and a quarter viewports tall. On mobile it is two
+         * full screens, so the section's centre sits deep inside the
+         * SECOND screen: the blind was only 64% open by the time the
+         * photo was completely in view, which is why it was still
+         * visibly striped once the section had finished arriving.
+         */
+        end: mobile ? "top top" : "center center",
         invalidateOnRefresh: true,
 
         onUpdate: (self) => {
