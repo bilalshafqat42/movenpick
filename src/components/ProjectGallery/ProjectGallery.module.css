@@ -26,16 +26,18 @@
   position: relative;
 
   /*
-   * One viewport per slide. The first is spent arriving, the rest are
-   * the horizontal travel, so three slides cost two viewport heights
-   * of scrolling.
+   * One viewport to arrive in, plus a runway per slide transition. The
+   * runway is longer than a viewport (see
+   * SCROLL_VIEWPORTS_PER_TRANSITION in ProjectGalleryClient) so the
+   * photos move less per unit of scroll and the section reads as
+   * deliberate rather than skittish.
    *
    * No overflow here or on .gallery: overflow other than `visible`
    * makes an element a scroll container, which would trap the sticky
    * .viewport inside it instead of letting it stick to the page.
    */
-  height: calc(var(--pg-slides, 3) * 100vh);
-  height: calc(var(--pg-slides, 3) * 100svh);
+  height: calc(var(--pg-scroll-viewports, 3) * 100vh);
+  height: calc(var(--pg-scroll-viewports, 3) * 100svh);
 
   /*
    * Exit snap point for Amenities' pinned scroll journey (see
@@ -43,8 +45,16 @@
    * is the clean "fully arrived" resting point right after it. It
    * lives on the wrapper, not the sticky child, so the anchor stays
    * put while the journey plays.
+   *
+   * The negative scroll-margin cancels the global scroll-padding-top
+   * that keeps ordinary sections clear of the fixed header (see
+   * globals.css). Without it this section snapped 90px short of full
+   * coverage, so "arrived" was never actually full screen and the very
+   * next nudge started sliding the photos. This is a full-bleed
+   * section: the header is meant to float over it, not sit above it.
    */
   scroll-snap-align: start;
+  scroll-margin-top: -90px;
 }
 
 .viewport {
@@ -138,6 +148,17 @@
   pointer-events: none;
 }
 
+/*
+ * The heading and body together, so the caption can step aside while a
+ * photo travels without taking the scrubber and counter with it — those
+ * report progress and have to stay legible throughout.
+ */
+.caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .heading {
   margin: 0;
 
@@ -147,8 +168,6 @@
   line-height: 1.25;
 
   color: #ffffff;
-
-  animation: contentFadeIn 500ms ease;
 }
 
 .text {
@@ -161,18 +180,6 @@
   line-height: 1.6;
 
   color: rgba(255, 255, 255, 0.82);
-
-  animation: contentFadeIn 500ms ease;
-}
-
-@keyframes contentFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }
 
 /* =========================================================
@@ -217,6 +224,13 @@
   height: 100%;
 
   background: #ffffff;
+
+  /*
+   * Moved with `x` by ProjectGalleryClient, never `left`: `left` is not
+   * compositable, so animating it invalidated layout for the whole
+   * pagination row on every scroll frame.
+   */
+  will-change: transform;
 }
 
 @media (min-width: 1025px) {
@@ -283,8 +297,4 @@
     scroll-snap-align: center;
   }
 
-  .heading,
-  .text {
-    animation: none;
-  }
 }
