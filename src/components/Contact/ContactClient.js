@@ -518,11 +518,19 @@ export default function ContactClient({
           onSubmit={handleSubmit}
           noValidate
         >
+          {/*
+            * The design sets this as one line, so the eyebrow lives
+            * INSIDE the heading rather than above it. Both content
+            * fields are untouched — "Reach Out" and "To Us" simply read
+            * together now.
+            *
+            * It also fixes the section's accessible name: the h2 is what
+            * aria-labelledby points at, so this section used to announce
+            * itself as just "To Us".
+            */}
           <header className={styles.headingGroup}>
-            <p className={styles.eyebrow}>{eyebrow}</p>
-
             <h2 id="contact-title" className={styles.heading}>
-              {heading}
+              <span className={styles.eyebrow}>{eyebrow}</span> {heading}
             </h2>
           </header>
 
@@ -767,6 +775,10 @@ export default function ContactClient({
             aria-busy={isSubmitting}
           >
             <span>{isSubmitting ? "Submitting..." : submitButtonLabel}</span>
+
+            <span className={styles.submitIcon} aria-hidden="true">
+              →
+            </span>
           </button>
 
           <p className={styles.consent}>

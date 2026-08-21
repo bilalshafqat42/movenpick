@@ -44,7 +44,13 @@
 
 .intro {
   display: flex;
-  align-items: flex-end;
+  /*
+   * Top-aligned, level with the heading across the gutter, per the
+   * design. It was bottom-aligned, which on a tall form left the
+   * paragraph stranded at the foot of the column a long way from
+   * anything it relates to.
+   */
+  align-items: flex-start;
 
   min-width: 0;
   height: 100%;
@@ -81,17 +87,15 @@
   margin: 0 0 44px;
 }
 
+/*
+ * Part of the heading now, not a separate red kicker above it — the
+ * design runs "Reach Out To Us" as one serif line. It stays its own
+ * element so the two content fields behind it remain independently
+ * editable.
+ */
 .eyebrow {
-  margin: 0 0 5px;
-
-  font-family: var(--font-noto-sans);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-
-  color: var(--color-cta-red);
+  font: inherit;
+  color: inherit;
 }
 
 .heading {
@@ -259,7 +263,12 @@
 }
 
 .input::placeholder {
-  color: rgba(137, 118, 85, 0.6);
+  /*
+   * Full gold, matching the selects. These were at 60% opacity while
+   * the "I'm a" and country selects rendered at full strength, so the
+   * fields in one column read as two different tones.
+   */
+  color: var(--color-gold);
   opacity: 1;
 }
 
@@ -439,7 +448,8 @@
 }
 
 .phoneInput :global(.PhoneInputInput::placeholder) {
-  color: rgba(137, 118, 85, 0.6);
+  /* Same golden tone as every other field. */
+  color: var(--color-gold);
   opacity: 1;
 }
 
@@ -454,17 +464,23 @@
   align-items: center;
   justify-content: center;
 
+  gap: 12px;
+
   min-width: 206px;
   height: 54px;
 
   margin-top: 2px;
   padding: 0 28px;
 
-  border: 1px solid var(--color-cta-red);
+  /*
+   * The site's golden CTA, same treatment as TrustedPartner's
+   * .ctaButton, rather than the red it used to be.
+   */
+  border: 1px solid var(--color-gold);
   border-radius: 999px;
 
   background: transparent;
-  color: var(--color-cta-red);
+  color: var(--color-gold);
 
   font-family: var(--font-noto-sans);
   font-size: 12px;
@@ -476,9 +492,33 @@
   cursor: pointer;
   overflow: hidden;
 
-  transition:
-    color 300ms ease,
-    background-color 300ms ease;
+  transition: color 500ms ease;
+}
+
+/*
+ * Fill animation: a gold layer sweeps in from the left on hover, the
+ * same technique and timing as the red CTAs elsewhere on the site (see
+ * Amenities' .requestButton and the Project Overview buttons) — this
+ * one just wears the golden palette.
+ */
+.submitButton::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background: var(--color-gold);
+
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.submitButton:hover::before,
+.submitButton:focus-visible::before {
+  transform: scaleX(1);
 }
 
 .submitButton span {
@@ -486,14 +526,40 @@
   z-index: 1;
 }
 
+/*
+ * The arrow the design pairs with the label. Nudged on hover so the
+ * button reads as pointing somewhere rather than just filling in.
+ */
+.submitIcon {
+  font-size: 15px;
+  line-height: 1;
+
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.submitButton:hover .submitIcon,
+.submitButton:focus-visible .submitIcon {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submitIcon {
+    transition: none;
+  }
+
+  .submitButton:hover .submitIcon,
+  .submitButton:focus-visible .submitIcon {
+    transform: none;
+  }
+}
+
 .submitButton:hover,
 .submitButton:focus-visible {
-  background: var(--color-cta-red);
   color: var(--color-cream);
 }
 
 .submitButton:focus-visible {
-  outline: 1px solid var(--color-cta-red);
+  outline: 1px solid var(--color-gold);
   outline-offset: 5px;
 }
 
@@ -554,6 +620,68 @@
 /* =========================================================
    Medium desktop
    ========================================================= */
+
+/* =========================================================
+   Desktop
+
+   Placed here, after every base rule it overrides. At equal
+   specificity the later rule wins whether or not it sits in a media
+   query, so leading the file with this block left the type sizes and
+   spacing below silently winning over it.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  /*
+   * Full height, and the two columns laid out on the page's own
+   * 12-column grid: --page-gutter is exactly one column
+   * (8.3334vw, capped), so padding a column either side leaves ten,
+   * and a one-column gap between two equal halves gives each of them
+   * four and a half.
+   *
+   * Using the gutter variable rather than its own clamp is what keeps
+   * the gap a true column at every width instead of drifting out of
+   * step with the page grid.
+   */
+  .viewport {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--page-gutter);
+
+    min-height: 100vh;
+    min-height: 100svh;
+
+    /*
+     * Cleared past the fixed header. This section is a full viewport
+     * tall and carries one of the page's scroll-snap points, so it
+     * comes to rest with its top edge at the top of the screen — at the
+     * old 72px the left paragraph, which is top-aligned, sat behind the
+     * header bar and its first two lines were unreadable.
+     */
+    padding-top: calc(var(--header-height, 90px) + clamp(24px, 4vh, 56px));
+  }
+
+  .description {
+    font-size: 18px;
+  }
+
+  /*
+   * Roomier than the 34px the base rule gives these, matching the
+   * design's rhythm. The heading sits further from the first field
+   * than the fields sit from each other, so it does not read as
+   * another label in the list.
+   */
+  .headingGroup {
+    margin-bottom: 100px;
+  }
+
+  .nameRow,
+  .fieldRow {
+    margin-bottom: 80px;
+  }
+
+  .nameRow {
+    column-gap: 40px;
+  }
+}
 
 @media (max-width: 1180px) {
   .viewport {
