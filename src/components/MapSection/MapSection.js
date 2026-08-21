@@ -752,6 +752,36 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
 
     let mapDidLoad = false;
 
+    /*
+     * Touch screens need a one-finger drag to scroll the PAGE, not pan
+     * the map.
+     *
+     * The map stage is a full 100svh on mobile, so once it is on screen
+     * there is nothing else under the thumb. With Mapbox owning every
+     * one-finger gesture the page could not be scrolled at all: a 400px
+     * swipe moved it 0px, in either direction, on every handset and on
+     * a touch tablet. The visitor was simply stranded on the map.
+     *
+     * cooperativeGestures is Mapbox's own answer — two fingers to pan,
+     * one finger passes through to the page. Panning survives; the trap
+     * does not. Its other half, requiring a modifier key to zoom by
+     * scroll, is moot here because scroll and pinch zoom are both
+     * disabled below anyway.
+     *
+     * Keyed on the pointer, not on a width. The trap is a property of
+     * how you touch the screen rather than of how wide it is, and a
+     * width breakpoint missed the tablet tier entirely while a desktop
+     * window narrowed past it would have lost drag-pan for no reason.
+     *
+     * Read at construction because it has to be passed as an option:
+     * map.setCooperativeGestures() exists but only flips a flag, and the
+     * touch handler then reaches for a DOM node that is created only
+     * when the option was set here, which threw on every touchmove.
+     * Pointer type does not change under a live page, so there is
+     * nothing to keep in step afterwards.
+     */
+    const usesTouchGestures = window.matchMedia("(pointer: coarse)").matches;
+
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       accessToken,
@@ -765,7 +795,7 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
 
       attributionControl: false,
 
-      cooperativeGestures: false,
+      cooperativeGestures: usesTouchGestures,
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
