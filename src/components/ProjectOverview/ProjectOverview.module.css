@@ -225,6 +225,38 @@
    ========================================================= */
 
 @media (max-width: 767px) {
+  /*
+   * Its own full screen, so it snaps as one. The block padding carries
+   * the header clearance itself, because globals.css cancels this
+   * section's scroll-padding on mobile to let a 100svh section rest
+   * flush against the top of the screen.
+   */
+  .projectOverview {
+    display: flex;
+    flex-direction: column;
+
+    /*
+     * The four blocks share the screen rather than sitting as one
+     * centred clump.
+     *
+     * Centring left 187px of dead cream above the heading and 106px
+     * below the buttons on a 956px screen while the blocks stayed
+     * bunched together. space-between hands that same space to the gaps
+     * between them instead, and adapts on its own to however the long
+     * heading happens to wrap — no figure to keep in step with the copy.
+     *
+     * The `gap` is the floor underneath it, so on a short handset where
+     * there is no slack to distribute the blocks still never touch.
+     */
+    justify-content: space-between;
+    gap: clamp(20px, 3svh, 32px);
+
+    min-height: 100svh;
+
+    padding-top: calc(var(--header-height, 90px) + clamp(16px, 3svh, 40px));
+    padding-bottom: clamp(24px, 4svh, 48px);
+  }
+
   .description {
     font-size: 26px;
   }

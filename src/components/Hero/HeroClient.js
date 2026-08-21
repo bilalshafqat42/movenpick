@@ -71,9 +71,10 @@ export default function HeroClient({
   const revealImage = useCallback((event) => {
     event.preventDefault();
 
+    const section = sectionRef.current;
     const imageSection = imageSectionRef.current;
 
-    if (!imageSection) {
+    if (!section || !imageSection) {
       return;
     }
 
@@ -81,11 +82,67 @@ export default function HeroClient({
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
+    /*
+     * On mobile the hero is already one screen with the photo panel
+     * in it, so there is nothing left inside the section to reveal —
+     * Scroll Down moves on to the next section instead. Read from the
+     * DOM rather than by id so it follows the page order rather than
+     * needing to know what comes next.
+     */
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const nextSection = section.nextElementSibling;
+
+    let targetY = panelRestScrollY(imageSection);
+
+    if (mobile && nextSection) {
+      /*
+       * Land on the position the next section's snap point will settle
+       * at, not merely at its top.
+       *
+       * That offset is the page's scroll-padding PLUS the section's own
+       * scroll-margin, and on mobile those cancel out (see globals.css:
+       * 90px of padding against -90px of margin, so a full-screen
+       * section rests flush). Subtracting only the padding left the
+       * tween 90px short, and restoring snapping afterwards yanked the
+       * page that 90px in a single frame — the abrupt jolt at the end.
+       */
+      const rootStyle = window.getComputedStyle(document.documentElement);
+      const nextStyle = window.getComputedStyle(nextSection);
+
+      const snapOffset =
+        (parseFloat(rootStyle.scrollPaddingTop) || 0) +
+        (parseFloat(nextStyle.scrollMarginTop) || 0);
+
+      targetY = Math.max(
+        0,
+        nextSection.getBoundingClientRect().top + window.scrollY - snapOffset,
+      );
+    }
+
+    /*
+     * CSS scroll snapping is suspended for the duration.
+     *
+     * The browser re-snaps after every frame a scripted scroll writes,
+     * so the tween and the snap end up taking turns dragging the page —
+     * the same fight that made this button stutter badly enough to be
+     * reported as broken once before. Restored on completion and on
+     * interrupt, so a tween that never finishes cannot leave the page
+     * without snapping.
+     */
+    const root = document.documentElement;
+    const restoreSnap = () => {
+      root.style.removeProperty("scroll-snap-type");
+    };
+
+    root.style.scrollSnapType = "none";
+
     gsap.to(window, {
-      scrollTo: { y: panelRestScrollY(imageSection), autoKill: false },
+      scrollTo: { y: targetY, autoKill: false },
       duration: reduceMotion ? 0 : 1.4,
       ease: "power2.inOut",
       overwrite: true,
+      onComplete: restoreSnap,
+      onInterrupt: restoreSnap,
     });
   }, []);
 

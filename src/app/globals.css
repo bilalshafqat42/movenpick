@@ -98,7 +98,34 @@ html {
 }
 
 /*
- * The hero deliberately has NO snap point.
+ * Mobile: the hero and the project overview each become exactly one
+ * screen, so they get their own snap point and rest flush.
+ *
+ * The negative scroll-margin cancels the scroll-padding above. That
+ * padding exists so an ordinary section lands clear of the fixed
+ * header, but a section that is deliberately 100svh tall would then
+ * rest 90px down and hang that far below the fold. These two carry
+ * their own header clearance internally instead, so they want the
+ * padding cancelled.
+ *
+ * The hero gets a snap point ONLY here. On desktop it must not have one
+ * (see the note below) because its Scroll Down journey and the frame's
+ * scrubbed growth both run through that scroll range; on mobile there
+ * is no growth animation and Scroll Down leaves the section entirely.
+ */
+@media (max-width: 767px) {
+  #home {
+    scroll-snap-align: start;
+  }
+
+  #home,
+  #project-overview {
+    scroll-margin-top: calc(-1 * var(--header-height, 90px));
+  }
+}
+
+/*
+ * The hero deliberately has NO snap point on desktop.
  *
  * It was given one (`end` on #hero-image, so a rest would land the
  * panel's bottom edge on the viewport's) and it wrecked the section.
