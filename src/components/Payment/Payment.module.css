@@ -361,6 +361,19 @@
 
   .rowSublabel {
     font-size: 16px;
+
+    /*
+     * More air under the milestone line than the 4px the base rule
+     * gives it. That gap was set against a 20px label and a 13px
+     * sublabel; at the desktop sizes above (24px and 16px) the two
+     * lines sat too close to read as separate pieces of information.
+     *
+     * A margin rather than a gap on .row: the rule is absolutely
+     * positioned, so it is out of flow and a flex gap would space only
+     * these two anyway — this says the same thing in one property and
+     * holds even where .row is not a flex column.
+     */
+    margin-top: 10px;
   }
 }
 
