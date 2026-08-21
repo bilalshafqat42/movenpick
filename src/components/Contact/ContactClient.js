@@ -276,6 +276,69 @@ export default function ContactClient({
           }
 
           /*
+           * Mobile: one line after another, and nothing else.
+           *
+           * No clip-path wipe here. That reveal is scrubbed against
+           * scroll position, so on a handset — where this section is a
+           * full 100svh that snaps into place — the whole panel was
+           * still uncovering itself while the reader was already
+           * looking at it. Text arriving one piece at a time says
+           * "read me in this order" on its own; a second, scroll-linked
+           * reveal underneath it only competed.
+           *
+           * No y offset either, for the same reason: any vertical
+           * travel on a screen this size reads as the page still
+           * settling rather than as an entrance. Opacity alone.
+           *
+           * Ordered by where each element actually sits on screen, not
+           * by DOM order, because the mobile layout puts the form above
+           * the description while the markup has them the other way
+           * round. Sorting by position means the sequence follows the
+           * eye whatever the CSS does with the order later.
+           */
+          if (mobile) {
+            gsap.set(viewport, {
+              clipPath: "none",
+            });
+
+            const inReadingOrder = [...introChildren, ...formChildren]
+              /*
+               * Anything with no height takes no part. The status line
+               * is empty until a submission answers, and leaving it in
+               * spent one whole step of the stagger on a row nobody can
+               * see — a beat of nothing right before the closing
+               * paragraph.
+               */
+              .filter((child) => child.getBoundingClientRect().height > 0)
+              .sort(
+                (first, second) =>
+                  first.getBoundingClientRect().top -
+                  second.getBoundingClientRect().top,
+              );
+
+            gsap.fromTo(
+              inReadingOrder,
+              {
+                autoAlpha: 0,
+              },
+              {
+                autoAlpha: 1,
+                duration: 0.55,
+                stagger: 0.11,
+                ease: "power2.out",
+
+                scrollTrigger: {
+                  trigger: section,
+                  start: "top 75%",
+                  once: true,
+                },
+              },
+            );
+
+            return;
+          }
+
+          /*
            * Reveal the complete section from bottom to top.
            */
           gsap.fromTo(
@@ -292,7 +355,7 @@ export default function ContactClient({
                 trigger: section,
                 start: "top bottom",
                 end: "top top",
-                scrub: mobile ? 0.5 : 0.7,
+                scrub: 0.7,
                 invalidateOnRefresh: true,
               },
             },
@@ -305,7 +368,7 @@ export default function ContactClient({
             introChildren,
             {
               autoAlpha: 0,
-              y: mobile ? 28 : 40,
+              y: 40,
             },
             {
               autoAlpha: 1,
@@ -328,7 +391,7 @@ export default function ContactClient({
             formChildren,
             {
               autoAlpha: 0,
-              y: mobile ? 24 : 34,
+              y: 34,
             },
             {
               autoAlpha: 1,

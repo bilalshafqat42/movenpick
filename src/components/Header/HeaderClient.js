@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import {
+  ENTRANCE_STAGGER,
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  INTRO_BREAKPOINT,
+  introStepStart,
+} from "@/lib/motion";
 
 import styles from "./Header.module.css";
 
@@ -260,43 +266,61 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
       let introTimeline;
 
       if (!reduceMotion) {
+        /*
+         * On the home page, desktop only, these controls are the second
+         * beat of the page-load sequence: they wait for the hero's
+         * opening copy to land, hold for a beat, and then come down.
+         * The photo and pattern follow them.
+         *
+         * Gated on the hero actually being present rather than on the
+         * route, because the other pages (privacy, terms, thank-you)
+         * have no opening copy to wait for — there the header should
+         * simply arrive, as it always has.
+         */
+        const waitsForHero =
+          Boolean(document.getElementById("home")) &&
+          window.matchMedia(INTRO_BREAKPOINT).matches;
+
         introTimeline = gsap.timeline({
+          delay: waitsForHero ? introStepStart(1) : 0,
+
           defaults: {
             ease: ENTRANCE_EASE,
           },
         });
 
+        /*
+         * fromTo, not from. `from` treats the element's CURRENT state as
+         * the destination, and these four now start hidden in CSS so
+         * that nothing flashes before the sequence reaches them (see the
+         * intro block in Header.module.css). Read that way, `from`
+         * animated each control from invisible to invisible and the
+         * header never appeared at all. The destination has to be
+         * stated.
+         */
         introTimeline
-          .from(`.${styles.menuControl}`, {
-            autoAlpha: 0,
-            y: -14,
-            duration: ENTRANCE_DURATION,
-          })
-          .from(
+          .fromTo(
+            `.${styles.menuControl}`,
+            { autoAlpha: 0, y: -14 },
+            { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+            0,
+          )
+          .fromTo(
             `.${styles.logo}`,
-            {
-              autoAlpha: 0,
-              y: -14,
-              duration: ENTRANCE_DURATION,
-            },
+            { autoAlpha: 0, y: -14 },
+            { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
             ENTRANCE_STAGGER,
           )
-          .from(
+          .fromTo(
             `.${styles.callback}`,
-            {
-              autoAlpha: 0,
-              y: -14,
-              duration: ENTRANCE_DURATION,
-            },
+            { autoAlpha: 0, y: -14 },
+            { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
             ENTRANCE_STAGGER * 2,
           )
-          .from(
+          .fromTo(
             `.${styles.divider}`,
-            {
-              scaleX: 0,
-              transformOrigin: "left center",
-              duration: ENTRANCE_DURATION,
-            },
+            { scaleX: 0, transformOrigin: "left center" },
+            { scaleX: 1, transformOrigin: "left center", duration: ENTRANCE_DURATION },
             ENTRANCE_STAGGER * 3,
           );
       } else {

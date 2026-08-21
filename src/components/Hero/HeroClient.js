@@ -5,7 +5,13 @@ import SafeImage from "@/components/SafeImage";
 import { useCallback, useRef } from "react";
 
 import { gsap, useGSAP } from "@/lib/gsap";
-import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import {
+  ENTRANCE_STAGGER,
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  INTRO_BREAKPOINT,
+  introStepStart,
+} from "@/lib/motion";
 import styles from "./Hero.module.css";
 
 /*
@@ -187,8 +193,55 @@ export default function HeroClient({
       }
 
       /*
-       * Each element starts one ENTRANCE_STAGGER after the previous —
-       * building photo first, pattern shape last, per the requested order.
+       * Desktop opens in three deliberate beats instead of one cascade:
+       * the copy, then the header's controls (Header runs that one — see
+       * introStepStart in lib/motion), then the pattern and the
+       * building photo. Each group waits for the previous one to land
+       * and then holds for a beat, so the page introduces itself in the
+       * order it wants to be read.
+       *
+       * Each group moves as a single block. A stagger inside a group
+       * would blur the boundary between the beats, which is the whole
+       * point of the sequence.
+       */
+      if (window.matchMedia(INTRO_BREAKPOINT).matches) {
+        gsap.fromTo(
+          [eyebrowEl, titleEl, subtitleEl, scrollIndicator],
+          { autoAlpha: 0, y: 32 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: ENTRANCE_DURATION,
+            ease: ENTRANCE_EASE,
+            delay: introStepStart(0),
+          },
+        );
+
+        /*
+         * Third beat: the pattern and the photo, together, from below.
+         * They sit in the panel under the copy and do not move from
+         * there — this is only about when they arrive, not where.
+         */
+        gsap.fromTo(
+          [imageFrameEl, patternEl],
+          { autoAlpha: 0, y: 40 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: ENTRANCE_DURATION,
+            ease: ENTRANCE_EASE,
+            delay: introStepStart(2),
+          },
+        );
+
+        return;
+      }
+
+      /*
+       * Below 1025px, the original cascade: each element one
+       * ENTRANCE_STAGGER after the previous. The three-beat sequence
+       * above is a desktop composition — it depends on the copy and the
+       * photo occupying separate screens, which they do not here.
        */
       gsap
         .timeline({ defaults: { ease: ENTRANCE_EASE } })
@@ -330,31 +383,44 @@ export default function HeroClient({
       className={styles.hero}
       aria-labelledby="hero-title"
     >
-      <div ref={contentRef} className={styles.content}>
-        <p className={styles.eyebrow}>Duis aute irure</p>
+      {/*
+       * The copy and the scroll cue travel together, so they share a
+       * panel. On desktop that panel is the layer the photo slides up
+       * over; below 1025px it is `display: contents`, so the box is not
+       * there at all and the two sit in the hero's own flex column
+       * exactly as before.
+       */}
+      <div className={styles.textPanel}>
+        <div ref={contentRef} className={styles.content}>
+          <p className={styles.eyebrow}>Duis aute irure</p>
 
-        <h1 id="hero-title" className={styles.title}>
-          The home of active wellness
-        </h1>
+          <h1 id="hero-title" className={styles.title}>
+            The home of active wellness
+          </h1>
 
-        <p className={styles.subtitle}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
+          <p className={styles.subtitle}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </p>
+        </div>
+
+        <a
+          ref={scrollIndicatorRef}
+          href="#hero-image"
+          className={styles.scrollIndicator}
+          aria-label="Scroll down to discover Movenpick"
+          onClick={revealImage}
+        >
+          <span className={styles.scrollLine} aria-hidden="true" />
+          <span className={styles.scrollText}>Scroll Down</span>
+        </a>
       </div>
 
-      <a
-        ref={scrollIndicatorRef}
-        href="#hero-image"
-        className={styles.scrollIndicator}
-        aria-label="Scroll down to discover Movenpick"
-        onClick={revealImage}
+      <div
+        ref={imageSectionRef}
+        id="hero-image"
+        className={styles.imageSection}
       >
-        <span className={styles.scrollLine} aria-hidden="true" />
-        <span className={styles.scrollText}>Scroll Down</span>
-      </a>
-
-      <div ref={imageSectionRef} id="hero-image" className={styles.imageSection}>
         <Image
           ref={patternRef}
           src="/images/hero/pattern.avif"

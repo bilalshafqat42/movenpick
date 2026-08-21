@@ -787,6 +787,73 @@
    Reduced motion
    ========================================================= */
 
+/* =========================================================
+   Page-load intro, desktop only
+
+   These elements are revealed by the three-beat load sequence (see
+   introStepStart in lib/motion.js), and they start hidden HERE rather
+   than only in the GSAP from-state.
+
+   The server sends them visible, and GSAP cannot hide them until React
+   has hydrated. Measured at 1440px, that is a 194ms window in which the
+   finished page is painted — and because the sequence then holds the
+   header back until 1.5s and the photo until 3.15s, the result was a
+   glimpse of everything followed by a second and a half of empty cream.
+   A flash-then-hide reads as a page failing to load, not as an
+   entrance.
+
+   Desktop only, because only desktop runs the sequence; below 1025px
+   the original cascade starts immediately and there is nothing to hide
+   for.
+
+   The scripting query is the safety net: with JavaScript off, nothing
+   will ever reveal these, so they must never have been hidden.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .menuControl,
+  .logo,
+  .callback {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /*
+   * The divider is drawn open by a scaleX tween rather than faded, so
+   * its resting state is collapsed rather than transparent.
+   */
+  .divider {
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+}
+
+@media (min-width: 1025px) and (scripting: none) {
+  .menuControl,
+  .logo,
+  .callback {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .divider {
+    transform: none;
+  }
+}
+
+@media (min-width: 1025px) and (prefers-reduced-motion: reduce) {
+  .menuControl,
+  .logo,
+  .callback {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .divider {
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .header,
   .divider,

@@ -21,6 +21,19 @@
 }
 
 /* =========================================================
+   Text panel
+
+   A wrapper around the copy and the scroll cue so the two can be held
+   together as one layer on desktop. `display: contents` everywhere else
+   means the box is not there at all and the hero's own flex column is
+   untouched below 1025px.
+   ========================================================= */
+
+.textPanel {
+  display: contents;
+}
+
+/* =========================================================
    Text content
    ========================================================= */
 
@@ -333,12 +346,118 @@
 }
 
 /* =========================================================
+   Desktop parallax: the photo panel rises over the copy
+
+   The copy sticks to the top of the screen while the hero scrolls past
+   it, and the photo panel — a layer above it, the full width and height
+   of the screen — slides up and covers it. The copy does not move; it
+   is passed over and left behind.
+
+   The panel starts exactly where it always has: in normal flow directly
+   under the copy, with the same margin above it. Nothing is pushed down
+   a screen to make room. All that changed is that the copy now holds
+   its position instead of scrolling away, and the panel passes in front
+   of it rather than behind.
+
+   Because the layout is untouched, the hero is the same height it was
+   and the panel still comes to rest exactly one screen down — the
+   figure panelRestScrollY() computes for the Scroll Down button and for
+   the photo's 8-to-10 column growth in HeroClient. The parallax, the
+   button and the growth all finish at one position rather than three
+   tuned separately.
+
+   The cream background on the panel is what makes it a cover rather
+   than a veil: the pattern behind the photo is artwork with gaps in it,
+   not a backdrop, and without an opaque layer beneath it the heading
+   reads straight through.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  /*
+   * The top padding moves to the text panel. Left on .hero it would sit
+   * outside the sticky element, so the copy would stick to the very top
+   * of the viewport and slide up under the fixed header.
+   */
+  .hero {
+    padding-top: 0;
+  }
+
+  .textPanel {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+
+    padding-top: calc(90px + clamp(48px, 6vw, 96px));
+  }
+
+  .imageSection {
+    z-index: 2;
+
+    background: var(--color-cream);
+  }
+}
+
+/* =========================================================
+   Page-load intro, desktop only
+
+   These elements are revealed by the three-beat load sequence (see
+   introStepStart in lib/motion.js), and they start hidden HERE rather
+   than only in the GSAP from-state.
+
+   The server sends them visible, and GSAP cannot hide them until React
+   has hydrated. Measured at 1440px, that is a 194ms window in which the
+   finished page is painted — and because the sequence then holds the
+   header back until 1.5s and the photo until 3.15s, the result was a
+   glimpse of everything followed by a second and a half of empty cream.
+   A flash-then-hide reads as a page failing to load, not as an
+   entrance.
+
+   Desktop only, because only desktop runs the sequence; below 1025px
+   the original cascade starts immediately and there is nothing to hide
+   for.
+
+   The scripting query is the safety net: with JavaScript off, nothing
+   will ever reveal these, so they must never have been hidden.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .eyebrow,
+  .title,
+  .subtitle,
+  .scrollIndicator,
+  .patternShape,
+  .imageFrame {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (min-width: 1025px) and (scripting: none) {
+  .eyebrow,
+  .title,
+  .subtitle,
+  .scrollIndicator,
+  .patternShape,
+  .imageFrame {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* =========================================================
    Reduced motion
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .content > *,
   .scrollIndicator,
+  .patternShape,
   .imageFrame {
     opacity: 1 !important;
     visibility: visible !important;

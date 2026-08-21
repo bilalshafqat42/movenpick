@@ -297,21 +297,57 @@ a.value:focus-visible,
   .legalRow {
     grid-column: 2 / -1;
     grid-row: 4;
+
+    /*
+     * The desktop rule sets `gap: 150px`, which is BOTH axes. Below
+     * desktop the three links no longer fit on one line, so that figure
+     * stopped being a gap between links and became 150px of empty
+     * footer between wrapped lines: measured 355px of legal row at
+     * 768px wide, three lines of 13px text spread over a third of the
+     * footer's height.
+     *
+     * Two axes, two values. The column gap is what separates the links;
+     * the row gap only ever applies to a wrap, so it is sized for one.
+     */
+    column-gap: 24px;
+    row-gap: 12px;
   }
 }
 
 /* Mobile */
 
 @media (max-width: 600px) {
+  /*
+   * Spacing scales with the screen rather than sitting at a flat
+   * 70/48/42. Those figures were set for a large handset; on a 568px
+   * screen the same seven stacked blocks and their fixed gaps ran the
+   * footer well past the viewport for no gain in legibility.
+   *
+   * The bottom padding is the exception, and is deliberately not a
+   * proportion of anything. It exists to clear the floating
+   * back-to-top and chat controls, which are fixed to the
+   * bottom-right of the screen and sit directly over the footer's last
+   * row once the page is scrolled to the end: measured before this, the
+   * back-to-top button covered "Terms & Conditions" at 440px wide and
+   * "Privacy Policy" at 320px, making a legal link untappable.
+   *
+   * It is built from the control's own metrics so the two cannot drift
+   * apart — its offset from the bottom edge, its height, and a little
+   * breathing room. 24px and 56px are the figures in
+   * BackToTop.module.css for this tier; the 480px tier below matches
+   * its smaller ones, safe-area inset included, because on a notched
+   * handset the button sits higher than its nominal offset.
+   */
   .inner {
     display: flex;
     flex-direction: column;
 
     min-height: auto;
 
-    padding: 70px var(--page-gutter) 48px;
+    padding: clamp(48px, 8svh, 70px) var(--page-gutter)
+      calc(24px + 56px + 14px);
 
-    gap: 42px;
+    gap: clamp(28px, 4.2svh, 42px);
   }
 
   .logoMark {
@@ -331,11 +367,29 @@ a.value:focus-visible,
   }
 
   .copyright {
-    margin-top: 24px;
+    margin-top: clamp(12px, 2.4svh, 24px);
   }
 
+  /*
+   * Same fix as the tablet tier above, tightened again: at 18px the
+   * three links still hold one line on a large handset (302px of text
+   * plus 36px of gap inside 367px of usable width) and fall to two tidy
+   * lines below that, instead of the two- and three-line stacks 150px
+   * apart that were adding 186px at 440px wide and 355px at 375.
+   */
   .legalRow {
     align-self: flex-start;
+
+    column-gap: 18px;
+    row-gap: 12px;
+  }
+}
+
+/* Small mobile — matches BackToTop's own 480px tier */
+
+@media (max-width: 480px) {
+  .inner {
+    padding-bottom: calc(max(16px, env(safe-area-inset-bottom)) + 50px + 14px);
   }
 }
 
