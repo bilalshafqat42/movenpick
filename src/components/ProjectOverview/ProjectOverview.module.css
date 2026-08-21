@@ -20,7 +20,35 @@
   font-weight: 400;
   line-height: 1.35;
 
-  color: var(--color-gold);
+  /*
+   * 60% gold, written as a colour rather than `opacity: 0.6`.
+   *
+   * This paragraph fades in on scroll, and that entrance drives
+   * `opacity` from 0 to 1 as an inline style — which beats any opacity
+   * set here, so the softening would have survived until the animation
+   * ran and then been wiped out. Putting the alpha in the colour keeps
+   * the two out of each other's way.
+   *
+   * This is the resting strength of the SECOND half. On desktop only
+   * the opening sentence is brought up to full gold (see
+   * ProjectOverviewClient), and everything after the first full stop
+   * stays here.
+   */
+  color: rgba(var(--color-gold-rgb), 0.6);
+}
+
+/*
+ * One word of the heading. It inherits the 70% above, and
+ * ProjectOverviewClient brings each one up to full --color-gold in
+ * turn as the section arrives.
+ *
+ * No display change: left inline, so the words wrap and justify
+ * exactly as the unsplit sentence did. Making them inline-block would
+ * have been the easy way to animate them and would also have changed
+ * where every line broke.
+ */
+.descriptionWord {
+  color: inherit;
 }
 
 /* =========================================================

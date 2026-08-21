@@ -16,6 +16,7 @@ export default function ProjectOverviewClient({
 }) {
   const sectionRef = useRef(null);
   const descriptionRef = useRef(null);
+  const descriptionWordRefs = useRef([]);
   const dividerRef = useRef(null);
   const statsRef = useRef(null);
   const ctaRowRef = useRef(null);
@@ -38,11 +39,56 @@ export default function ProjectOverviewClient({
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      /*
+       * The heading sits at 60% gold (see .description in the module
+       * CSS) and its opening sentence is brought up to full strength
+       * one word at a time, left to right, as it arrives — the sentence
+       * lighting up in the order it is read, with the rest of the
+       * paragraph left soft behind it.
+       *
+       * The destination is read from --color-gold rather than written
+       * out here, so this cannot drift from the brand token.
+       */
+      const descriptionWords = descriptionWordRefs.current.filter(Boolean);
+
+      const fullStrengthGold =
+        window
+          .getComputedStyle(document.documentElement)
+          .getPropertyValue("--color-gold")
+          .trim() || "#897655";
+
+      /*
+       * Which words light up: on desktop, everything through the first
+       * full stop; below that, the whole paragraph.
+       *
+       * Found by looking for the stop rather than by counting words, so
+       * rewriting the copy moves the boundary with it instead of
+       * leaving a hard-coded index pointing into the middle of a
+       * sentence. If the text has no full stop at all the search
+       * returns -1 and the whole paragraph lights, which is the sensible
+       * reading of "up to the first sentence" when there is only one.
+       */
+      const litWords = () => {
+        if (!window.matchMedia("(min-width: 1025px)").matches) {
+          return descriptionWords;
+        }
+
+        const firstStop = descriptionWords.findIndex((word) =>
+          word.textContent.includes("."),
+        );
+
+        return firstStop === -1
+          ? descriptionWords
+          : descriptionWords.slice(0, firstStop + 1);
+      };
+
       if (reduceMotion) {
         gsap.set([descriptionEl, divider, ...statItems, ctaRow], {
           autoAlpha: 1,
           y: 0,
         });
+
+        gsap.set(litWords(), { color: fullStrengthGold });
 
         return;
       }
@@ -66,6 +112,42 @@ export default function ProjectOverviewClient({
               y: 0,
               duration: ENTRANCE_DURATION,
             })
+            .to(
+              /*
+               * Resolved here rather than at setup, so the width when
+               * the animation actually runs is what decides, not the
+               * width the page happened to load at.
+               */
+              litWords(),
+              {
+                color: fullStrengthGold,
+                duration: 0.5,
+
+                /*
+                 * Linear, because this is a sweep across a sentence
+                 * rather than a single object arriving. An ease would
+                 * make the light rush the opening words and dawdle over
+                 * the closing ones.
+                 */
+                ease: "none",
+
+                /*
+                 * `amount`, not `each`: the sweep takes 1.2 seconds to
+                 * cross the sentence however many words the sentence
+                 * happens to have. With a per-word figure, rewriting
+                 * the copy — or the desktop/mobile difference in how
+                 * many words are lit — would change how long this
+                 * takes.
+                 */
+                stagger: { amount: 1.2, from: "start" },
+              },
+              /*
+               * Overlapped with the paragraph's own entrance rather
+               * than queued behind it, so the text lights up as it
+               * settles instead of arriving and then waiting to be lit.
+               */
+              ENTRANCE_STAGGER,
+            )
             .to(
               divider,
               { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
@@ -95,12 +177,33 @@ export default function ProjectOverviewClient({
       className={styles.projectOverview}
       aria-labelledby="project-overview-description"
     >
+      {/*
+       * Split on whitespace and kept as separate tokens, so the runs of
+       * space are rendered back exactly as they were written rather
+       * than normalised to one space each. The words are spans only so
+       * the sweep below has something to brighten one at a time; the
+       * heading still reads as one continuous string.
+       */}
       <h2
         ref={descriptionRef}
         id="project-overview-description"
         className={styles.description}
       >
-        {description}
+        {description.split(/(\s+)/).map((token, index) =>
+          /\s/.test(token) ? (
+            token
+          ) : (
+            <span
+              key={index}
+              ref={(element) => {
+                descriptionWordRefs.current[index] = element;
+              }}
+              className={styles.descriptionWord}
+            >
+              {token}
+            </span>
+          ),
+        )}
       </h2>
 
       <hr ref={dividerRef} className={styles.divider} />
