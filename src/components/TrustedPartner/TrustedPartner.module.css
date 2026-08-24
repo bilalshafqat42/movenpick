@@ -278,6 +278,39 @@
 @media (min-width: 1025px) {
   .card {
     border-color: transparent;
+
+    /*
+     * Sized so the card rests 685px in from each side of the photo.
+     *
+     * Written as "the panel less 1370px" rather than as a width,
+     * because 685 is the figure that was asked for and this keeps it
+     * literally in the rule: at 1920 the panel is 1905 and the card
+     * comes out 535 wide, which is 685 either side exactly.
+     *
+     * The 340px floor is what stops it collapsing on narrower windows.
+     * Below about 1710px wide there is not 1370px to give away — at
+     * 1440 the subtraction alone would leave a 55px card — so the floor
+     * takes over and the inset simply becomes whatever is left.
+     */
+    width: max(340px, calc(100% - 1370px));
+  }
+
+  /*
+   * The copy keeps the width it has at rest, even once the card behind
+   * it has grown to fill the screen.
+   *
+   * --tp-card-content-width is measured and published by
+   * TrustedPartnerClient at the one moment the card is at its resting
+   * size. Without it the heading and paragraph stretched with the card
+   * and re-wrapped as it grew, so the finished state showed the same
+   * words in a different shape from the one that was designed.
+   *
+   * The button is not listed: it sizes to its own label and is centred,
+   * so it never re-wrapped in the first place.
+   */
+  .cardHeading,
+  .cardText {
+    width: var(--tp-card-content-width, auto);
   }
 }
 
@@ -440,8 +473,27 @@
     height: 100svh;
   }
 
+  /*
+   * fit-content, not a percentage.
+   *
+   * The card used to shrink-wrap its text here by accident: the resting
+   * size was measured while an inline `width: auto` was still on the
+   * element, so the 88% in this rule never actually applied. Now that
+   * the measurement respects the stylesheet, 88% would suddenly widen
+   * the card from about 220px to 388px — a visible change to a mobile
+   * layout that was signed off as it stands. fit-content asks for the
+   * shrink-wrap deliberately, so the size is what it was and the rule
+   * now says so rather than leaking it.
+   */
   .card {
-    width: 88%;
+    /*
+     * No max-width to go with this. fit-content is already bounded by
+     * the space available, so a cap adds nothing at rest — and it does
+     * real harm during the takeover: the grow drives the card out to
+     * the full panel, and an 88% ceiling quietly stopped it short so it
+     * never reached full bleed.
+     */
+    width: fit-content;
     /* padding: 32px 24px; */
     padding: 48px 36px;
   }

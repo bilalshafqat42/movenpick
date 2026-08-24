@@ -8,6 +8,19 @@ import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion
 import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Amenities.module.css";
 
+/*
+ * How far into the next stage a gesture has to carry before it counts
+ * as asking for that stage, as a fraction of one stage's scroll.
+ * Anything smaller is treated as staying where it is.
+ */
+const STAGE_COMMIT_THRESHOLD = 0.06;
+
+/* How long the snap takes to carry one photograph into place. */
+const STAGE_SNAP_DURATION = { min: 0.5, max: 0.8 };
+
+/* Pause after the scroll stops before the snap takes over. */
+const STAGE_SNAP_DELAY = 0.12;
+
 export default function AmenitiesClient({ heading, introText, items, ctaLabel }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -269,12 +282,93 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
                 transformOrigin: "top center",
               });
 
+              /*
+               * One gesture, one photograph.
+               *
+               * Each stage occupies a fixed slice of the journey — 675px
+               * of scroll at 1440x900 — and nothing was holding the
+               * scroll to those slices. A mouse notch is well under
+               * that, so it looked right on a mouse, but a trackpad
+               * flick carries far more than one slice's worth of
+               * momentum and skipped two or three photographs in a
+               * single gesture.
+               *
+               * The snap quantises the scroll to the stage boundaries.
+               * It is deliberately NOT GSAP's default velocity
+               * projection, which asks "where would this gesture have
+               * ended up" — that is exactly the question that lets a
+               * hard flick fling past several stages. This asks where
+               * the scroll actually IS and moves one stage from there,
+               * so the size of the gesture stops mattering.
+               *
+               * COMMIT_THRESHOLD is the small amount of travel that
+               * still counts as "staying put", so a stray pixel or two
+               * does not advance a stage on its own.
+               */
+              const stageIncrement = 1 / items.length;
+
+              /*
+               * Where the last gesture came to rest. The next one moves
+               * ONE stage from here, whatever its size.
+               *
+               * Quantising from the current scroll position was not
+               * enough: a flick is a burst of wheel events, and by the
+               * time the scroll stops and the snap runs, the page has
+               * already travelled two or three stages. Snapping to the
+               * nearest boundary from there simply confirmed the skip.
+               * Stepping from the settled stage instead makes the size
+               * of the gesture irrelevant.
+               */
+              let settledStage = 0;
+
+              const snapToStage = (naturalValue, self) => {
+                const raw = self.progress / stageIncrement;
+                const forward = self.direction !== -1;
+                const travelled = Math.abs(raw - settledStage);
+
+                const index =
+                  travelled < STAGE_COMMIT_THRESHOLD
+                    ? settledStage
+                    : settledStage + (forward ? 1 : -1);
+
+                const clamped = gsap.utils.clamp(0, items.length, index);
+
+                return gsap.utils.clamp(0, 1, clamped * stageIncrement);
+              };
+
               stageTrigger = ScrollTrigger.create({
                 trigger: stageWrapper,
                 start: "top top",
                 end: "bottom bottom",
                 scrub: 0.3,
                 invalidateOnRefresh: true,
+
+                snap: {
+                  snapTo: snapToStage,
+                  duration: STAGE_SNAP_DURATION,
+                  delay: STAGE_SNAP_DELAY,
+                  ease: "power2.inOut",
+
+                  onComplete: (self) => {
+                    settledStage = Math.round(self.progress / stageIncrement);
+                  },
+                },
+
+                /*
+                 * Leaving the journey resyncs the settled stage to
+                 * wherever the scroll actually is, so returning to the
+                 * section — or arriving from a menu jump — steps from
+                 * the stage on screen rather than from a stale one.
+                 */
+                onToggle: (self) => {
+                  if (!self.isActive) {
+                    settledStage = gsap.utils.clamp(
+                      0,
+                      items.length,
+                      Math.round(self.progress / stageIncrement),
+                    );
+                  }
+                },
 
                 onUpdate: (self) => {
                   gsap.set(progressFill, { scaleY: self.progress });

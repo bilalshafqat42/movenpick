@@ -30,6 +30,23 @@ const GROW_VIEWPORTS = 0.9;
  */
 const GROW_ARRIVAL_VIEWPORTS = 0.2;
 
+/*
+ * The Accor block introduces itself one line at a time: logo, then
+ * eyebrow, then heading, then paragraph.
+ *
+ * Its own figures rather than the site-wide ENTRANCE_STAGGER, which is
+ * 0.15s. Four elements at that spacing land inside half a second, which
+ * is close enough to simultaneous that the sequence does not register
+ * as one — it just looked like the block fading in. At 0.34s each step
+ * is separately legible and the four span a little over a second.
+ *
+ * The rise is longer than the usual 24px for the same reason: a short
+ * travel at speed is easy to miss, and this block is the section's
+ * whole first impression.
+ */
+const TEXT_REVEAL_STAGGER = 0.34;
+const TEXT_REVEAL_RISE = 44;
+
 export default function TrustedPartnerClient({
   logo,
   logoAlt,
@@ -75,7 +92,15 @@ export default function TrustedPartnerClient({
       ).matches;
 
       if (reduceMotion) {
-        gsap.set([...textReveal, media, card].filter(Boolean), {
+        const cardContents = card
+          ? [
+              card.querySelector(`.${styles.cardHeading}`),
+              card.querySelector(`.${styles.cardText}`),
+              card.querySelector(`.${styles.ctaButton}`),
+            ].filter(Boolean)
+          : [];
+
+        gsap.set([...textReveal, ...cardContents, media, card].filter(Boolean), {
           autoAlpha: 1,
           y: 0,
         });
@@ -83,7 +108,7 @@ export default function TrustedPartnerClient({
         return;
       }
 
-      gsap.set(textReveal, { autoAlpha: 0, y: 24 });
+      gsap.set(textReveal, { autoAlpha: 0, y: TEXT_REVEAL_RISE });
 
       const textTrigger = ScrollTrigger.create({
         trigger: section,
@@ -95,7 +120,7 @@ export default function TrustedPartnerClient({
             autoAlpha: 1,
             y: 0,
             duration: ENTRANCE_DURATION,
-            stagger: ENTRANCE_STAGGER,
+            stagger: TEXT_REVEAL_STAGGER,
             ease: ENTRANCE_EASE,
           });
         },
@@ -123,8 +148,21 @@ export default function TrustedPartnerClient({
       const heldStill = window.getComputedStyle(media).position === "sticky";
 
       if (media && card && mediaScroll && heldStill) {
+        /*
+         * The card's own contents arrive one at a time — heading, then
+         * paragraph, then button — on the same rhythm as the Accor
+         * block above it, so the two halves of the section introduce
+         * themselves the same way.
+         */
+        const cardReveal = [
+          card.querySelector(`.${styles.cardHeading}`),
+          card.querySelector(`.${styles.cardText}`),
+          card.querySelector(`.${styles.ctaButton}`),
+        ].filter(Boolean);
+
         gsap.set(media, { autoAlpha: 0, y: 28 });
         gsap.set(card, { autoAlpha: 0, y: 24 });
+        gsap.set(cardReveal, { autoAlpha: 0, y: TEXT_REVEAL_RISE });
 
         mediaTrigger = ScrollTrigger.create({
           trigger: media,
@@ -139,6 +177,21 @@ export default function TrustedPartnerClient({
                 card,
                 { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
                 ENTRANCE_STAGGER,
+              )
+              /*
+               * Starts as the card itself lands rather than after it,
+               * so the panel and the first line of copy feel like one
+               * arrival instead of two queued events.
+               */
+              .to(
+                cardReveal,
+                {
+                  autoAlpha: 1,
+                  y: 0,
+                  duration: ENTRANCE_DURATION,
+                  stagger: TEXT_REVEAL_STAGGER,
+                },
+                ENTRANCE_STAGGER * 2,
               );
           },
         });
@@ -180,7 +233,19 @@ export default function TrustedPartnerClient({
          * photo.
          */
         const measureInsets = () => {
-          const edges = ["top", "right", "bottom", "left"];
+          /*
+           * `width` and `height` are cleared alongside the four edges.
+           *
+           * The grow sets both to `auto` so the insets can define the
+           * box, and that inline `auto` survived into this measurement —
+           * so the card shrink-wrapped its text and the CSS width was
+           * never what got measured. Setting a width in the stylesheet
+           * had no visible effect at all: measured 518px against a rule
+           * asking for less. Clearing them here means the rule decides
+           * the resting size, which is the only place it can be
+           * expressed once and read by everything.
+           */
+          const edges = ["top", "right", "bottom", "left", "width", "height"];
           const saved = edges.map((edge) => card.style[edge]);
 
           edges.forEach((edge) => {
@@ -189,6 +254,29 @@ export default function TrustedPartnerClient({
 
           const cardRect = card.getBoundingClientRect();
           const mediaRect = media.getBoundingClientRect();
+
+          /*
+           * The width the copy wraps at, published while the card is at
+           * its resting size — the only moment it can be read.
+           *
+           * The card grows to fill the whole panel, and without this the
+           * heading and paragraph grew with it and re-wrapped: the same
+           * words in a completely different shape by the time the
+           * takeover finished. Freezing the wrap width keeps the copy
+           * looking exactly as it does at rest while the background
+           * expands behind it.
+           */
+          const cardStyle = window.getComputedStyle(card);
+
+          const restingContentWidth =
+            cardRect.width -
+            (parseFloat(cardStyle.paddingLeft) || 0) -
+            (parseFloat(cardStyle.paddingRight) || 0);
+
+          card.style.setProperty(
+            "--tp-card-content-width",
+            `${Math.round(restingContentWidth)}px`,
+          );
 
           edges.forEach((edge, index) => {
             card.style[edge] = saved[index];
