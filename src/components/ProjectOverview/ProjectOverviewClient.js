@@ -4,7 +4,11 @@ import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
-import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  HERO_COPY_STAGGER,
+} from "@/lib/motion";
 import styles from "./ProjectOverview.module.css";
 
 export default function ProjectOverviewClient({
@@ -104,6 +108,13 @@ export default function ProjectOverviewClient({
         start: "top 78%",
 
         onReveal: () => {
+          /*
+           * The same gap the hero's opening uses, so the two sections
+           * introduce themselves at one pace rather than this one
+           * running half again as fast.
+           */
+          const step = HERO_COPY_STAGGER;
+
           const timeline = gsap.timeline({ defaults: { ease: ENTRANCE_EASE } });
 
           timeline
@@ -146,23 +157,41 @@ export default function ProjectOverviewClient({
                * than queued behind it, so the text lights up as it
                * settles instead of arriving and then waiting to be lit.
                */
-              ENTRANCE_STAGGER,
+              step,
             )
             .to(
               divider,
               { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-              ENTRANCE_STAGGER,
+              step,
             )
-            .to(statItems, {
-              autoAlpha: 1,
-              y: 0,
-              duration: ENTRANCE_DURATION,
-              stagger: ENTRANCE_STAGGER,
-            }, ENTRANCE_STAGGER * 2)
+            /*
+             * The four figures arrive one at a time — Q4 2028, then
+             * 40/60, then the unit types, then the price — rather than
+             * as a block, on the same spacing the hero uses.
+             */
+            .to(
+              statItems,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: ENTRANCE_DURATION,
+                stagger: step,
+              },
+              step * 2,
+            )
+            /*
+             * One step after the last figure, whatever the figure count
+             * happens to be.
+             *
+             * The figures start at step * 2 and each is one step apart,
+             * so the last of four lands at step * 5 — two more than the
+             * count, not three. Written as `count + 1` the first time,
+             * which put the buttons 450ms behind instead of 225.
+             */
             .to(
               ctaRow,
               { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-              ENTRANCE_STAGGER * 2 + ENTRANCE_STAGGER * statItems.length + ENTRANCE_STAGGER,
+              step * (statItems.length + 2),
             );
         },
       });
