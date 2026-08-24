@@ -215,6 +215,42 @@
 }
 
 /* =========================================================
+   Desktop: rides over the hero's pinned photograph
+
+   The hero holds its photo panel on screen for one more viewport (see
+   .hero's padding-bottom in Hero.module.css). This section is pulled
+   back up by exactly that much, so the document is no taller than
+   before and the runway is spent with this section sliding up over the
+   photo rather than the photo scrolling away first.
+
+   z-index is what puts it in front: the pinned panel is a positioned
+   element, and without a higher index of its own this section's
+   background would paint beneath it. The section keeps its natural
+   height — a full screen of it left too much empty space.
+
+   The cream background is doing real work here too — it is what the
+   photo disappears behind. Take it away and the photo reads through
+   the copy.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .projectOverview {
+    position: relative;
+    z-index: 3;
+
+    margin-top: -100vh;
+    margin-top: -100svh;
+
+    /*
+     * The space above the heading, set outright rather than left to the
+     * section's 8vw clamp. The clamp capped at 110px, which put the
+     * heading only 20px below the fixed header.
+     */
+    padding-top: 160px;
+  }
+}
+
+/* =========================================================
    Tablet
    ========================================================= */
 

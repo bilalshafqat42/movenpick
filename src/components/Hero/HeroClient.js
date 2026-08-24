@@ -40,9 +40,29 @@ import styles from "./Hero.module.css";
  * rather than the two being tuned separately and drifting.
  */
 function panelRestScrollY(imageSection) {
-  const rect = imageSection.getBoundingClientRect();
+  /*
+   * Measured from the layout tree, not from getBoundingClientRect.
+   *
+   * The panel is sticky on desktop so that the section after it can
+   * ride over it, and a stuck element's rect reports where it is
+   * PAINTED, not where it sits in the flow — once stuck it returns a
+   * top of 0 forever, which made this figure track the scroll position
+   * instead of staying the constant it is meant to be. offsetTop is
+   * layout-based and ignores sticky offsets entirely.
+   *
+   * Four things read this: the Scroll Down jump, the end of the photo's
+   * growth, where the pattern is pinned, and when the pattern is
+   * switched off. All four have to agree, so there is one definition.
+   */
+  let top = 0;
+  let node = imageSection;
 
-  return Math.max(0, rect.bottom + window.scrollY - window.innerHeight);
+  while (node) {
+    top += node.offsetTop;
+    node = node.offsetParent;
+  }
+
+  return Math.max(0, top + imageSection.offsetHeight - window.innerHeight);
 }
 
 export default function HeroClient({
@@ -564,7 +584,9 @@ export default function HeroClient({
             <a
               href={ctaHref}
               className={styles.ctaButton}
-              {...(ctaHref === "#contact" ? { "data-contact-popup": true } : {})}
+              {...(ctaHref === "#contact"
+                ? { "data-contact-popup": true }
+                : {})}
             >
               <span>{ctaLabel}</span>
               <span className={styles.ctaIcon} aria-hidden="true">
@@ -586,44 +608,55 @@ export default function HeroClient({
         </a>
       </div>
 
-      <div
-        ref={imageSectionRef}
-        id="hero-image"
-        className={styles.imageSection}
-      >
-        {/*
-         * The pattern needs a wrapper of its own.
-         *
-         * next/image with `fill` writes position: absolute as an INLINE
-         * style, and inline beats any stylesheet rule — so the pinning
-         * could never be applied to the image itself. The wrapper is
-         * what gets pinned; the image just fills whatever box it is
-         * given.
-         */}
-        <div ref={patternRef} className={styles.patternPin}>
-          <Image
-            src="/images/hero/pattern.avif"
-            alt=""
-            aria-hidden="true"
-            fill
-            quality={80}
-            sizes="100vw"
-            priority
-            className={styles.patternShape}
-          />
-        </div>
+      {/*
+       * The panel needs a wrapper to be sticky inside.
+       *
+       * A sticky element is confined by its own MARGIN box, so putting
+       * the runway on the panel's margin-bottom left it no room to
+       * shift and it never stuck at all. The runway belongs to a
+       * separate box. Below 1025px this wrapper is `display: contents`
+       * and is not in the layout at all.
+       */}
+      <div className={styles.imageScroll}>
+        <div
+          ref={imageSectionRef}
+          id="hero-image"
+          className={styles.imageSection}
+        >
+          {/*
+           * The pattern needs a wrapper of its own.
+           *
+           * next/image with `fill` writes position: absolute as an INLINE
+           * style, and inline beats any stylesheet rule — so the pinning
+           * could never be applied to the image itself. The wrapper is
+           * what gets pinned; the image just fills whatever box it is
+           * given.
+           */}
+          <div ref={patternRef} className={styles.patternPin}>
+            <Image
+              src="/images/hero/pattern.avif"
+              alt=""
+              aria-hidden="true"
+              fill
+              quality={80}
+              sizes="100vw"
+              priority
+              className={styles.patternShape}
+            />
+          </div>
 
-        <div ref={imageFrameRef} className={styles.imageFrame}>
-          <SafeImage
-            src={mainImage}
-            fallbackSrc={mainImageFallback}
-            alt={mainImageAlt}
-            fill
-            quality={85}
-            sizes="(max-width: 767px) 88vw, (max-width: 1024px) 74vw, 100vw"
-            priority
-            className={styles.image}
-          />
+          <div ref={imageFrameRef} className={styles.imageFrame}>
+            <SafeImage
+              src={mainImage}
+              fallbackSrc={mainImageFallback}
+              alt={mainImageAlt}
+              fill
+              quality={85}
+              sizes="(max-width: 767px) 88vw, (max-width: 1024px) 74vw, 100vw"
+              priority
+              className={styles.image}
+            />
+          </div>
         </div>
       </div>
     </section>

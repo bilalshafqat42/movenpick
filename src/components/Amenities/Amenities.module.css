@@ -51,14 +51,12 @@
   position: relative;
 
   /*
-   * "Magnetic" entry: scroll-snap-align (paired with the proximity
-   * scroll-snap-type set globally in globals.css) pulls a gesture that
-   * lands near this element's top into a clean, full-page-aligned
-   * start rather than stopping mid-header-overlap. The matching exit
-   * snap point lives on ProjectGallery, the section right after this
-   * one's pinned journey ends.
+   * No snap point. This used to have a "magnetic" entry that pulled a
+   * gesture landing near its top into a page-aligned start, but the
+   * section is scrolled through freely now and the pull was fighting
+   * the reader rather than helping them. The exit snap on ProjectGallery
+   * still gives the journey a clean resting point at the far end.
    */
-  scroll-snap-align: start;
 }
 
 .stickyViewport {
@@ -89,9 +87,16 @@
 }
 
 .content {
+  /*
+   * Named because the divider's gap below the list is measured against
+   * it: the column's own gap and the divider's margin stack, so the
+   * margin has to subtract this to land on the figure it says.
+   */
+  --content-gap: 48px;
+
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: var(--content-gap);
 
   /*
    * Stretched to the row's full height by .body's flex default
@@ -152,6 +157,8 @@
 }
 
 .item {
+  position: relative;
+
   display: flex;
   align-items: center;
 
@@ -214,7 +221,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 20px;
+
+  /*
+   * The button reads as its own step rather than as part of the
+   * paragraph above it. At 20px the two were close enough to look like
+   * one block.
+   */
+  gap: 32px;
 }
 
 .ctaText {
@@ -365,6 +378,92 @@
 .image {
   object-fit: cover;
   object-position: center center;
+}
+
+/* =========================================================
+   Desktop: the marker belongs to the selected item
+
+   A single continuous track used to run the full height of the list
+   with a fill growing down it as the journey advanced. It is replaced
+   here by a short rule beside the selected item only, in the same black
+   as that item's text, so the marker and the type say the same thing.
+
+   The rule is a pseudo-element rather than a border on the item: the
+   item sits inside .itemsWrapper's 20px of left padding, so a border
+   would land 20px inboard of where the old track was. Pulling the
+   pseudo-element out by that padding keeps the marker on the list's
+   true left edge.
+
+   It fades rather than jumping, on the same 250ms as the item's colour,
+   so the two read as one change of state.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .progressTrack {
+    display: none;
+  }
+
+  .item::before {
+    content: "";
+
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: -20px;
+
+    width: 2px;
+
+    background: #000000;
+
+    opacity: 0;
+
+    transition: opacity 250ms ease;
+  }
+
+  .item[data-active="true"]::before {
+    opacity: 1;
+  }
+
+  /*
+   * A measured 150px below the list, instead of `margin-top: auto`.
+   *
+   * The auto margin pushed the closing group to the bottom of the row,
+   * which left whatever space happened to be spare — about 250px — and
+   * the gap changed with the viewport rather than being a decision.
+   *
+   * The column's own gap is subtracted because the two stack: a flat
+   * 150px margin measured 198px on screen, which is 150 plus the 48 the
+   * flex column had already put there.
+   */
+  .divider {
+    margin-top: calc(150px - var(--content-gap));
+  }
+
+  .ctaGroup {
+    gap: 60px;
+  }
+}
+
+/* =========================================================
+   Desktop: sits above the hero's pinned photograph
+
+   The hero holds its photo on screen while the section before this one
+   rides over it. That photo is a positioned element, and this section's
+   background is not — so a static background paints UNDERNEATH it, and
+   the strip of screen below the project overview showed the building
+   through instead of cream.
+
+   Giving this section a stacking position of its own is what closes
+   that strip. Only the section immediately after the overview needs it:
+   the photo is pinned for exactly one screen of runway, so nothing
+   further down the page is ever in the same window.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .amenities {
+    position: relative;
+    z-index: 3;
+  }
 }
 
 /* =========================================================

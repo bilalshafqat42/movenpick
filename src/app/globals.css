@@ -85,12 +85,15 @@ html {
  * page-level decision, and one list is far easier to reason about than
  * seven separate declarations.
  *
- * Two sections are deliberately absent because they own their own snap
- * points already, placed on their inner scroll wrappers so the anchor
- * stays still while their journeys play: Amenities
- * (.stageWrapper) and Project Gallery (.scrollWrapper).
+ * Project Gallery is deliberately absent because it owns its own snap
+ * point already, placed on its inner scroll wrapper (.scrollWrapper) so
+ * the anchor stays still while its journey plays.
  */
-#project-overview,
+/*
+ * #project-overview is deliberately NOT in this list. It rides up over
+ * the hero's pinned photograph, and a snap point in the middle of that
+ * handover fought the gesture that was driving it.
+ */
 #trusted-partner,
 #gallery,
 #location-map,
