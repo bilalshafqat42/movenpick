@@ -828,13 +828,21 @@
    will ever reveal these, so they must never have been hidden.
    ========================================================= */
 
+/*
+ * No width condition on these three blocks any more: the opening
+ * sequence runs at every size, so the controls have to start hidden at
+ * every size. Left desktop-only, a phone rendered them from the server,
+ * GSAP hid them at hydration and revealed them a second later — a
+ * flash, then a blank header.
+ */
+.menuControl,
+.logo,
+.callback {
+  opacity: 0;
+  visibility: hidden;
+}
+
 @media (min-width: 1025px) {
-  .menuControl,
-  .logo,
-  .callback {
-    opacity: 0;
-    visibility: hidden;
-  }
 
   /*
    * The divider is drawn open by a scaleX tween rather than faded, so
@@ -846,7 +854,12 @@
   }
 }
 
-@media (min-width: 1025px) and (scripting: none) {
+.divider {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+@media (scripting: none) {
   .menuControl,
   .logo,
   .callback {
@@ -859,7 +872,7 @@
   }
 }
 
-@media (min-width: 1025px) and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
   .menuControl,
   .logo,
   .callback {

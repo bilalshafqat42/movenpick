@@ -332,7 +332,7 @@
 /* =========================================================
    Framed image — 10 of the page's 12 columns wide.
 
-   On desktop this is the size the photo STARTS at — 8 of 12 columns —
+   On desktop this is the size the photo STARTS at — 6 of 12 columns —
    not the size it ends at: HeroClient grows it from here to the full
    width and height of its panel as the panel arrives, so the pattern around it is
    gradually covered until the photograph is the whole section. The
@@ -346,15 +346,15 @@
   z-index: 1;
 
   /*
-   * 66.667vw is 8 of the page's 12 columns, which is where the photo
+   * 50vw is 6 of the page's 12 columns, which is where the photo
    * starts; it grows from here to the full 12 and the full height of
    * the panel.
    *
-   * 1280px is the pixel cap, chosen as exactly 8 columns at 1920 wide.
-   * At 1100 it bound early and a 1920 screen started the photo at 6.9
-   * columns rather than 8. Beyond 1920 it does bind, which is the
-   * point of a cap: the photo stops chasing the viewport on very wide
-   * displays.
+   * 960px is the pixel cap, chosen as exactly 6 columns at 1920 wide,
+   * so the column count holds rather than the cap binding early and
+   * quietly making the photo narrower than it says. Beyond 1920 it does
+   * bind, which is the point of a cap: the photo stops chasing the
+   * viewport on very wide displays.
    *
    * The third term is a guard for short, wide screens: the frame can
    * be tall enough to outgrow a 100svh panel, and this caps the width
@@ -362,7 +362,7 @@
    * below, so it converts a height budget into a width). It is
    * inactive at ordinary desktop proportions.
    */
-  width: min(66.667vw, 1280px, calc((100svh - 64px) * 904 / 624));
+  width: min(50vw, 960px, calc((100svh - 64px) * 904 / 624));
   aspect-ratio: 904 / 624;
 
   overflow: hidden;

@@ -7,7 +7,7 @@ import {
   ENTRANCE_STAGGER,
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
-  INTRO_BREAKPOINT,
+  HERO_COPY_STAGGER,
   introStepStart,
 } from "@/lib/motion";
 
@@ -300,10 +300,12 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
          * route, because the other pages (privacy, terms, thank-you)
          * have no opening copy to wait for — there the header should
          * simply arrive, as it always has.
+         *
+         * No width condition. The sequence runs at every size, so the
+         * header follows the copy on a phone exactly as it does on a
+         * desktop.
          */
-        const waitsForHero =
-          Boolean(document.getElementById("home")) &&
-          window.matchMedia(INTRO_BREAKPOINT).matches;
+        const waitsForHero = Boolean(document.getElementById("home"));
 
         introTimeline = gsap.timeline({
           delay: waitsForHero ? introStepStart(1) : 0,
@@ -322,30 +324,47 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
          * header never appeared at all. The destination has to be
          * stated.
          */
+        /*
+         * Logo first, then the menu on the left, then the callback link
+         * on the right, then the rule underneath — and on the same
+         * spacing as the hero's copy above, so the opening reads as one
+         * sequence that carries on into the header rather than two that
+         * happen to follow each other.
+         *
+         * The order used to start with the menu control because that is
+         * the order the markup happens to be in. The logo leads now,
+         * which is the order the eye is meant to take.
+         */
+        const step = HERO_COPY_STAGGER;
+
         introTimeline
           .fromTo(
-            `.${styles.menuControl}`,
+            `.${styles.logo}`,
             { autoAlpha: 0, y: -14 },
             { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
             0,
           )
           .fromTo(
-            `.${styles.logo}`,
+            `.${styles.menuControl}`,
             { autoAlpha: 0, y: -14 },
             { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-            ENTRANCE_STAGGER,
+            step,
           )
           .fromTo(
             `.${styles.callback}`,
             { autoAlpha: 0, y: -14 },
             { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-            ENTRANCE_STAGGER * 2,
+            step * 2,
           )
           .fromTo(
             `.${styles.divider}`,
             { scaleX: 0, transformOrigin: "left center" },
-            { scaleX: 1, transformOrigin: "left center", duration: ENTRANCE_DURATION },
-            ENTRANCE_STAGGER * 3,
+            {
+              scaleX: 1,
+              transformOrigin: "left center",
+              duration: ENTRANCE_DURATION,
+            },
+            step * 3,
           );
       } else {
         gsap.set(

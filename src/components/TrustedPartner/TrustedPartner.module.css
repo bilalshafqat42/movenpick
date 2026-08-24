@@ -485,15 +485,27 @@
    * shrink-wrap deliberately, so the size is what it was and the rule
    * now says so rather than leaking it.
    */
+  /*
+   * Rests 121px in from the top and bottom of the photo and 63px in
+   * from each side, then grows from there to full bleed.
+   *
+   * Written as the panel less twice each inset, so the two figures
+   * asked for stay literally in the rule and hold at any screen size:
+   * 440 - 126 = 314 wide, 956 - 242 = 714 tall.
+   *
+   * min-height rather than height for the vertical. The card is taller
+   * than its copy needs at this width, which is the point — but if the
+   * text ever grew past it, a fixed height would clip it while a
+   * minimum simply gives way.
+   *
+   * No max-width or max-height to go with them: the takeover drives the
+   * card out to the whole panel, and a ceiling would quietly stop it
+   * short of full bleed.
+   */
   .card {
-    /*
-     * No max-width to go with this. fit-content is already bounded by
-     * the space available, so a cap adds nothing at rest — and it does
-     * real harm during the takeover: the grow drives the card out to
-     * the full panel, and an 88% ceiling quietly stopped it short so it
-     * never reached full bleed.
-     */
-    width: fit-content;
+    width: calc(100% - 126px);
+    min-height: calc(100% - 242px);
+
     /* padding: 32px 24px; */
     padding: 48px 36px;
   }

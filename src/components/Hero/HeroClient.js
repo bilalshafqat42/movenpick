@@ -9,6 +9,7 @@ import {
   ENTRANCE_STAGGER,
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
+  HERO_COPY_STAGGER,
   INTRO_BREAKPOINT,
   introStepStart,
 } from "@/lib/motion";
@@ -227,9 +228,11 @@ export default function HeroClient({
        * and then holds for a beat, so the page introduces itself in the
        * order it wants to be read.
        *
-       * Each group moves as a single block. A stagger inside a group
-       * would blur the boundary between the beats, which is the whole
-       * point of the sequence.
+       * Within the first beat the five lines arrive one at a time —
+       * eyebrow, heading, description, Discover More, Scroll Down —
+       * rather than as one block. They used to move together, which is
+       * why the button in particular looked like it had no entrance of
+       * its own.
        */
       if (window.matchMedia(INTRO_BREAKPOINT).matches) {
         gsap.fromTo(
@@ -241,21 +244,31 @@ export default function HeroClient({
             autoAlpha: 1,
             y: 0,
             duration: ENTRANCE_DURATION,
+            stagger: HERO_COPY_STAGGER,
             ease: ENTRANCE_EASE,
             delay: introStepStart(0),
           },
         );
 
         /*
-         * Third beat: the pattern and the photo arrive together.
+         * The pattern first, then the building photo one step after it,
+         * continuing the same rhythm the copy and the header just set.
          *
-         * The photo rises into place; the pattern only fades. On
-         * desktop the pattern is pinned to the viewport (see
-         * .patternShape in the module CSS) precisely so that it never
-         * moves, and a rise here would be the one thing that moved it.
+         * Both rise into place the same way.
+         *
+         * The rise is applied to the IMAGE inside the pattern's
+         * wrapper, never to the wrapper itself. The wrapper is what is
+         * pinned to the viewport (see .patternPin in the module CSS),
+         * and it also carries the visibility that switches the pattern
+         * off once the hero is past — moving it here would unpin it,
+         * and writing to it would fight that trigger. The image can
+         * travel freely inside it, which gives the same entrance with
+         * neither side effect.
          */
+        const patternImageEl = patternEl?.querySelector("img") ?? patternEl;
+
         gsap.fromTo(
-          imageFrameEl,
+          patternImageEl,
           { autoAlpha: 0, y: 40 },
           {
             autoAlpha: 1,
@@ -266,22 +279,15 @@ export default function HeroClient({
           },
         );
 
-        /*
-         * The image inside the wrapper, not the wrapper itself. The
-         * wrapper's visibility belongs to the trigger that switches the
-         * pattern off once the hero is past, and a tween writing the
-         * same property would fight it.
-         */
-        const patternImageEl = patternEl?.querySelector("img") ?? patternEl;
-
         gsap.fromTo(
-          patternImageEl,
-          { autoAlpha: 0 },
+          imageFrameEl,
+          { autoAlpha: 0, y: 40 },
           {
             autoAlpha: 1,
+            y: 0,
             duration: ENTRANCE_DURATION,
             ease: ENTRANCE_EASE,
-            delay: introStepStart(2),
+            delay: introStepStart(2) + HERO_COPY_STAGGER,
           },
         );
 
@@ -289,48 +295,70 @@ export default function HeroClient({
       }
 
       /*
-       * Below 1025px, the original cascade: each element one
-       * ENTRANCE_STAGGER after the previous. The three-beat sequence
-       * above is a desktop composition — it depends on the copy and the
-       * photo occupying separate screens, which they do not here.
+       * Below 1025px, one cascade rather than the desktop's three beats,
+       * which depend on the copy and the photo occupying separate
+       * screens — they do not here.
+       *
+       * Same order and the same widened gap as desktop, and the button
+       * is part of it: it used to be left out of this list entirely, so
+       * on a phone it simply sat there from the first frame while
+       * everything around it arrived.
        */
-      gsap
-        .timeline({ defaults: { ease: ENTRANCE_EASE } })
-        .fromTo(
-          eyebrowEl,
-          { autoAlpha: 0, y: 22 },
-          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-          0,
-        )
+      const step = HERO_COPY_STAGGER;
+
+      const mobileTimeline = gsap.timeline({
+        defaults: { ease: ENTRANCE_EASE, duration: ENTRANCE_DURATION },
+      });
+
+      mobileTimeline
+        .fromTo(eyebrowEl, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0 }, 0)
         .fromTo(
           titleEl,
           { autoAlpha: 0, y: 32 },
-          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-          ENTRANCE_STAGGER,
+          { autoAlpha: 1, y: 0 },
+          step,
         )
         .fromTo(
           subtitleEl,
           { autoAlpha: 0, y: 20 },
-          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-          ENTRANCE_STAGGER * 2,
-        )
+          { autoAlpha: 1, y: 0 },
+          step * 2,
+        );
+
+      if (ctaButtonEl) {
+        mobileTimeline.fromTo(
+          ctaButtonEl,
+          { autoAlpha: 0, y: 18 },
+          { autoAlpha: 1, y: 0 },
+          step * 3,
+        );
+      }
+
+      mobileTimeline
         .fromTo(
           scrollIndicator,
           { autoAlpha: 0, y: 14 },
-          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-          ENTRANCE_STAGGER * 3,
+          { autoAlpha: 1, y: 0 },
+          step * 4,
+        )
+        /*
+         * The pattern and the photo wait for the header, exactly as
+         * they do on desktop, so the opening is one chain at every
+         * size rather than two that overlap on a phone. Positioned at
+         * the shared absolute times rather than at multiples of `step`,
+         * because the header sits between them and the copy.
+         */
+        .fromTo(
+          patternEl,
+          { autoAlpha: 0, y: 28 },
+          { autoAlpha: 1, y: 0 },
+          introStepStart(2),
         )
         .fromTo(
           imageFrameEl,
           { autoAlpha: 0, y: 28 },
-          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-          ENTRANCE_STAGGER * 4,
-        )
-        .fromTo(
-          patternEl,
-          { autoAlpha: 0, y: 28 },
-          { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-          ENTRANCE_STAGGER * 5,
+          { autoAlpha: 1, y: 0 },
+          introStepStart(2) + step,
         );
     },
     { scope: sectionRef },

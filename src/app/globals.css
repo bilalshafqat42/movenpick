@@ -54,7 +54,16 @@
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: #f2ede5;
+
+  /*
+   * The brand cream, not the slightly greyer #f2ede5 this used to be.
+   *
+   * This colour is what shows wherever the page itself does not paint:
+   * the overscroll area above and below the document, and behind any
+   * section without its own background. At #f2ede5 it read as a
+   * different tone from every cream section sitting on top of it.
+   */
+  background: var(--color-cream);
   color: #17201f;
 }
 

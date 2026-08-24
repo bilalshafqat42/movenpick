@@ -367,6 +367,14 @@ a.value:focus-visible,
   }
 
   .copyright {
+    /*
+     * The base rule sets `align-self: end`, which means "bottom" in the
+     * desktop grid but "right" in this flex column, where the cross
+     * axis is horizontal. That is what was pushing the copyright line
+     * over to the right edge while everything above it stayed left.
+     */
+    align-self: flex-start;
+
     margin-top: clamp(12px, 2.4svh, 24px);
   }
 
