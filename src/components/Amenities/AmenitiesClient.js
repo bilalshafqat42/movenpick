@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Amenities.module.css";
@@ -120,13 +121,7 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
             y: mobile ? 24 : 32,
           });
 
-          const contentTimeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: mobile ? "top 78%" : "top 72%",
-              once: true,
-            },
-          });
+          const contentTimeline = gsap.timeline({ paused: true });
 
           contentTimeline.to(contentReveal, {
             autoAlpha: 1,
@@ -134,6 +129,12 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
             duration: ENTRANCE_DURATION,
             stagger: ENTRANCE_STAGGER,
             ease: ENTRANCE_EASE,
+          });
+
+          revealOnArrival({
+            trigger: section,
+            start: mobile ? "top 78%" : "top 72%",
+            onReveal: () => contentTimeline.play(),
           });
 
           /*

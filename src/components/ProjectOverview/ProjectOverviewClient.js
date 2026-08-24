@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 import styles from "./ProjectOverview.module.css";
 
@@ -98,12 +99,11 @@ export default function ProjectOverviewClient({
         y: 24,
       });
 
-      ScrollTrigger.create({
+      revealOnArrival({
         trigger: section,
         start: "top 78%",
-        once: true,
 
-        onEnter: () => {
+        onReveal: () => {
           const timeline = gsap.timeline({ defaults: { ease: ENTRANCE_EASE } });
 
           timeline

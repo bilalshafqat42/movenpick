@@ -17,6 +17,7 @@ import { parsePhoneNumberFromString } from "libphonenumber-js/max";
 import "react-phone-number-input/style.css";
 
 import { gsap, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
 import styles from "./Contact.module.css";
 
 const TRACKING_STORAGE_KEY = "movenpick_campaign_tracking";
@@ -316,24 +317,21 @@ export default function ContactClient({
                   second.getBoundingClientRect().top,
               );
 
-            gsap.fromTo(
-              inReadingOrder,
-              {
-                autoAlpha: 0,
-              },
-              {
-                autoAlpha: 1,
-                duration: 0.55,
-                stagger: 0.11,
-                ease: "power2.out",
+            gsap.set(inReadingOrder, { autoAlpha: 0 });
 
-                scrollTrigger: {
-                  trigger: section,
-                  start: "top 75%",
-                  once: true,
-                },
+            revealOnArrival({
+              trigger: section,
+              start: "top 75%",
+
+              onReveal: () => {
+                gsap.to(inReadingOrder, {
+                  autoAlpha: 1,
+                  duration: 0.55,
+                  stagger: 0.11,
+                  ease: "power2.out",
+                });
               },
-            );
+            });
 
             return;
           }
@@ -375,13 +373,10 @@ export default function ContactClient({
             (child) => child.getBoundingClientRect().height > 0,
           );
 
-          gsap.fromTo(
-            inReadingOrder,
-            {
-              autoAlpha: 0,
-              y: 24,
-            },
-            {
+          gsap.set(inReadingOrder, { autoAlpha: 0, y: 24 });
+
+          const revealDesktop = () =>
+            gsap.to(inReadingOrder, {
               autoAlpha: 1,
               y: 0,
               duration: 0.7,
@@ -393,14 +388,13 @@ export default function ContactClient({
                */
               stagger: 0.12,
               ease: "power3.out",
+            });
 
-              scrollTrigger: {
-                trigger: section,
-                start: "top 60%",
-                once: true,
-              },
-            },
-          );
+          revealOnArrival({
+            trigger: section,
+            start: "top 60%",
+            onReveal: revealDesktop,
+          });
         },
       );
 

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 import styles from "./TrustedPartner.module.css";
 
@@ -110,12 +111,11 @@ export default function TrustedPartnerClient({
 
       gsap.set(textReveal, { autoAlpha: 0, y: TEXT_REVEAL_RISE });
 
-      const textTrigger = ScrollTrigger.create({
+      const textTrigger = revealOnArrival({
         trigger: section,
         start: "top 78%",
-        once: true,
 
-        onEnter: () => {
+        onReveal: () => {
           gsap.to(textReveal, {
             autoAlpha: 1,
             y: 0,
@@ -164,12 +164,11 @@ export default function TrustedPartnerClient({
         gsap.set(card, { autoAlpha: 0, y: 24 });
         gsap.set(cardReveal, { autoAlpha: 0, y: TEXT_REVEAL_RISE });
 
-        mediaTrigger = ScrollTrigger.create({
+        mediaTrigger = revealOnArrival({
           trigger: media,
           start: "top 80%",
-          once: true,
 
-          onEnter: () => {
+          onReveal: () => {
             gsap
               .timeline({ defaults: { ease: ENTRANCE_EASE } })
               .to(media, { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION })

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 
 import { gsap, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
 import styles from "./Footer.module.css";
 
 export default function FooterClient({
@@ -92,7 +93,7 @@ export default function FooterClient({
            * Each block fades up from below and appears
            * one at a time, with a small delay between them.
            */
-          gsap.fromTo(
+          const footerReveal = gsap.fromTo(
             items,
             {
               autoAlpha: 0,
@@ -104,14 +105,15 @@ export default function FooterClient({
               duration: 0.85,
               stagger: 0.08,
               ease: "power3.out",
-
-              scrollTrigger: {
-                trigger: footer,
-                start: "top 78%",
-                once: true,
-              },
+              paused: true,
             },
           );
+
+          revealOnArrival({
+            trigger: footer,
+            start: "top 78%",
+            onReveal: () => footerReveal.play(),
+          });
         },
       );
 

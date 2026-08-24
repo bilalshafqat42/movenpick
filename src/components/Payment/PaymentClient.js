@@ -4,6 +4,7 @@ import SafeImage from "@/components/SafeImage";
 import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
 import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
 import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Payment.module.css";
@@ -69,12 +70,11 @@ export default function PaymentClient({
        */
       gsap.set([headingEl, textEl], { autoAlpha: 0, y: 24 });
 
-      const introTrigger = ScrollTrigger.create({
+      const introTrigger = revealOnArrival({
         trigger: section,
         start: "top 78%",
-        once: true,
 
-        onEnter: () => {
+        onReveal: () => {
           gsap.to([headingEl, textEl], {
             autoAlpha: 1,
             y: 0,
@@ -193,12 +193,11 @@ export default function PaymentClient({
       gsap.set(rows, { autoAlpha: 0, y: 18 });
       gsap.set(rules.filter(Boolean), { scaleX: 0 });
 
-      const rowsTrigger = ScrollTrigger.create({
+      const rowsTrigger = revealOnArrival({
         trigger: table,
         start: "top 82%",
-        once: true,
 
-        onEnter: () => {
+        onReveal: () => {
           const timeline = gsap.timeline({
             defaults: { duration: BEAT_DURATION, ease: ENTRANCE_EASE },
           });
