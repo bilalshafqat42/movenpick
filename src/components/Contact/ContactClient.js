@@ -339,76 +339,64 @@ export default function ContactClient({
           }
 
           /*
-           * Reveal the complete section from bottom to top.
+           * Desktop: the text arrives, and nothing else does.
+           *
+           * There was a clip-path wipe here that uncovered the whole
+           * panel from the bottom as you scrolled, scrubbed against
+           * scroll position. It is gone. Two entrances competing over
+           * the same moment read as one indecisive one, and the panel
+           * uncovering itself underneath the copy was the half that was
+           * not carrying any meaning: text arriving one piece at a time
+           * already says "read me in this order".
+           *
+           * One timeline rather than two triggers a few percent apart,
+           * so the left paragraph and the form are a single cascade
+           * with one rhythm instead of two overlapping ones that happen
+           * to start close together.
            */
-          gsap.fromTo(
-            viewport,
-            {
-              clipPath: "inset(100% 0% 0% 0%)",
-            },
-            {
-              clipPath: "inset(0% 0% 0% 0%)",
-
-              ease: "none",
-
-              scrollTrigger: {
-                trigger: section,
-                start: "top bottom",
-                end: "top top",
-                scrub: 0.7,
-                invalidateOnRefresh: true,
-              },
-            },
-          );
+          gsap.set(viewport, {
+            clipPath: "none",
+          });
 
           /*
-           * Left description entrance.
+           * Reading order for a two-column layout, which is not the
+           * same as top-to-bottom: the paragraph on the left and the
+           * form heading on the right sit within a few pixels of each
+           * other vertically, so sorting by position would interleave
+           * the two columns. Left column first, then the form from its
+           * heading down, is how the section is actually read.
+           *
+           * Zero-height children are dropped for the same reason as on
+           * mobile — the status line is empty until a submission
+           * answers, and it would otherwise spend a whole step of the
+           * stagger on a row nobody can see.
            */
+          const inReadingOrder = [...introChildren, ...formChildren].filter(
+            (child) => child.getBoundingClientRect().height > 0,
+          );
+
           gsap.fromTo(
-            introChildren,
+            inReadingOrder,
             {
               autoAlpha: 0,
-              y: 40,
+              y: 24,
             },
             {
               autoAlpha: 1,
               y: 0,
-              duration: 0.85,
-              ease: "power3.out",
-
-              scrollTrigger: {
-                trigger: section,
-                start: "top 60%",
-                once: true,
-              },
-            },
-          );
-
-          /*
-           * Form heading, fields and button entrance.
-           */
-          gsap.fromTo(
-            formChildren,
-            {
-              autoAlpha: 0,
-              y: 34,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.8,
+              duration: 0.7,
               /*
-               * Wide enough to read as one field after another rather
-               * than the whole form arriving at once. Eight children at
-               * 0.07 spread over half a second, which looked like a
-               * single move.
+               * Wide enough to read as one line after another rather
+               * than the whole column arriving at once. An earlier
+               * 0.07 spread the whole form over half a second and
+               * looked like a single move.
                */
               stagger: 0.12,
               ease: "power3.out",
 
               scrollTrigger: {
                 trigger: section,
-                start: "top 56%",
+                start: "top 60%",
                 once: true,
               },
             },

@@ -227,19 +227,43 @@ export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) 
       }
 
       /*
-       * No header-height offset: every full-viewport section (Amenities,
-       * Project, Payment, SeaSection, ...) reveals itself via a scrubbed
-       * clip-path whose completion trigger is the section's top hitting
-       * the true viewport top (y=0). Landing short of that by even the
-       * header's height leaves the reveal genuinely incomplete — not
-       * just visually lagging — since scrub maps scroll position to
-       * animation progress directly. The header is a transparent glass
-       * overlay by design (see its "scrolled" state), so it's meant to
-       * float over a fully-revealed section rather than sit above it.
+       * Land where the browser's own scroll snapping would land, which
+       * is the section's top less the page's scroll-padding plus that
+       * section's own scroll-margin.
+       *
+       * This used to jump to the raw element top with no offset at all,
+       * on the reasoning that the header was a transparent overlay
+       * meant to float over a fully-revealed section. That stopped
+       * being true — the header is solid cream now — and the result was
+       * measurable: clicking Amenities put its first line 157px above
+       * the header's bottom edge on desktop and 176px on mobile, and
+       * Payment Plan lost 36px of its heading.
+       *
+       * Reading the two CSS values rather than subtracting a flat 90px
+       * is what keeps the original concern satisfied. The full-bleed
+       * sections that must arrive at a true y=0 for their scrubbed
+       * reveals already cancel the padding with a negative
+       * scroll-margin (see globals.css and ProjectGallery), so the two
+       * terms sum to zero and they still land exactly on the viewport
+       * top. Ordinary sections have no such margin, so they clear the
+       * header. One rule, and it stays correct if either value is
+       * retuned later.
        */
+      const rootStyle = window.getComputedStyle(document.documentElement);
+      const targetStyle = window.getComputedStyle(target);
+
+      const snapOffset =
+        (parseFloat(rootStyle.scrollPaddingTop) || 0) +
+        (parseFloat(targetStyle.scrollMarginTop) || 0);
+
+      const targetY = Math.max(
+        0,
+        target.getBoundingClientRect().top + window.scrollY - snapOffset,
+      );
+
       gsap.to(window, {
         scrollTo: {
-          y: target,
+          y: targetY,
           autoKill: false,
         },
         duration: reduceMotion ? 0 : 1.1,

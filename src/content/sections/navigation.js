@@ -6,7 +6,17 @@
  * WordPress draws between Menus and page content.
  */
 const NAV_ITEMS = [
-  { label: "About", href: "#about" },
+  /*
+   * About points at #project-overview, the section that opens with the
+   * project description and carries the key facts (completion, payment
+   * split, unit types, starting price) and the two calls to action.
+   *
+   * It used to point at #about, which does not exist anywhere on the
+   * site, so the link silently did nothing. There is no "about us"
+   * section on a single-project page; this overview is what a visitor
+   * clicking About is looking for.
+   */
+  { label: "About", href: "#project-overview" },
   { label: "Location", href: "#location-map" },
   { label: "Amenities", href: "#amenities" },
   { label: "Payment Plan", href: "#payment-plan" },

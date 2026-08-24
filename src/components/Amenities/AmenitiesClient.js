@@ -187,7 +187,47 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
                * play out across, the same as Payment's.
                */
               start: "top 62%",
-              end: "top -20%",
+              /*
+               * Ends exactly where the section comes to rest, given as
+               * an absolute scroll position rather than a geometric
+               * offset.
+               *
+               * The header's scroll-padding means a section rests with
+               * its top 90px below the viewport top, and a menu jump
+               * now lands on precisely that position so the intro copy
+               * is not tucked under the bar. This reveal is scrubbed
+               * against scroll, so "finished" has to be that same
+               * position or a visitor arriving from the menu meets a
+               * half-drawn blind: measured at 68% open before this, and
+               * still 81% when the end was merely nudged up by the
+               * header's height.
+               *
+               * The honest cost is that the reveal now plays out over
+               * about half a viewport instead of a full one. That is
+               * the trade: it cannot both start when the photograph
+               * becomes visible AND run a full viewport AND be finished
+               * by the time the section settles, because those three
+               * describe a longer stretch of scroll than actually
+               * exists between them. Starting earlier was the
+               * alternative, and it is the worse one — it is what this
+               * trigger was moved AWAY from, because the blind was then
+               * a fifth open before any of it was on screen.
+               */
+              end: () => {
+                const headerHeight =
+                  parseFloat(
+                    getComputedStyle(document.documentElement).getPropertyValue(
+                      "--header-height",
+                    ),
+                  ) || 90;
+
+                return Math.max(
+                  1,
+                  section.getBoundingClientRect().top +
+                    window.scrollY -
+                    headerHeight,
+                );
+              },
               scrub: mobile ? 0.55 : 0.8,
               invalidateOnRefresh: true,
             },

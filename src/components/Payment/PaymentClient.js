@@ -132,7 +132,27 @@ export default function PaymentClient({
          * photo was completely in view, which is why it was still
          * visibly striped once the section had finished arriving.
          */
-        end: mobile ? "top top" : "center center",
+        /*
+         * Ends exactly where the section comes to rest, for the reason
+         * given on the Amenities blind: menu jumps land on that
+         * position so the copy clears the header, and a reveal scrubbed
+         * against scroll has to call that same position "finished" or
+         * it is still striped when the visitor arrives. Measured at 87%
+         * open before this.
+         */
+        end: () => {
+          const headerHeight =
+            parseFloat(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--header-height",
+              ),
+            ) || 90;
+
+          return Math.max(
+            1,
+            section.getBoundingClientRect().top + window.scrollY - headerHeight,
+          );
+        },
         invalidateOnRefresh: true,
 
         onUpdate: (self) => {

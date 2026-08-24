@@ -366,8 +366,17 @@
   border: 0;
   border-radius: 0;
 
-  background-color: #073d61;
-  background-image: url("/images/sea.avif");
+  /*
+   * The payment-plan photograph, the same one the Payment section uses.
+   *
+   * The colour underneath it is not decoration: it is what shows while
+   * the photo is still loading, and it moved with the photo. It used to
+   * be #073d61, the deep blue of the sea image that was here before, so
+   * leaving it would have flashed a block of navy over a warm dusk
+   * shot. Brand gold sits under the new photograph instead.
+   */
+  background-color: var(--color-gold);
+  background-image: url("/images/payment/payment-plan.avif");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -391,7 +400,16 @@
   position: absolute;
   inset: 0;
 
-  background: linear-gradient(90deg, rgba(7, 61, 97, 0.1) 0%, transparent 20%);
+  /*
+   * A shade along the inner edge, so the photograph does not meet the
+   * cream nav panel as a hard seam. Keyed to the photograph's own
+   * palette — it was the sea image's navy and is now brand gold.
+   */
+  background: linear-gradient(
+    90deg,
+    rgba(var(--color-gold-rgb), 0.14) 0%,
+    transparent 20%
+  );
 
   pointer-events: none;
 
