@@ -4,7 +4,7 @@ import Image from "next/image";
 import SafeImage from "@/components/SafeImage";
 import { useCallback, useRef } from "react";
 
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import {
   ENTRANCE_STAGGER,
   ENTRANCE_DURATION,
@@ -168,6 +168,11 @@ export default function HeroClient({
       const eyebrowEl = content.querySelector(`.${styles.eyebrow}`);
       const titleEl = content.querySelector(`.${styles.title}`);
       const subtitleEl = content.querySelector(`.${styles.subtitle}`);
+      /*
+       * Optional: the button only renders when both a label and a link
+       * are set, so everything below has to cope with it being absent.
+       */
+      const ctaButtonEl = content.querySelector(`.${styles.ctaButton}`);
 
       if (!eyebrowEl || !titleEl || !subtitleEl) {
         return;
@@ -183,10 +188,11 @@ export default function HeroClient({
             eyebrowEl,
             titleEl,
             subtitleEl,
+            ctaButtonEl,
             scrollIndicator,
             imageFrameEl,
             patternEl,
-          ],
+          ].filter(Boolean),
           { autoAlpha: 1, y: 0 },
         );
 
@@ -207,7 +213,9 @@ export default function HeroClient({
        */
       if (window.matchMedia(INTRO_BREAKPOINT).matches) {
         gsap.fromTo(
-          [eyebrowEl, titleEl, subtitleEl, scrollIndicator],
+          [eyebrowEl, titleEl, subtitleEl, ctaButtonEl, scrollIndicator].filter(
+            Boolean,
+          ),
           { autoAlpha: 0, y: 32 },
           {
             autoAlpha: 1,
@@ -219,16 +227,38 @@ export default function HeroClient({
         );
 
         /*
-         * Third beat: the pattern and the photo, together, from below.
-         * They sit in the panel under the copy and do not move from
-         * there — this is only about when they arrive, not where.
+         * Third beat: the pattern and the photo arrive together.
+         *
+         * The photo rises into place; the pattern only fades. On
+         * desktop the pattern is pinned to the viewport (see
+         * .patternShape in the module CSS) precisely so that it never
+         * moves, and a rise here would be the one thing that moved it.
          */
         gsap.fromTo(
-          [imageFrameEl, patternEl],
+          imageFrameEl,
           { autoAlpha: 0, y: 40 },
           {
             autoAlpha: 1,
             y: 0,
+            duration: ENTRANCE_DURATION,
+            ease: ENTRANCE_EASE,
+            delay: introStepStart(2),
+          },
+        );
+
+        /*
+         * The image inside the wrapper, not the wrapper itself. The
+         * wrapper's visibility belongs to the trigger that switches the
+         * pattern off once the hero is past, and a tween writing the
+         * same property would fight it.
+         */
+        const patternImageEl = patternEl?.querySelector("img") ?? patternEl;
+
+        gsap.fromTo(
+          patternImageEl,
+          { autoAlpha: 0 },
+          {
+            autoAlpha: 1,
             duration: ENTRANCE_DURATION,
             ease: ENTRANCE_EASE,
             delay: introStepStart(2),
@@ -291,6 +321,7 @@ export default function HeroClient({
       const section = sectionRef.current;
       const imageSection = imageSectionRef.current;
       const imageFrameEl = imageFrameRef.current;
+      const patternEl = patternRef.current;
 
       if (!section || !imageSection || !imageFrameEl) {
         return undefined;
@@ -314,6 +345,7 @@ export default function HeroClient({
            */
           if (!desktop || reduceMotion) {
             gsap.set(imageFrameEl, { clearProps: "width,height" });
+            section.style.removeProperty("--hero-pattern-top");
 
             return undefined;
           }
@@ -330,9 +362,94 @@ export default function HeroClient({
            * measured again instead of animating from a size that
            * belonged to the old viewport.
            */
+          /*
+           * Where the pinned pattern sits: the panel's top edge when
+           * the page is at a scroll position of zero, which is the same
+           * distance the panel travels before coming to rest. Published
+           * as a custom property for the CSS to read, and re-measured on
+           * every refresh so a resized window repins it rather than
+           * leaving it at the old viewport's figure.
+           */
+          const syncPatternTop = () => {
+            section.style.setProperty(
+              "--hero-pattern-top",
+              `${Math.round(panelRestScrollY(imageSection))}px`,
+            );
+          };
+
+          syncPatternTop();
+
+          /*
+           * A pinned element outlives its section unless something
+           * switches it off. Fixed positioning takes the pattern out of
+           * the flow entirely, so once the hero had scrolled past it
+           * carried on painting over whatever came next — it sat on top
+           * of the project overview's key facts.
+           *
+           * Switched off the moment the photograph finishes filling
+           * the panel, not when the hero eventually ends. At that point
+           * the photo covers the whole viewport, so the pattern behind
+           * it has nothing left to contribute and turning it off is
+           * invisible — whereas leaving it on until the hero's bottom
+           * edge cleared the screen meant it was still painting over
+           * the project overview's key facts and buttons.
+           *
+           * The end is panelRestScrollY, the same figure the growth,
+           * the parallax and the Scroll Down button all use, so
+           * "pattern off" and "photo full" are the same moment by
+           * construction rather than by two numbers that happen to
+           * agree.
+           *
+           * The visibility is written straight to the element rather
+           * than through GSAP: the pattern's fade-in is a GSAP
+           * autoAlpha tween on the image inside this wrapper, and two
+           * things writing visibility to the same element would take
+           * turns winning.
+           */
+          const patternVisibility = patternEl
+            ? ScrollTrigger.create({
+                trigger: section,
+                start: 0,
+                end: () => Math.max(1, panelRestScrollY(imageSection)),
+                invalidateOnRefresh: true,
+
+                /*
+                 * Fades out and back in, rather than switching off once
+                 * and staying off. onLeave and onEnterBack are a pair:
+                 * scrolling down past the point where the photo fills
+                 * the panel takes the pattern away, scrolling back up
+                 * brings it back.
+                 *
+                 * overwrite: "auto" so a quick change of direction
+                 * cancels the tween in flight instead of queueing a
+                 * second one behind it — otherwise a fast scroll up and
+                 * down leaves the pattern settling on the wrong state.
+                 */
+                onLeave: () => {
+                  gsap.to(patternEl, {
+                    autoAlpha: 0,
+                    duration: 0.45,
+                    ease: "power2.out",
+                    overwrite: "auto",
+                  });
+                },
+
+                onEnterBack: () => {
+                  gsap.to(patternEl, {
+                    autoAlpha: 1,
+                    duration: 0.45,
+                    ease: "power2.out",
+                    overwrite: "auto",
+                  });
+                },
+              })
+            : null;
+
           const restingSize = { width: 0, height: 0 };
 
           const measureRestingSize = () => {
+            syncPatternTop();
+
             gsap.set(imageFrameEl, { clearProps: "width,height" });
 
             restingSize.width = imageFrameEl.offsetWidth;
@@ -399,6 +516,15 @@ export default function HeroClient({
           return () => {
             growth.scrollTrigger?.kill();
             growth.kill();
+
+            patternVisibility?.kill();
+
+            if (patternEl) {
+              gsap.killTweensOf(patternEl);
+              gsap.set(patternEl, { clearProps: "opacity,visibility" });
+            }
+
+            section.style.removeProperty("--hero-pattern-top");
           };
         },
       );
@@ -465,17 +591,27 @@ export default function HeroClient({
         id="hero-image"
         className={styles.imageSection}
       >
-        <Image
-          ref={patternRef}
-          src="/images/hero/pattern.avif"
-          alt=""
-          aria-hidden="true"
-          fill
-          quality={80}
-          sizes="100vw"
-          priority
-          className={styles.patternShape}
-        />
+        {/*
+         * The pattern needs a wrapper of its own.
+         *
+         * next/image with `fill` writes position: absolute as an INLINE
+         * style, and inline beats any stylesheet rule — so the pinning
+         * could never be applied to the image itself. The wrapper is
+         * what gets pinned; the image just fills whatever box it is
+         * given.
+         */}
+        <div ref={patternRef} className={styles.patternPin}>
+          <Image
+            src="/images/hero/pattern.avif"
+            alt=""
+            aria-hidden="true"
+            fill
+            quality={80}
+            sizes="100vw"
+            priority
+            className={styles.patternShape}
+          />
+        </div>
 
         <div ref={imageFrameRef} className={styles.imageFrame}>
           <SafeImage

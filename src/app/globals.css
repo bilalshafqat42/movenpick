@@ -24,6 +24,8 @@
   --color-gold-rgb: 137, 118, 85;
   --color-red: #f95331;
   --color-cta-red: #ff4016;
+  /* Same colour as an RGB triplet, so rules can set their own alpha on it. */
+  --color-cta-red-rgb: 255, 64, 22;
 
   /*
    * Standard side padding for every section: 1 column of a 12-column grid

@@ -94,6 +94,21 @@
    the rest of the page rather than a one-off.
    ========================================================= */
 
+/*
+ * A text link with a rule under it, not a pill.
+ *
+ * Two lines stacked in the same place rather than one line that changes
+ * colour: ::after is the resting rule at 60%, ::before is the same red
+ * at full strength sitting on top of it, scaled to nothing until hover.
+ * Hovering scales it out from the left, so the rule appears to fill in
+ * rather than fade — and because it is a transform, it is a
+ * compositor-only animation with no repaint of the text above it.
+ *
+ * A single element animating background-position or width would have
+ * done it too, but both of those relayout or repaint on every frame,
+ * and neither leaves the 60% rule visible underneath while the full
+ * one travels.
+ */
 .ctaButton {
   position: relative;
 
@@ -102,10 +117,8 @@
   gap: 10px;
 
   margin-top: 32px;
-  padding: 14px 26px;
-
-  border: 1px solid var(--color-cta-red);
-  border-radius: 999px;
+  /* Bottom padding only: it is the gap between the text and its rule. */
+  padding: 0 0 10px;
 
   font-family: var(--font-noto-sans);
   font-size: 14px;
@@ -118,12 +131,36 @@
   color: var(--color-cta-red);
 }
 
+/* The resting rule. */
+.ctaButton::after {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  height: 1px;
+
+  background: rgba(var(--color-cta-red-rgb), 0.6);
+}
+
+/*
+ * The full-strength rule that fills in from the left on hover, and at
+ * 2px it is twice the weight of the one resting underneath. Because it
+ * sits at bottom: 0 it grows upward over the 1px rule rather than
+ * shifting anything, so the text above never moves.
+ */
 .ctaButton::before {
   content: "";
 
   position: absolute;
-  inset: 0;
-  z-index: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+
+  height: 2px;
 
   background: var(--color-cta-red);
 
@@ -143,11 +180,6 @@
   z-index: 1;
 }
 
-.ctaButton:hover,
-.ctaButton:focus-visible {
-  color: var(--color-cream);
-}
-
 .ctaIcon {
   display: inline-flex;
   align-items: center;
@@ -155,6 +187,22 @@
 
   font-size: 14px;
   line-height: 1;
+
+  /*
+   * Nudges 2px right on hover, on the same curve and duration as the
+   * rule filling in, so the two read as one gesture rather than two
+   * effects that happen to fire together.
+   *
+   * translate rather than margin or position: it is a compositor-only
+   * property, so the arrow cannot drag a relayout of the row behind it
+   * on every frame.
+   */
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ctaButton:hover .ctaIcon,
+.ctaButton:focus-visible .ctaIcon {
+  transform: translateX(2px);
 }
 
 /* =========================================================
@@ -251,11 +299,21 @@
   margin-left: calc(50% - 50vw);
 }
 
-.patternShape {
+/*
+ * The box the pattern is drawn into. It exists so that something other
+ * than next/image owns the positioning: `fill` writes
+ * position: absolute inline, and an inline style cannot be overridden
+ * by a rule, so the pinning below has to live on a wrapper.
+ */
+.patternPin {
   position: absolute;
   inset: 0;
   z-index: 0;
 
+  pointer-events: none;
+}
+
+.patternShape {
   object-fit: cover;
 
   pointer-events: none;
@@ -265,9 +323,9 @@
 /* =========================================================
    Framed image — 10 of the page's 12 columns wide.
 
-   On desktop this is the size the photo STARTS at, not the size it
-   ends at: HeroClient grows it from here to the full width and height
-   of its panel as the panel arrives, so the pattern around it is
+   On desktop this is the size the photo STARTS at — 8 of 12 columns —
+   not the size it ends at: HeroClient grows it from here to the full
+   width and height of its panel as the panel arrives, so the pattern around it is
    gradually covered until the photograph is the whole section. The
    growth reads this rule for its starting size rather than restating
    it, so there is one definition of "framed".
@@ -279,15 +337,23 @@
   z-index: 1;
 
   /*
-   * 83.333vw is 10 of 12 columns; 1375px is the old 1100px cap scaled
-   * by the same 10/8. The third term is a guard for short, wide
-   * screens: at 10 columns the frame is tall enough to outgrow a
-   * 100svh panel somewhere around a 1920x900 window, and this caps the
-   * width by the height available instead (904/624 is the aspect ratio
-   * below, so this converts a height budget into a width). It is
+   * 66.667vw is 8 of the page's 12 columns, which is where the photo
+   * starts; it grows from here to the full 12 and the full height of
+   * the panel.
+   *
+   * 1280px is the pixel cap, chosen as exactly 8 columns at 1920 wide.
+   * At 1100 it bound early and a 1920 screen started the photo at 6.9
+   * columns rather than 8. Beyond 1920 it does bind, which is the
+   * point of a cap: the photo stops chasing the viewport on very wide
+   * displays.
+   *
+   * The third term is a guard for short, wide screens: the frame can
+   * be tall enough to outgrow a 100svh panel, and this caps the width
+   * by the height available instead (904/624 is the aspect ratio
+   * below, so it converts a height budget into a width). It is
    * inactive at ordinary desktop proportions.
    */
-  width: min(83.333vw, 1375px, calc((100svh - 64px) * 904 / 624));
+  width: min(66.667vw, 1280px, calc((100svh - 64px) * 904 / 624));
   aspect-ratio: 904 / 624;
 
   overflow: hidden;
@@ -469,6 +535,37 @@
 
     background: var(--color-cream);
   }
+
+  /*
+   * The pattern is pinned to the viewport, not laid inside the panel.
+   *
+   * Anything inside the panel travels with it, and the panel is what
+   * rises and grows — so as long as the pattern lived there it either
+   * moved with the panel or was progressively uncovered as the panel
+   * grew. Both read as movement. Taking it out of the panel's
+   * coordinate system entirely is the only way it can genuinely never
+   * change.
+   *
+   * --hero-pattern-top is the panel's top edge at a scroll position of
+   * zero, written by HeroClient and re-measured whenever the layout
+   * changes. Pinning the pattern there means what you see is exactly
+   * what the page loads with, and it stays that way at every scroll
+   * position: the photograph rises and grows in front of it and
+   * eventually covers it, but the pattern itself never moves and never
+   * shows more of itself than it did at the start.
+   */
+  .patternPin {
+    position: fixed;
+    top: var(--hero-pattern-top, 0px);
+    right: auto;
+    bottom: auto;
+    left: 0;
+    z-index: 0;
+
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+  }
 }
 
 /* =========================================================
@@ -498,6 +595,7 @@
   .eyebrow,
   .title,
   .subtitle,
+  .ctaButton,
   .scrollIndicator,
   .patternShape,
   .imageFrame {
@@ -510,6 +608,7 @@
   .eyebrow,
   .title,
   .subtitle,
+  .ctaButton,
   .scrollIndicator,
   .patternShape,
   .imageFrame {
@@ -524,6 +623,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .content > *,
+  .ctaButton,
   .scrollIndicator,
   .patternShape,
   .imageFrame {
@@ -534,5 +634,10 @@
 
   .scrollLine::after {
     animation: none;
+  }
+
+  .ctaButton::before,
+  .ctaIcon {
+    transition: none;
   }
 }
