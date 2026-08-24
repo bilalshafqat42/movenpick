@@ -10,6 +10,12 @@ export const HERO_FIELDS = [
     defaultValue: "/images/hero/main.avif",
   },
   {
+    key: "main-image-alt",
+    label: "Main image alt text",
+    type: "TEXT",
+    defaultValue: "[Add Movenpick hero image description]",
+  },
+  {
     key: "eyebrow",
     label: "Eyebrow",
     type: "TEXT",

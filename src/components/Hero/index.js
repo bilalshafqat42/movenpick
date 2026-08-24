@@ -13,6 +13,7 @@ export default async function Hero() {
     <HeroClient
       mainImage={content["main-image"]}
       mainImageFallback={fieldDefault(HERO_FIELDS, "main-image")}
+      mainImageAlt={content["main-image-alt"]}
       eyebrow={content.eyebrow}
       heading={content.heading}
       text={content.text}

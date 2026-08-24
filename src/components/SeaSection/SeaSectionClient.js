@@ -147,7 +147,7 @@ export default function SeaSectionClient({ image, imageAlt, imageFallback }) {
     <section
       ref={sectionRef}
       className={styles.seaSection}
-      aria-label="[Movenpick lifestyle section — confirm wording]"
+      aria-label="Coastal lifestyle imagery"
     >
       <div className={styles.stickyViewport}>
         <div ref={panelRef} className={styles.panel}>

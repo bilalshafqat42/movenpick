@@ -42,7 +42,6 @@ import {
   DEFAULT_WHATSAPP_NUMBER,
   HEADER_SUBTITLE,
   PINNED_PHONE_COUNTRIES,
-  PROJECT_NAME,
   ROLES,
   SEARCH_STAGES,
   SLOT_WINDOWS,
@@ -124,9 +123,9 @@ const BROKER_PROGRESS_STEPS = [
   CHAT_STEP.EMAIL,
 ];
 
-function createInitialLeadData() {
+function createInitialLeadData(projectName) {
   return {
-    project: PROJECT_NAME,
+    project: projectName,
     source: "Movenpick Website Chatbot",
 
     role: "",
@@ -158,9 +157,9 @@ function createMessage({ type = "bot", text, meta }) {
   };
 }
 
-function buildInitialMessages(strings) {
+function buildInitialMessages(strings, fillProject) {
   return [
-    createMessage({ text: strings.greetingTitle, meta: strings.metaBot }),
+    createMessage({ text: fillProject(strings.greetingTitle), meta: strings.metaBot }),
     createMessage({ text: strings.greetingSubtitle, meta: strings.metaBot }),
     createMessage({ text: strings.roleQuestion, meta: strings.metaBot }),
   ];
@@ -186,6 +185,8 @@ function formatSlotWindowLabel(window, language, strings) {
 export default function Chat({
   agentPhoto = "/images/agent/avatar.avif",
   agentPhotoSquare = "/images/agent/avatar-square.avif",
+  projectName = "[Movenpick Project Name]",
+  projectShortName = "[Movenpick Project]",
 }) {
   const [widgetState, setWidgetState] = useState(WIDGET_STATE.CLOSED);
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
@@ -193,11 +194,27 @@ export default function Chat({
   const strings = STRINGS[language];
   const isRtl = language === "ar";
 
+  /*
+   * Every string in STRINGS/TEASER/WHATSAPP_TEMPLATES that names the
+   * project carries a {{project_name}}/{{project_short}} token rather
+   * than a hardcoded literal (see chatFlow.js) — this is the one place
+   * those tokens get filled in, from the real value marketing sets in
+   * the panel (chatAgent.js's project-name/project-short-name fields).
+   */
+  const fillProject = useCallback(
+    (text) =>
+      fillTemplate(text, {
+        project_name: projectName,
+        project_short: projectShortName,
+      }),
+    [projectName, projectShortName],
+  );
+
   const [chatStep, setChatStep] = useState(CHAT_STEP.ROLE);
-  const [leadData, setLeadData] = useState(createInitialLeadData);
+  const [leadData, setLeadData] = useState(() => createInitialLeadData(projectName));
 
   const [messages, setMessages] = useState(() =>
-    buildInitialMessages(STRINGS[DEFAULT_LANGUAGE]),
+    buildInitialMessages(STRINGS[DEFAULT_LANGUAGE], fillProject),
   );
 
   const [inputValue, setInputValue] = useState("");
@@ -303,8 +320,8 @@ export default function Chat({
 
   const resetChat = useCallback(() => {
     setChatStep(CHAT_STEP.ROLE);
-    setLeadData(createInitialLeadData());
-    setMessages(buildInitialMessages(STRINGS[language]));
+    setLeadData(createInitialLeadData(projectName));
+    setMessages(buildInitialMessages(STRINGS[language], fillProject));
 
     setInputValue("");
     setFieldError("");
@@ -313,7 +330,7 @@ export default function Chat({
     setCloseVariant("");
     setSlotState("idle");
     setConfirmedSlotLabel("");
-  }, [language]);
+  }, [language, fillProject, projectName]);
 
   const toggleLanguage = useCallback(() => {
     setLanguage((current) => (current === "en" ? "ar" : "en"));
@@ -686,12 +703,14 @@ export default function Chat({
 
       appendMessage({
         text:
-          role.id === "broker" ? strings.stageQuestionBroker : strings.stageQuestion,
+          role.id === "broker"
+            ? fillProject(strings.stageQuestionBroker)
+            : strings.stageQuestion,
       });
 
       setChatStep(CHAT_STEP.SEARCH_STAGE);
     },
-    [appendMessage, language, strings],
+    [appendMessage, language, strings, fillProject],
   );
 
   const handleSearchStageSelection = useCallback(
@@ -1063,6 +1082,7 @@ export default function Chat({
         unitTypeLabel: selectedUnitTypeLabel,
         company: leadData.company,
       },
+      projectName,
     });
   }, [
     closeVariant,
@@ -1072,6 +1092,7 @@ export default function Chat({
     leadData.role,
     selectedUnitTypeLabel,
     whatsappNumber,
+    projectName,
   ]);
 
   const callUrl = callNumber ? `tel:${callNumber}` : "";
@@ -1247,7 +1268,7 @@ export default function Chat({
         {closeVariant === "nurture" ? (
           <>
             <p className={styles.statusText}>
-              {isBroker ? strings.nurtureTextBroker : strings.nurtureText}
+              {isBroker ? strings.nurtureTextBroker : fillProject(strings.nurtureText)}
             </p>
 
             <a
@@ -1431,7 +1452,7 @@ export default function Chat({
             </span>
 
             <span className={styles.headerText}>
-              <span className={styles.agentName}>{PROJECT_NAME}</span>
+              <span className={styles.agentName}>{projectName}</span>
 
               <span className={styles.agentStatus}>
                 {HEADER_SUBTITLE[language]}
@@ -1591,7 +1612,7 @@ export default function Chat({
             className={styles.teaserText}
             onClick={handleTeaserClick}
           >
-            {strings.teaserText}
+            {fillProject(strings.teaserText)}
           </button>
         </div>
       ) : null}

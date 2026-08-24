@@ -2,9 +2,6 @@ export const LANGUAGES = ["en", "ar"];
 
 export const DEFAULT_LANGUAGE = "en";
 
-export const PROJECT_NAME = "[Movenpick Project Name]";
-export const PROJECT_SHORT_NAME = "[Movenpick Project]";
-
 export const HEADER_SUBTITLE = { en: "by Refine", ar: "من Refine" };
 
 // Left blank deliberately: Movenpick has no confirmed WhatsApp/call number
@@ -23,8 +20,8 @@ export const TEASER = {
   delaySeconds: 15,
   scrollPercent: 40,
   text: {
-    en: "👋 Want the [Movenpick Project] payment plan?",
-    ar: "👋 هل تريد الاطلاع على خطة الدفع لمشروع [Movenpick Project]؟",
+    en: "👋 Want the {{project_short}} payment plan?",
+    ar: "👋 هل تريد الاطلاع على خطة الدفع لمشروع {{project_short}}؟",
   },
 };
 
@@ -126,24 +123,24 @@ export const BROKER_LINKS = [
 
 export const WHATSAPP_TEMPLATES = {
   hot: {
-    en: "Hi, I'm {{first_name}}. I'm interested in a {{unit_type_label}} at [Movenpick Project Name] and ready to move. #MOVENPICK",
-    ar: "مرحباً، أنا {{first_name}}. مهتم بوحدة {{unit_type_label}} في [Movenpick Project Name] وجاهز للمتابعة. #MOVENPICK",
+    en: "Hi, I'm {{first_name}}. I'm interested in a {{unit_type_label}} at {{project_name}} and ready to move. #MOVENPICK",
+    ar: "مرحباً، أنا {{first_name}}. مهتم بوحدة {{unit_type_label}} في {{project_name}} وجاهز للمتابعة. #MOVENPICK",
   },
   nurture: {
-    en: "Hi, I'm {{first_name}}. Please send me the [Movenpick Project Name] brochure. #MOVENPICK",
-    ar: "مرحباً، أنا {{first_name}}. أرجو إرسال بروشور [Movenpick Project Name]. #MOVENPICK",
+    en: "Hi, I'm {{first_name}}. Please send me the {{project_name}} brochure. #MOVENPICK",
+    ar: "مرحباً، أنا {{first_name}}. أرجو إرسال بروشور {{project_name}}. #MOVENPICK",
   },
   broker: {
-    en: "Hi, I'm {{first_name}} from {{company}} — interested in partnering on [Movenpick Project Name]. #MOVENPICKPARTNER",
-    ar: "مرحباً، أنا {{first_name}} من {{company}} — مهتم بالشراكة في مشروع [Movenpick Project Name]. #MOVENPICKPARTNER",
+    en: "Hi, I'm {{first_name}} from {{company}} — interested in partnering on {{project_name}}. #MOVENPICKPARTNER",
+    ar: "مرحباً، أنا {{first_name}} من {{company}} — مهتم بالشراكة في مشروع {{project_name}}. #MOVENPICKPARTNER",
   },
   hot_broker: {
-    en: "Hi, I'm {{first_name}} from {{company}}. I have a client for a {{unit_type_label}} at [Movenpick Project Name]. #MOVENPICKPARTNER",
-    ar: "مرحباً، أنا {{first_name}} من {{company}}. لديّ عميل مهتم بوحدة {{unit_type_label}} في [Movenpick Project Name]. #MOVENPICKPARTNER",
+    en: "Hi, I'm {{first_name}} from {{company}}. I have a client for a {{unit_type_label}} at {{project_name}}. #MOVENPICKPARTNER",
+    ar: "مرحباً، أنا {{first_name}} من {{company}}. لديّ عميل مهتم بوحدة {{unit_type_label}} في {{project_name}}. #MOVENPICKPARTNER",
   },
   nurture_broker: {
-    en: "Hi, I'm {{first_name}} from {{company}}. Please send me the [Movenpick Project Name] broker pack. #MOVENPICKPARTNER",
-    ar: "مرحباً، أنا {{first_name}} من {{company}}. أرجو إرسال حزمة الوسيط لمشروع [Movenpick Project Name]. #MOVENPICKPARTNER",
+    en: "Hi, I'm {{first_name}} from {{company}}. Please send me the {{project_name}} broker pack. #MOVENPICKPARTNER",
+    ar: "مرحباً، أنا {{first_name}} من {{company}}. أرجو إرسال حزمة الوسيط لمشروع {{project_name}}. #MOVENPICKPARTNER",
   },
 };
 
@@ -160,14 +157,14 @@ export const STRINGS = {
     minimiseChatAria: "Minimise chat",
     toggleHoverLabel: "Talk to Us",
 
-    greetingTitle: "Hi there — welcome to [Movenpick Project Name] by Refine! 👋",
+    greetingTitle: "Hi there — welcome to {{project_name}} by Refine! 👋",
     greetingSubtitle:
       "Answer a few quick questions and I'll get you prices, the payment plan, and a direct line to our team — takes under a minute.",
 
     roleQuestion: "I'm here as a…",
 
     stageQuestion: "What best describes your current buying intent?",
-    stageQuestionBroker: "Do you have a client for [Movenpick Project] right now?",
+    stageQuestionBroker: "Do you have a client for {{project_short}} right now?",
 
     bedroomsQuestion: "How many bedrooms are you interested in?",
     bedroomsQuestionBroker: "Which unit types are your clients asking for?",
@@ -215,7 +212,7 @@ export const STRINGS = {
     slotConfirmText: "Booked ✅ We'll call you {{slot_label}}.",
     scheduleWhatsappLabel: "💬 Message us — we reply at 9",
 
-    nurtureText: "We'll send you the [Movenpick Project Name] brochure and payment plan on WhatsApp.",
+    nurtureText: "We'll send you the {{project_name}} brochure and payment plan on WhatsApp.",
     nurtureTextBroker:
       "We'll send you the broker pack — brochure, payment plan and registration link — on WhatsApp.",
     nurtureWhatsappLabel: "📲 Get it on WhatsApp",
@@ -249,14 +246,14 @@ export const STRINGS = {
     minimiseChatAria: "تصغير المحادثة",
     toggleHoverLabel: "تحدث معنا",
 
-    greetingTitle: "مرحباً — أهلاً بك في [Movenpick Project Name] من Refine! 👋",
+    greetingTitle: "مرحباً — أهلاً بك في {{project_name}} من Refine! 👋",
     greetingSubtitle:
       "أجب عن بضعة أسئلة سريعة وسأزودك بالأسعار وخطة الدفع وخط تواصل مباشر مع فريقنا — في أقل من دقيقة.",
 
     roleQuestion: "أنا هنا بصفتي…",
 
     stageQuestion: "ما الذي يصف نيتك الشرائية الحالية بشكل أفضل؟",
-    stageQuestionBroker: "هل لديك عميل لمشروع [Movenpick Project] حالياً؟",
+    stageQuestionBroker: "هل لديك عميل لمشروع {{project_short}} حالياً؟",
 
     bedroomsQuestion: "كم عدد غرف النوم التي تهمك؟",
     bedroomsQuestionBroker: "ما أنواع الوحدات التي يطلبها عملاؤك؟",
@@ -304,7 +301,7 @@ export const STRINGS = {
     slotConfirmText: "تم الحجز ✅ سنتصل بك {{slot_label}}.",
     scheduleWhatsappLabel: "💬 راسلنا الآن — سنرد في التاسعة صباحاً",
 
-    nurtureText: "سنرسل لك بروشور [Movenpick Project Name] وخطة الدفع عبر واتساب.",
+    nurtureText: "سنرسل لك بروشور {{project_name}} وخطة الدفع عبر واتساب.",
     nurtureTextBroker: "سنرسل لك حزمة الوسيط — البروشور وخطة الدفع ورابط التسجيل — عبر واتساب.",
     nurtureWhatsappLabel: "📲 استلمه عبر واتساب",
     nurtureWhatsappLabelBroker: "📲 استلم حزمة الوسيط",

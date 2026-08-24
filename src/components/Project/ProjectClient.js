@@ -766,13 +766,15 @@ export default function ProjectClient({
           <article
             ref={introRef}
             className={styles.introCard}
-            aria-label="[Movenpick residential retreat — confirm wording]"
+            aria-labelledby="project-intro-heading"
           >
             <div ref={introContentRef} className={styles.introContent}>
               <div>
                 <p className={styles.eyebrow}>{eyebrow}</p>
 
-                <h3 className={styles.title}>{title}</h3>
+                <h3 id="project-intro-heading" className={styles.title}>
+                  {title}
+                </h3>
               </div>
 
               <a

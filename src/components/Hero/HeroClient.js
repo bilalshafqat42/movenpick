@@ -48,9 +48,12 @@ function panelRestScrollY(imageSection) {
 export default function HeroClient({
   mainImage,
   mainImageFallback,
+  mainImageAlt,
   eyebrow,
   heading,
   text,
+  ctaLabel,
+  ctaHref,
 }) {
   const sectionRef = useRef(null);
   const contentRef = useRef(null);
@@ -423,16 +426,26 @@ export default function HeroClient({
        */}
       <div className={styles.textPanel}>
         <div ref={contentRef} className={styles.content}>
-          <p className={styles.eyebrow}>Duis aute irure</p>
+          <p className={styles.eyebrow}>{eyebrow}</p>
 
           <h1 id="hero-title" className={styles.title}>
-            The home of active wellness
+            {heading}
           </h1>
 
-          <p className={styles.subtitle}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </p>
+          <p className={styles.subtitle}>{text}</p>
+
+          {ctaLabel && ctaHref ? (
+            <a
+              href={ctaHref}
+              className={styles.ctaButton}
+              {...(ctaHref === "#contact" ? { "data-contact-popup": true } : {})}
+            >
+              <span>{ctaLabel}</span>
+              <span className={styles.ctaIcon} aria-hidden="true">
+                →
+              </span>
+            </a>
+          ) : null}
         </div>
 
         <a
@@ -460,6 +473,7 @@ export default function HeroClient({
           fill
           quality={80}
           sizes="100vw"
+          priority
           className={styles.patternShape}
         />
 
@@ -467,10 +481,11 @@ export default function HeroClient({
           <SafeImage
             src={mainImage}
             fallbackSrc={mainImageFallback}
-            alt="[Add Movenpick hero image description]"
+            alt={mainImageAlt}
             fill
             quality={85}
             sizes="(max-width: 767px) 88vw, (max-width: 1024px) 74vw, 100vw"
+            priority
             className={styles.image}
           />
         </div>

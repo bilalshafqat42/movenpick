@@ -32,7 +32,7 @@
           "key": "nav-1-href",
           "label": "Menu item 1 — Link",
           "type": "LINK",
-          "defaultValue": "#about"
+          "defaultValue": "#project-overview"
         },
         {
           "key": "nav-2-label",
@@ -127,7 +127,13 @@
           "key": "main-image",
           "label": "Main image",
           "type": "IMAGE",
-          "defaultValue": "/images/hero/hero.svg"
+          "defaultValue": "/images/hero/main.avif"
+        },
+        {
+          "key": "main-image-alt",
+          "label": "Main image alt text",
+          "type": "TEXT",
+          "defaultValue": "[Add Movenpick hero image description]"
         },
         {
           "key": "eyebrow",
@@ -170,28 +176,90 @@
       ]
     },
     {
-      "slug": "about",
-      "label": "About",
+      "slug": "projectOverview",
+      "label": "Project Overview",
       "group": "content",
       "minRole": "EDITOR",
       "fields": [
         {
-          "key": "eyebrow",
-          "label": "Eyebrow",
+          "key": "description",
+          "label": "Description paragraph",
           "type": "TEXT",
-          "defaultValue": "[Eyebrow]"
+          "long": true,
+          "defaultValue": "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua. Ut Enim Ad Minim Veniam. Duis Aute Irure Dolor In Reprehenderit In Voluptate Velit Esse Cillum Dolore"
         },
         {
-          "key": "heading",
-          "label": "Heading",
+          "key": "stat-1-value",
+          "label": "Key fact 1 — value",
           "type": "TEXT",
-          "defaultValue": "[About heading]"
+          "defaultValue": "Q4 2028"
         },
         {
-          "key": "image",
-          "label": "Image",
-          "type": "IMAGE",
-          "defaultValue": "/images/about/about.svg"
+          "key": "stat-1-label",
+          "label": "Key fact 1 — label",
+          "type": "TEXT",
+          "defaultValue": "Project Completion"
+        },
+        {
+          "key": "stat-2-value",
+          "label": "Key fact 2 — value",
+          "type": "TEXT",
+          "defaultValue": "40/60"
+        },
+        {
+          "key": "stat-2-label",
+          "label": "Key fact 2 — label",
+          "type": "TEXT",
+          "defaultValue": "Payment Plan"
+        },
+        {
+          "key": "stat-3-value",
+          "label": "Key fact 3 — value",
+          "type": "TEXT",
+          "defaultValue": "Studio - 2BR"
+        },
+        {
+          "key": "stat-3-label",
+          "label": "Key fact 3 — label",
+          "type": "TEXT",
+          "defaultValue": "Unit Types"
+        },
+        {
+          "key": "stat-4-value",
+          "label": "Key fact 4 — value",
+          "type": "TEXT",
+          "defaultValue": "From 799,000"
+        },
+        {
+          "key": "stat-4-label",
+          "label": "Key fact 4 — label",
+          "type": "TEXT",
+          "defaultValue": "Starting Price"
+        },
+        {
+          "key": "cta-1-label",
+          "label": "Primary button label",
+          "type": "TEXT",
+          "defaultValue": "Discover More"
+        },
+        {
+          "key": "cta-1-href",
+          "label": "Primary button link",
+          "type": "LINK",
+          "helperText": "Leave as #contact to open the enquiry form.",
+          "defaultValue": "#contact"
+        },
+        {
+          "key": "cta-2-label",
+          "label": "Secondary button label",
+          "type": "TEXT",
+          "defaultValue": "Download Brochure"
+        },
+        {
+          "key": "cta-2-href",
+          "label": "Secondary button link (brochure PDF)",
+          "type": "LINK",
+          "defaultValue": "/pdf/oceara-brochure.pdf"
         }
       ]
     },
@@ -202,29 +270,36 @@
       "minRole": "EDITOR",
       "fields": [
         {
-          "key": "eyebrow",
-          "label": "Eyebrow",
+          "key": "heading",
+          "label": "Heading",
           "type": "TEXT",
-          "defaultValue": "[Eyebrow]"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
+        },
+        {
+          "key": "intro-text",
+          "label": "Intro text",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         },
         {
           "key": "item-1-title",
           "label": "Item 1 — Title",
           "type": "TEXT",
-          "defaultValue": "[Feature 1 title]"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
         },
         {
           "key": "item-1-description",
           "label": "Item 1 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "[Feature 1 description]"
+          "defaultValue": "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua."
         },
         {
           "key": "item-1-image",
           "label": "Item 1 — Image",
           "type": "IMAGE",
-          "defaultValue": "/images/amenities/feature-1.svg"
+          "defaultValue": "/images/gallery/boy.avif"
         },
         {
           "key": "item-1-imageAlt",
@@ -236,20 +311,20 @@
           "key": "item-2-title",
           "label": "Item 2 — Title",
           "type": "TEXT",
-          "defaultValue": "[Feature 2 title]"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
         },
         {
           "key": "item-2-description",
           "label": "Item 2 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "[Feature 2 description]"
+          "defaultValue": "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua."
         },
         {
           "key": "item-2-image",
           "label": "Item 2 — Image",
           "type": "IMAGE",
-          "defaultValue": "/images/amenities/feature-2.svg"
+          "defaultValue": "/images/gallery/yacht.avif"
         },
         {
           "key": "item-2-imageAlt",
@@ -261,20 +336,20 @@
           "key": "item-3-title",
           "label": "Item 3 — Title",
           "type": "TEXT",
-          "defaultValue": "[Feature 3 title]"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
         },
         {
           "key": "item-3-description",
           "label": "Item 3 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "[Feature 3 description]"
+          "defaultValue": "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua."
         },
         {
           "key": "item-3-image",
           "label": "Item 3 — Image",
           "type": "IMAGE",
-          "defaultValue": "/images/amenities/feature-3.svg"
+          "defaultValue": "/images/gallery/wellness.avif"
         },
         {
           "key": "item-3-imageAlt",
@@ -286,20 +361,20 @@
           "key": "item-4-title",
           "label": "Item 4 — Title",
           "type": "TEXT",
-          "defaultValue": "[Feature 4 title]"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
         },
         {
           "key": "item-4-description",
           "label": "Item 4 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "[Feature 4 description]"
+          "defaultValue": "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua."
         },
         {
           "key": "item-4-image",
           "label": "Item 4 — Image",
           "type": "IMAGE",
-          "defaultValue": "/images/amenities/feature-4.svg"
+          "defaultValue": "/images/gallery/garden.avif"
         },
         {
           "key": "item-4-imageAlt",
@@ -308,29 +383,244 @@
           "defaultValue": "Placeholder — replace with a real photo"
         },
         {
-          "key": "item-5-title",
-          "label": "Item 5 — Title",
+          "key": "cta-label",
+          "label": "Button label",
           "type": "TEXT",
-          "defaultValue": "[Feature 5 title]"
+          "defaultValue": "Submit Request"
+        }
+      ]
+    },
+    {
+      "slug": "projectGallery",
+      "label": "Project Gallery",
+      "group": "content",
+      "minRole": "EDITOR",
+      "fields": [
+        {
+          "key": "slide-1-image",
+          "label": "Slide 1 — Image",
+          "type": "IMAGE",
+          "defaultValue": "/images/slider.avif"
         },
         {
-          "key": "item-5-description",
-          "label": "Item 5 — Description",
+          "key": "slide-1-alt",
+          "label": "Slide 1 — Image alt text",
+          "type": "TEXT",
+          "defaultValue": "Movenpick building exterior"
+        },
+        {
+          "key": "slide-1-heading",
+          "label": "Slide 1 — Heading",
+          "type": "TEXT",
+          "defaultValue": "Excepteur sint occaecat cupidatat"
+        },
+        {
+          "key": "slide-1-text",
+          "label": "Slide 1 — Caption",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "[Feature 5 description]"
+          "defaultValue": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
         },
         {
-          "key": "item-5-image",
-          "label": "Item 5 — Image",
+          "key": "slide-2-image",
+          "label": "Slide 2 — Image",
           "type": "IMAGE",
-          "defaultValue": "/images/amenities/feature-5.svg"
+          "defaultValue": "/images/gallery/game.avif"
         },
         {
-          "key": "item-5-imageAlt",
-          "label": "Item 5 — Image alt text",
+          "key": "slide-2-alt",
+          "label": "Slide 2 — Image alt text",
           "type": "TEXT",
           "defaultValue": "Placeholder — replace with a real photo"
+        },
+        {
+          "key": "slide-2-heading",
+          "label": "Slide 2 — Heading",
+          "type": "TEXT",
+          "defaultValue": "Excepteur sint occaecat cupidatat"
+        },
+        {
+          "key": "slide-2-text",
+          "label": "Slide 2 — Caption",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+        },
+        {
+          "key": "slide-3-image",
+          "label": "Slide 3 — Image",
+          "type": "IMAGE",
+          "defaultValue": "/images/gallery/stone.avif"
+        },
+        {
+          "key": "slide-3-alt",
+          "label": "Slide 3 — Image alt text",
+          "type": "TEXT",
+          "defaultValue": "Placeholder — replace with a real photo"
+        },
+        {
+          "key": "slide-3-heading",
+          "label": "Slide 3 — Heading",
+          "type": "TEXT",
+          "defaultValue": "Excepteur sint occaecat cupidatat"
+        },
+        {
+          "key": "slide-3-text",
+          "label": "Slide 3 — Caption",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+        },
+        {
+          "key": "slide-4-image",
+          "label": "Slide 4 — Image",
+          "type": "IMAGE",
+          "defaultValue": "/images/gallery/yacht.avif"
+        },
+        {
+          "key": "slide-4-alt",
+          "label": "Slide 4 — Image alt text",
+          "type": "TEXT",
+          "defaultValue": "Placeholder — replace with a real photo"
+        },
+        {
+          "key": "slide-4-heading",
+          "label": "Slide 4 — Heading",
+          "type": "TEXT",
+          "defaultValue": "Excepteur sint occaecat cupidatat"
+        },
+        {
+          "key": "slide-4-text",
+          "label": "Slide 4 — Caption",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+        },
+        {
+          "key": "slide-5-image",
+          "label": "Slide 5 — Image",
+          "type": "IMAGE",
+          "defaultValue": "/images/gallery/wellness.avif"
+        },
+        {
+          "key": "slide-5-alt",
+          "label": "Slide 5 — Image alt text",
+          "type": "TEXT",
+          "defaultValue": "Placeholder — replace with a real photo"
+        },
+        {
+          "key": "slide-5-heading",
+          "label": "Slide 5 — Heading",
+          "type": "TEXT",
+          "defaultValue": "Excepteur sint occaecat cupidatat"
+        },
+        {
+          "key": "slide-5-text",
+          "label": "Slide 5 — Caption",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+        },
+        {
+          "key": "slide-6-image",
+          "label": "Slide 6 — Image",
+          "type": "IMAGE",
+          "defaultValue": "/images/gallery/garden.avif"
+        },
+        {
+          "key": "slide-6-alt",
+          "label": "Slide 6 — Image alt text",
+          "type": "TEXT",
+          "defaultValue": "Placeholder — replace with a real photo"
+        },
+        {
+          "key": "slide-6-heading",
+          "label": "Slide 6 — Heading",
+          "type": "TEXT",
+          "defaultValue": "Excepteur sint occaecat cupidatat"
+        },
+        {
+          "key": "slide-6-text",
+          "label": "Slide 6 — Caption",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+        }
+      ]
+    },
+    {
+      "slug": "trustedPartner",
+      "label": "Trusted Partner",
+      "group": "content",
+      "minRole": "EDITOR",
+      "fields": [
+        {
+          "key": "logo",
+          "label": "Partner logo",
+          "type": "IMAGE",
+          "defaultValue": "/images/accor-logo.svg"
+        },
+        {
+          "key": "logo-alt",
+          "label": "Partner logo — alt text",
+          "type": "TEXT",
+          "defaultValue": "Accor"
+        },
+        {
+          "key": "label",
+          "label": "Label",
+          "type": "TEXT",
+          "defaultValue": "Our Trusted Partner"
+        },
+        {
+          "key": "heading",
+          "label": "Heading",
+          "type": "TEXT",
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
+        },
+        {
+          "key": "text",
+          "label": "Text",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        },
+        {
+          "key": "image",
+          "label": "Photo",
+          "type": "IMAGE",
+          "defaultValue": "/images/trust.avif"
+        },
+        {
+          "key": "image-alt",
+          "label": "Photo — alt text",
+          "type": "TEXT",
+          "defaultValue": "[Add alt text for the Accor lobby photo]"
+        },
+        {
+          "key": "card-heading",
+          "label": "Card — Heading",
+          "type": "TEXT",
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
+        },
+        {
+          "key": "card-text",
+          "label": "Card — Text",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        },
+        {
+          "key": "cta-label",
+          "label": "Card — Button label",
+          "type": "TEXT",
+          "defaultValue": "Discover Accor"
+        },
+        {
+          "key": "cta-href",
+          "label": "Card — Button link",
+          "type": "LINK",
+          "defaultValue": "https://www.accor.com"
         }
       ]
     },
@@ -344,124 +634,150 @@
           "key": "eyebrow",
           "label": "Eyebrow",
           "type": "TEXT",
-          "defaultValue": "Connected To The"
+          "defaultValue": ""
         },
         {
           "key": "heading",
           "label": "Heading",
           "type": "TEXT",
-          "defaultValue": "City, Grounded By Nature"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
         },
         {
           "key": "intro-text",
           "label": "Intro text",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "Enjoy the tranquillity of island living while remaining effortlessly connected to Dubai's most important destinations, business districts, lifestyle hubs and leisure experiences."
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         },
         {
           "key": "item-1-time",
           "label": "Item 1 — Time",
           "type": "TEXT",
-          "defaultValue": "15 Min"
+          "defaultValue": "2 Min"
         },
         {
           "key": "item-1-destination",
           "label": "Item 1 — Destination",
           "type": "TEXT",
-          "defaultValue": "Dubai International Airport (DXB)"
+          "defaultValue": "Medcare Medical Centre"
         },
         {
           "key": "item-1-latitude",
           "label": "Item 1 — Latitude",
           "type": "TEXT",
           "helperText": "The pin's real position on the map. Changing the destination without updating this leaves the pin pointing at the old place. Find coordinates by right-clicking the location in Google Maps and copying the first number.",
-          "defaultValue": "25.2532"
+          "defaultValue": "25.0500"
         },
         {
           "key": "item-1-longitude",
           "label": "Item 1 — Longitude",
           "type": "TEXT",
           "helperText": "The second number from the same Google Maps right-click.",
-          "defaultValue": "55.3644"
+          "defaultValue": "55.2280"
         },
         {
           "key": "item-2-time",
           "label": "Item 2 — Time",
           "type": "TEXT",
-          "defaultValue": "20 Min"
+          "defaultValue": "9 Min"
         },
         {
           "key": "item-2-destination",
           "label": "Item 2 — Destination",
           "type": "TEXT",
-          "defaultValue": "Downtown Dubai, Burj Khalifa"
+          "defaultValue": "Dubai Hills Mall"
         },
         {
           "key": "item-2-latitude",
           "label": "Item 2 — Latitude",
           "type": "TEXT",
           "helperText": "The pin's real position on the map. Changing the destination without updating this leaves the pin pointing at the old place. Find coordinates by right-clicking the location in Google Maps and copying the first number.",
-          "defaultValue": "25.1972"
+          "defaultValue": "25.1010"
         },
         {
           "key": "item-2-longitude",
           "label": "Item 2 — Longitude",
           "type": "TEXT",
           "helperText": "The second number from the same Google Maps right-click.",
-          "defaultValue": "55.2744"
+          "defaultValue": "55.2450"
         },
         {
           "key": "item-3-time",
           "label": "Item 3 — Time",
           "type": "TEXT",
-          "defaultValue": "20 Min"
+          "defaultValue": "19 Min"
         },
         {
           "key": "item-3-destination",
           "label": "Item 3 — Destination",
           "type": "TEXT",
-          "defaultValue": "Dubai Creek Golf Club"
+          "defaultValue": "Dubai Marina"
         },
         {
           "key": "item-3-latitude",
           "label": "Item 3 — Latitude",
           "type": "TEXT",
           "helperText": "The pin's real position on the map. Changing the destination without updating this leaves the pin pointing at the old place. Find coordinates by right-clicking the location in Google Maps and copying the first number.",
-          "defaultValue": "25.2425"
+          "defaultValue": "25.0805"
         },
         {
           "key": "item-3-longitude",
           "label": "Item 3 — Longitude",
           "type": "TEXT",
           "helperText": "The second number from the same Google Maps right-click.",
-          "defaultValue": "55.3337"
+          "defaultValue": "55.139"
         },
         {
           "key": "item-4-time",
           "label": "Item 4 — Time",
           "type": "TEXT",
-          "defaultValue": "30 Min"
+          "defaultValue": "23 Min"
         },
         {
           "key": "item-4-destination",
           "label": "Item 4 — Destination",
           "type": "TEXT",
-          "defaultValue": "Dubai Marina"
+          "defaultValue": "Dubai International Airport (DXB)"
         },
         {
           "key": "item-4-latitude",
           "label": "Item 4 — Latitude",
           "type": "TEXT",
           "helperText": "The pin's real position on the map. Changing the destination without updating this leaves the pin pointing at the old place. Find coordinates by right-clicking the location in Google Maps and copying the first number.",
-          "defaultValue": "25.0805"
+          "defaultValue": "25.2532"
         },
         {
           "key": "item-4-longitude",
           "label": "Item 4 — Longitude",
           "type": "TEXT",
           "helperText": "The second number from the same Google Maps right-click.",
-          "defaultValue": "55.139"
+          "defaultValue": "55.3644"
+        },
+        {
+          "key": "item-5-time",
+          "label": "Item 5 — Time",
+          "type": "TEXT",
+          "defaultValue": "20 Min"
+        },
+        {
+          "key": "item-5-destination",
+          "label": "Item 5 — Destination",
+          "type": "TEXT",
+          "defaultValue": "Burj Khalifa"
+        },
+        {
+          "key": "item-5-latitude",
+          "label": "Item 5 — Latitude",
+          "type": "TEXT",
+          "helperText": "The pin's real position on the map. Changing the destination without updating this leaves the pin pointing at the old place. Find coordinates by right-clicking the location in Google Maps and copying the first number.",
+          "defaultValue": "25.197197"
+        },
+        {
+          "key": "item-5-longitude",
+          "label": "Item 5 — Longitude",
+          "type": "TEXT",
+          "helperText": "The second number from the same Google Maps right-click.",
+          "defaultValue": "55.274376"
         }
       ]
     },
@@ -554,16 +870,17 @@
       "minRole": "EDITOR",
       "fields": [
         {
-          "key": "eyebrow",
-          "label": "Eyebrow",
-          "type": "TEXT",
-          "defaultValue": "Designed"
-        },
-        {
           "key": "heading",
           "label": "Heading",
           "type": "TEXT",
-          "defaultValue": "Around Life's Better Moments"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
+        },
+        {
+          "key": "text",
+          "label": "Intro text",
+          "type": "TEXT",
+          "long": true,
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         },
         {
           "key": "item-1-image",
@@ -581,14 +898,14 @@
           "key": "item-1-title",
           "label": "Item 1 — Title",
           "type": "TEXT",
-          "defaultValue": "Wellness Resort"
+          "defaultValue": "Amenities Name"
         },
         {
           "key": "item-1-description",
           "label": "Item 1 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "[Movenpick gallery intro copy]"
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
         },
         {
           "key": "item-2-image",
@@ -606,14 +923,14 @@
           "key": "item-2-title",
           "label": "Item 2 — Title",
           "type": "TEXT",
-          "defaultValue": "Active Living"
+          "defaultValue": "Amenities Name"
         },
         {
           "key": "item-2-description",
           "label": "Item 2 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "Thoughtfully planned spaces encourage movement, recreation and a more balanced way of living."
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
         },
         {
           "key": "item-3-image",
@@ -631,14 +948,14 @@
           "key": "item-3-title",
           "label": "Item 3 — Title",
           "type": "TEXT",
-          "defaultValue": "Nature Retreat"
+          "defaultValue": "Amenities Name"
         },
         {
           "key": "item-3-description",
           "label": "Item 3 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "Immersive landscaped spaces create quiet moments for reflection, connection and relaxation."
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
         },
         {
           "key": "item-4-image",
@@ -656,14 +973,14 @@
           "key": "item-4-title",
           "label": "Item 4 — Title",
           "type": "TEXT",
-          "defaultValue": "Resort Moments"
+          "defaultValue": "Amenities Name"
         },
         {
           "key": "item-4-description",
           "label": "Item 4 — Description",
           "type": "TEXT",
           "long": true,
-          "defaultValue": "Everyday life is elevated through carefully considered leisure spaces and resort-inspired surroundings."
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
         }
       ]
     },
@@ -727,40 +1044,17 @@
       "minRole": "EDITOR",
       "fields": [
         {
-          "key": "eyebrow",
-          "label": "Eyebrow",
-          "type": "TEXT",
-          "defaultValue": "Payment"
-        },
-        {
           "key": "heading",
           "label": "Heading",
           "type": "TEXT",
-          "defaultValue": "Plan"
+          "defaultValue": "Duis Aute Irure Dolor In Reprehenderit"
         },
         {
-          "key": "plan-number-1",
-          "label": "Plan number 1",
+          "key": "text",
+          "label": "Intro text",
           "type": "TEXT",
-          "defaultValue": "20"
-        },
-        {
-          "key": "plan-number-2",
-          "label": "Plan number 2",
-          "type": "TEXT",
-          "defaultValue": "80"
-        },
-        {
-          "key": "plan-label-1",
-          "label": "Plan label 1",
-          "type": "TEXT",
-          "defaultValue": "During Construction"
-        },
-        {
-          "key": "plan-label-2",
-          "label": "Plan label 2",
-          "type": "TEXT",
-          "defaultValue": "After Handover"
+          "long": true,
+          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         },
         {
           "key": "image",
@@ -775,22 +1069,130 @@
           "defaultValue": "[Add alt text for Movenpick lifestyle image]"
         },
         {
-          "key": "brochure-button-label",
-          "label": "Brochure button label",
+          "key": "milestone-1-label",
+          "label": "Milestone 1 — Label",
           "type": "TEXT",
-          "defaultValue": "Download Brochure"
+          "defaultValue": "Booking"
         },
         {
-          "key": "brochure-url",
-          "label": "Brochure file link",
-          "type": "LINK",
-          "defaultValue": "/pdf/oceara-brochure.pdf"
+          "key": "milestone-1-percent",
+          "label": "Milestone 1 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "5%"
         },
         {
-          "key": "submit-button-label",
-          "label": "Submit request button label",
+          "key": "milestone-1-sublabel",
+          "label": "Milestone 1 — Sub-label",
           "type": "TEXT",
-          "defaultValue": "Submit Request"
+          "defaultValue": "On Booking / Reservation"
+        },
+        {
+          "key": "milestone-2-label",
+          "label": "Milestone 2 — Label",
+          "type": "TEXT",
+          "defaultValue": "1st Installment - DLD"
+        },
+        {
+          "key": "milestone-2-percent",
+          "label": "Milestone 2 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "15%"
+        },
+        {
+          "key": "milestone-2-sublabel",
+          "label": "Milestone 2 — Sub-label",
+          "type": "TEXT",
+          "defaultValue": "Within 60 Days Of Booking"
+        },
+        {
+          "key": "milestone-3-label",
+          "label": "Milestone 3 — Label",
+          "type": "TEXT",
+          "defaultValue": "2nd Installment"
+        },
+        {
+          "key": "milestone-3-percent",
+          "label": "Milestone 3 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "5%"
+        },
+        {
+          "key": "milestone-3-sublabel",
+          "label": "Milestone 3 — Sub-label",
+          "type": "TEXT",
+          "defaultValue": "6 Months After Booking"
+        },
+        {
+          "key": "milestone-4-label",
+          "label": "Milestone 4 — Label",
+          "type": "TEXT",
+          "defaultValue": "3rd Installment"
+        },
+        {
+          "key": "milestone-4-percent",
+          "label": "Milestone 4 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "5%"
+        },
+        {
+          "key": "milestone-4-sublabel",
+          "label": "Milestone 4 — Sub-label",
+          "type": "TEXT",
+          "defaultValue": "12 Months After Booking"
+        },
+        {
+          "key": "milestone-5-label",
+          "label": "Milestone 5 — Label",
+          "type": "TEXT",
+          "defaultValue": "4th Installment"
+        },
+        {
+          "key": "milestone-5-percent",
+          "label": "Milestone 5 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "5%"
+        },
+        {
+          "key": "milestone-5-sublabel",
+          "label": "Milestone 5 — Sub-label",
+          "type": "TEXT",
+          "defaultValue": "18 Months After Booking"
+        },
+        {
+          "key": "milestone-6-label",
+          "label": "Milestone 6 — Label",
+          "type": "TEXT",
+          "defaultValue": "5th Installment"
+        },
+        {
+          "key": "milestone-6-percent",
+          "label": "Milestone 6 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "5%"
+        },
+        {
+          "key": "milestone-6-sublabel",
+          "label": "Milestone 6 — Sub-label",
+          "type": "TEXT",
+          "defaultValue": "24 Months After Booking"
+        },
+        {
+          "key": "milestone-7-label",
+          "label": "Milestone 7 — Label",
+          "type": "TEXT",
+          "defaultValue": "Final Installment"
+        },
+        {
+          "key": "milestone-7-percent",
+          "label": "Milestone 7 — Percentage",
+          "type": "TEXT",
+          "defaultValue": "60%"
+        },
+        {
+          "key": "milestone-7-sublabel",
+          "label": "Milestone 7 — Sub-label",
+          "type": "TEXT",
+          "defaultValue": "On Handover"
         }
       ]
     },
@@ -868,6 +1270,18 @@
           "label": "Chat header avatar — square, shown once the chat is open",
           "type": "IMAGE",
           "defaultValue": "/images/agent/avatar-square.avif"
+        },
+        {
+          "key": "project-name",
+          "label": "Project name, in full — used in the chat header and every message that names the project",
+          "type": "TEXT",
+          "defaultValue": "[Movenpick Project Name]"
+        },
+        {
+          "key": "project-short-name",
+          "label": "Project name, shortened — used only where space is tight (the teaser bubble, one broker question)",
+          "type": "TEXT",
+          "defaultValue": "[Movenpick Project]"
         }
       ]
     },

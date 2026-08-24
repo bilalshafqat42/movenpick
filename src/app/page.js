@@ -87,6 +87,8 @@ export default async function Home() {
       <Chat
         agentPhoto={chatAgentContent["agent-photo"]}
         agentPhotoSquare={chatAgentContent["agent-photo-square"]}
+        projectName={chatAgentContent["project-name"]}
+        projectShortName={chatAgentContent["project-short-name"]}
       />
     </>
   );

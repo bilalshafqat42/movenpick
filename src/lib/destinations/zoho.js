@@ -129,7 +129,14 @@ export async function sendToZohoWebhook(lead) {
 function buildZohoPayload(lead) {
   return {
     site: process.env.SITE_KEY?.trim() || "movenpick",
-    project: "[Movenpick Project Name]",
+    /*
+     * Read from the chat's own raw submission (Chat.js's submitLead posts
+     * `project: lead.project`, which is the real project-name.js CMS field
+     * — see chatAgent.js), not a hardcoded literal. Only the chat widget
+     * sends this today; a contact-form lead has no project of its own to
+     * report, so this is simply absent there, same as before.
+     */
+    project: lead.raw?.project,
     source: lead.source,
     first_name: lead.firstName,
     last_name: lead.lastName,

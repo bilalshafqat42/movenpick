@@ -257,9 +257,12 @@ const nextConfig = {
     /*
      * Only these qualities may be requested. 100 is removed: it produces
      * far larger files for no perceptible gain over 90, and encoding at 100
-     * is the slowest path through sharp.
+     * is the slowest path through sharp. 80 and 85 are included because
+     * Hero and TrustedPartner request those exact values — Next.js 16
+     * rejects a `quality` prop that isn't in this list, at build time,
+     * regardless of `unoptimized`.
      */
-    qualities: [75, 90],
+    qualities: [75, 80, 85, 90],
 
     /*
      * Prefer AVIF on supporting browsers and use
