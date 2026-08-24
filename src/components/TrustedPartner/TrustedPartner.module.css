@@ -113,14 +113,31 @@
  * desktop instead of the 80vh (720px at 900px tall) this describes.
  */
 @media (min-width: 1025px) {
+  /*
+   * A full screen, with the fixed header's 90px taken off the top so
+   * the content centres in the part of the screen that is actually
+   * visible rather than in the whole viewport with a bar over it.
+   *
+   * padding-bottom is dropped to 0 here on purpose. With equal padding
+   * top and bottom, adding the header clearance to the top alone would
+   * push the optical centre 45px below the real one. Clearing the
+   * bottom makes the content box exactly the visible area, so
+   * justify-content: center centres it in what the eye actually sees.
+   */
   .textBlock {
     justify-content: center;
 
-    height: 80vh;
+    height: 100vh;
+    height: 100svh;
+
+    padding-top: var(--header-height, 90px);
+    padding-bottom: 0;
   }
 
   .mediaScroll {
-    height: calc(80vh + var(--tp-runway, 1.1) * 100vh);
+    height: calc(
+      100svh - var(--header-height, 90px) + var(--tp-runway, 1.1) * 100vh
+    );
   }
 
   /*
@@ -135,11 +152,22 @@
    * position badly enough to swallow most of a wheel gesture. Sticky
    * changes no boxes.
    */
+  /*
+   * Held below the header rather than centred in the viewport. The
+   * photo is its own full screen now, so there is no leftover space to
+   * centre it in: it starts where the header ends and runs to the
+   * bottom of the screen.
+   *
+   * Sticky rather than GSAP's pin. The pin was rewriting this element's
+   * geometry while the browser tried to snap to the section, and the
+   * two fought over the scroll position badly enough to swallow most of
+   * a wheel gesture. Sticky changes no boxes.
+   */
   .mediaBlock {
     position: sticky;
-    top: 10vh;
+    top: var(--header-height, 90px);
 
-    height: 80vh;
+    height: calc(100svh - var(--header-height, 90px));
   }
 }
 
@@ -221,6 +249,35 @@
 ) {
   .card {
     background: rgba(var(--color-cream-rgb), 0.97);
+  }
+}
+
+/*
+ * Desktop: no visible edge on the card.
+ *
+ * The border above exists so the card still reads as a card once it has
+ * grown over the photo, since its cream fill is nearly the page
+ * background. On desktop the card now grows to the full screen, so that
+ * same border becomes a hairline rectangle drawn around the whole
+ * viewport, and where the grown card meets the section after it the two
+ * lines read as a stray rule across the page.
+ *
+ * border-color, not `border: 0`. The card's growth is driven by four
+ * measured insets (see TrustedPartnerClient), and removing the border
+ * outright would take 2px off the box and shift every one of those
+ * measurements. Making it transparent leaves the geometry untouched:
+ * background-clip defaults to border-box, so the cream simply paints
+ * through where the line used to be.
+ *
+ * This block sits AFTER the .card rule on purpose. Placed with the
+ * other desktop rules further up the file it lost to the later base
+ * rule on source order at equal specificity, and the border stayed at
+ * rgba(137, 118, 85, 0.25) with no sign anything had been overridden.
+ */
+
+@media (min-width: 1025px) {
+  .card {
+    border-color: transparent;
   }
 }
 

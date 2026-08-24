@@ -98,6 +98,20 @@ html {
 }
 
 /*
+ * Trusted Partner is two full screens on desktop, and the first of them
+ * carries its own header clearance internally (see .textBlock in
+ * TrustedPartner.module.css). So it wants the global scroll-padding
+ * cancelled: without this it would rest 90px down and hang that far
+ * below the fold, which is the same reasoning as the mobile block
+ * below.
+ */
+@media (min-width: 1025px) {
+  #trusted-partner {
+    scroll-margin-top: calc(-1 * var(--header-height, 90px));
+  }
+}
+
+/*
  * Mobile: the hero and the project overview each become exactly one
  * screen, so they get their own snap point and rest flush.
  *
