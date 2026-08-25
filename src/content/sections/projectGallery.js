@@ -1,16 +1,14 @@
 /*
  * Field definitions for the Project Gallery — a full-bleed sequence the
- * visitor scrolls through horizontally. Like Amenities and Gallery, the
- * slide count here is fixed; the admin can edit each slide's photo and
- * caption but not add or remove slides.
+ * visitor scrolls through horizontally.
  *
- * Note that only the first SCROLL_SLIDE_COUNT of these appear on the
- * page (see ProjectGalleryClient) — the horizontal journey is
- * deliberately capped so it does not hold the visitor in place for a
- * viewport height per slide. The rest stay defined and editable here so
- * raising that cap needs no content work.
+ * Slides are a real add/remove LIST field in the panel (Manager role and
+ * above — see permissions.js's content.edit.list, since removing a slide
+ * deletes content rather than changing it), not a fixed number of numbered
+ * slots. Whatever slides an editor adds or removes there is exactly what
+ * appears on the page: add 3, the site shows 3; add 6, it shows 6.
  */
-const SLIDES = [
+const DEFAULT_SLIDES = [
   {
     image: "/images/slider.avif",
     alt: "Movenpick building exterior",
@@ -32,76 +30,43 @@ const SLIDES = [
     text:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
+];
+
+export const PROJECT_GALLERY_FIELDS = [
   {
-    image: "/images/gallery/yacht.avif",
-    alt: "Placeholder — replace with a real photo",
-    heading: "Excepteur sint occaecat cupidatat",
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-  },
-  {
-    image: "/images/gallery/wellness.avif",
-    alt: "Placeholder — replace with a real photo",
-    heading: "Excepteur sint occaecat cupidatat",
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-  },
-  {
-    image: "/images/gallery/garden.avif",
-    alt: "Placeholder — replace with a real photo",
-    heading: "Excepteur sint occaecat cupidatat",
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    key: "slides",
+    label: "Slides",
+    type: "LIST",
+    itemLabel: "Slide",
+    helperText:
+      "Use + to add a slide, the trash icon to remove one. Each slide needs an image; heading and caption are optional.",
+    itemFields: [
+      { key: "image", label: "Image", type: "IMAGE" },
+      { key: "alt", label: "Image alt text", type: "TEXT" },
+      { key: "heading", label: "Heading", type: "TEXT" },
+      { key: "text", label: "Caption", type: "TEXT", long: true },
+    ],
   },
 ];
 
-export const PROJECT_GALLERY_SLIDE_COUNT = SLIDES.length;
-
-function slideFieldKey(slideNumber, fieldName) {
-  return `slide-${slideNumber}-${fieldName}`;
-}
-
-export const PROJECT_GALLERY_FIELDS = SLIDES.flatMap((slide, index) => {
-  const slideNumber = index + 1;
-
-  return [
-    {
-      key: slideFieldKey(slideNumber, "image"),
-      label: `Slide ${slideNumber} — Image`,
-      type: "IMAGE",
-      defaultValue: slide.image,
-    },
-    {
-      key: slideFieldKey(slideNumber, "alt"),
-      label: `Slide ${slideNumber} — Image alt text`,
-      type: "TEXT",
-      defaultValue: slide.alt,
-    },
-    {
-      key: slideFieldKey(slideNumber, "heading"),
-      label: `Slide ${slideNumber} — Heading`,
-      type: "TEXT",
-      defaultValue: slide.heading,
-    },
-    {
-      key: slideFieldKey(slideNumber, "text"),
-      label: `Slide ${slideNumber} — Caption`,
-      type: "TEXT",
-      long: true,
-      defaultValue: slide.text,
-    },
-  ];
-});
-
 export function shapeProjectGalleryContent(content) {
-  return Array.from({ length: PROJECT_GALLERY_SLIDE_COUNT }, (_, index) => {
-    const slideNumber = index + 1;
+  const items = Array.isArray(content.slides) ? content.slides : [];
 
-    return {
-      image: content[slideFieldKey(slideNumber, "image")],
-      alt: content[slideFieldKey(slideNumber, "alt")],
-      heading: content[slideFieldKey(slideNumber, "heading")],
-      text: content[slideFieldKey(slideNumber, "text")],
-    };
-  });
+  if (items.length > 0) {
+    return items.map((item) => ({
+      image: item?.image ?? "",
+      alt: item?.alt ?? "",
+      heading: item?.heading ?? "",
+      text: item?.text ?? "",
+    }));
+  }
+
+  /*
+   * Nothing added in the panel yet, most likely because the panel isn't
+   * connected (see @/lib/content.js's getSectionContent) or no one has used
+   * the + button yet. Fall back to the original three-slide demo sequence
+   * rather than rendering an empty gallery, matching every other section's
+   * promise that a disconnected panel still serves a complete page.
+   */
+  return DEFAULT_SLIDES;
 }

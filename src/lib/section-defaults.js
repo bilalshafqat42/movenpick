@@ -37,6 +37,14 @@ export function mergeRowsOverDefaults(rows, defaults) {
       if (row.imageUrl) {
         merged[row.key] = row.imageUrl;
       }
+    } else if (row.type === "LIST") {
+      // A LIST row's payload travels under `items`, never `value` — see
+      // public-content.js's toRow() on the panel side. An empty array is
+      // still a real, meaningful answer ("nothing added yet"), so it is
+      // merged in rather than treated like a missing value.
+      if (Array.isArray(row.items)) {
+        merged[row.key] = row.items;
+      }
     } else if (row.value !== null && row.value !== undefined) {
       merged[row.key] = row.value;
     }

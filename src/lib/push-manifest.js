@@ -35,7 +35,8 @@ function buildManifestPayload() {
          * section's own defaultValue convention), but the panel's
          * manifest schema requires a BOOLEAN field's default to be a
          * real true/false, not the string "true"/"false" — coerced
-         * here rather than changing the site-wide convention.
+         * here rather than changing the site-wide convention. Never sent
+         * for LIST: the panel's schema forbids a LIST field declaring one.
          */
         ...(field.defaultValue != null
           ? {
@@ -43,6 +44,34 @@ function buildManifestPayload() {
                 field.type === "BOOLEAN"
                   ? field.defaultValue === "true"
                   : field.defaultValue,
+            }
+          : {}),
+        /*
+         * A LIST field's per-item shape (e.g. Project Gallery's slides:
+         * image, alt, heading, caption). Mapped the same way as a normal
+         * field, one level down — the panel's schema mirrors this
+         * exactly (ItemFieldSchema).
+         */
+        ...(field.itemLabel ? { itemLabel: field.itemLabel } : {}),
+        ...(field.itemFields
+          ? {
+              itemFields: field.itemFields.map((itemField) => ({
+                key: itemField.key,
+                label: itemField.label,
+                type: itemField.type,
+                ...(itemField.long ? { multiline: true } : {}),
+                ...(itemField.helperText
+                  ? { helperText: itemField.helperText }
+                  : {}),
+                ...(itemField.defaultValue != null
+                  ? {
+                      default:
+                        itemField.type === "BOOLEAN"
+                          ? itemField.defaultValue === "true"
+                          : itemField.defaultValue,
+                    }
+                  : {}),
+              })),
             }
           : {}),
       })),

@@ -1,16 +1,16 @@
 /*
  * Field definitions for the Amenities section: a centered heading and
- * intro paragraph, a static list of key points — each with its own
+ * intro paragraph, an add/remove list of key points — each with its own
  * photo AND its own description, swapped in together on hover/focus —
  * and a closing "Submit Request" button.
+ *
+ * Items are a real add/remove LIST field in the panel (Manager role and
+ * above — see permissions.js's content.edit.list). Whatever items an
+ * editor adds or removes there is exactly what appears on the page:
+ * AmenitiesClient already derives its whole scroll-driven stage journey
+ * from items.length, so no component change was needed to make this safe.
  */
-
-/*
- * Reusing four of the Project Gallery's photos (public/images/gallery/)
- * so each item shows a distinct real image instead of the same
- * placeholder repeated four times.
- */
-const ITEMS = [
+const DEFAULT_ITEMS = [
   {
     title: "Duis Aute Irure Dolor In Reprehenderit",
     description:
@@ -41,12 +41,6 @@ const ITEMS = [
   },
 ];
 
-export const AMENITIES_ITEM_COUNT = ITEMS.length;
-
-function itemFieldKey(itemNumber, fieldName) {
-  return `item-${itemNumber}-${fieldName}`;
-}
-
 export const AMENITIES_FIELDS = [
   {
     key: "heading",
@@ -62,39 +56,20 @@ export const AMENITIES_FIELDS = [
     defaultValue:
       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
   },
-
-  ...ITEMS.flatMap((item, index) => {
-    const itemNumber = index + 1;
-
-    return [
-      {
-        key: itemFieldKey(itemNumber, "title"),
-        label: `Item ${itemNumber} — Title`,
-        type: "TEXT",
-        defaultValue: item.title,
-      },
-      {
-        key: itemFieldKey(itemNumber, "description"),
-        label: `Item ${itemNumber} — Description`,
-        type: "TEXT",
-        long: true,
-        defaultValue: item.description,
-      },
-      {
-        key: itemFieldKey(itemNumber, "image"),
-        label: `Item ${itemNumber} — Image`,
-        type: "IMAGE",
-        defaultValue: item.image,
-      },
-      {
-        key: itemFieldKey(itemNumber, "imageAlt"),
-        label: `Item ${itemNumber} — Image alt text`,
-        type: "TEXT",
-        defaultValue: item.imageAlt,
-      },
-    ];
-  }),
-
+  {
+    key: "items",
+    label: "Items",
+    type: "LIST",
+    itemLabel: "Item",
+    helperText:
+      "Use + to add an item, the trash icon to remove one. Each item needs an image; title and description are shown in the hover/scroll panel.",
+    itemFields: [
+      { key: "title", label: "Title", type: "TEXT" },
+      { key: "description", label: "Description", type: "TEXT", long: true },
+      { key: "image", label: "Image", type: "IMAGE" },
+      { key: "imageAlt", label: "Image alt text", type: "TEXT" },
+    ],
+  },
   {
     key: "cta-label",
     label: "Button label",
@@ -108,16 +83,17 @@ export const AMENITIES_FIELDS = [
  * returns) into the prop shape AmenitiesClient actually renders.
  */
 export function shapeAmenitiesContent(content) {
-  const items = Array.from({ length: AMENITIES_ITEM_COUNT }, (_, index) => {
-    const itemNumber = index + 1;
+  const rawItems = Array.isArray(content.items) ? content.items : [];
 
-    return {
-      title: content[itemFieldKey(itemNumber, "title")],
-      description: content[itemFieldKey(itemNumber, "description")],
-      image: content[itemFieldKey(itemNumber, "image")],
-      imageAlt: content[itemFieldKey(itemNumber, "imageAlt")],
-    };
-  });
+  const items =
+    rawItems.length > 0
+      ? rawItems.map((item) => ({
+          title: item?.title ?? "",
+          description: item?.description ?? "",
+          image: item?.image ?? "",
+          imageAlt: item?.imageAlt ?? "",
+        }))
+      : DEFAULT_ITEMS;
 
   return {
     heading: content.heading,

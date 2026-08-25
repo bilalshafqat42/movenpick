@@ -6,9 +6,9 @@
  * between this section and the page's scroll-snap points, and sticky
  * keeps the snap anchor on an element that never moves.
  *
- * --pg-slides is set inline by ProjectGalleryClient from the single
- * SCROLL_SLIDE_COUNT constant, so the wrapper height, the rail width
- * and the JS travel distance can never drift apart.
+ * --pg-slides is set inline by ProjectGalleryClient from the actual
+ * slide count it received, so the wrapper height, the rail width and
+ * the JS travel distance can never drift apart.
  */
 
 .gallery {

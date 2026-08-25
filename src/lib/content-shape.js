@@ -93,6 +93,22 @@ function inferRow(key, raw) {
       return { key, type: "IMAGE", value: null, imageUrl: imageUrl ?? value };
     }
 
+    /*
+     * A LIST row's payload travels under `items`, not `value`/`imageUrl`
+     * (see public-content.js's toRow() on the panel side) — those two stay
+     * null on a LIST row deliberately, so the null check below must not
+     * treat that as "nothing here" and drop the row.
+     */
+    if (type === "LIST") {
+      return {
+        key,
+        type: "LIST",
+        value: null,
+        imageUrl: null,
+        items: Array.isArray(raw.items) ? raw.items : [],
+      };
+    }
+
     if (value === null && imageUrl === null) {
       return null;
     }

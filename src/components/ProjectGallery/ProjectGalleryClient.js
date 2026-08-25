@@ -8,19 +8,6 @@ import { ENTRANCE_EASE } from "@/lib/motion";
 import styles from "./ProjectGallery.module.css";
 
 /*
- * How many slides the horizontal journey actually covers.
- *
- * The CMS defines six (see @/content/sections/projectGallery) and all
- * six stay editable in the panel, but holding a visitor in place for
- * six viewport heights of scroll just to get past one section reads as
- * being held hostage. Three establishes the sequence and hands the
- * page back. Raising this number is the only change needed to show
- * more — the wrapper height, rail width, travel distance and pagination
- * are all derived from it.
- */
-const SCROLL_SLIDE_COUNT = 3;
-
-/*
  * Viewport heights of scrolling per slide transition.
  *
  * Above 1 the photos move less per unit of scroll, which is what makes
@@ -89,7 +76,15 @@ const CAPTION_OUT_DURATION = 0.28;
 const CAPTION_IN_DURATION = 0.55;
 
 export default function ProjectGalleryClient({ slides }) {
-  const visibleSlides = slides.slice(0, SCROLL_SLIDE_COUNT);
+  /*
+   * How many slides actually appear is decided upstream, in
+   * shapeProjectGalleryContent (@/content/sections/projectGallery) — it
+   * only counts a slide as "added" once an editor has uploaded a real
+   * photo for it. The wrapper height, rail width, travel distance and
+   * pagination below are all derived from whatever length this array is,
+   * so raising or lowering the count in the panel needs no code change.
+   */
+  const visibleSlides = slides;
   const slideCount = visibleSlides.length;
   const transitionCount = Math.max(1, slideCount - 1);
 
