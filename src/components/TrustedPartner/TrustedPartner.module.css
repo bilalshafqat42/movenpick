@@ -291,8 +291,17 @@
      * Below about 1710px wide there is not 1370px to give away — at
      * 1440 the subtraction alone would leave a 55px card — so the floor
      * takes over and the inset simply becomes whatever is left.
+     *
+     * The 420px ceiling stops it growing on wider ones. A fixed
+     * subtraction means the card keeps gaining width with the screen:
+     * it reads well up to about 1790px, where it lands at 415, and by
+     * 1920 it has gained another 120px and the copy sits in a notably
+     * wider box. The ceiling holds it at the size it has on a laptop,
+     * so a 1920 or larger screen shows the same card rather than a
+     * bigger one. Past roughly 1790px the resting inset is therefore
+     * larger than 685 — that is the trade for a card that stays put.
      */
-    width: max(340px, calc(100% - 1370px));
+    width: clamp(340px, calc(100% - 1370px), 420px);
   }
 
   /*
