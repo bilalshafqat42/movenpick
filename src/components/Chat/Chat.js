@@ -890,7 +890,7 @@ export default function Chat({
           throw new Error(result?.message ?? strings.errorFallback);
         }
 
-        const returnedReference = result.reference ?? `OCE-${Date.now()}`;
+        const returnedReference = result.reference ?? `MVP-${Date.now()}`;
 
         setReference(returnedReference);
 
