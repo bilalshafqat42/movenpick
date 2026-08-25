@@ -1,6 +1,9 @@
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
 import { fieldDefault } from "@/lib/section-defaults";
-import { PAYMENT_FIELDS, shapePaymentContent } from "@/content/sections/payment";
+import {
+  PAYMENT_FIELDS,
+  shapePaymentContent,
+} from "@/content/sections/payment";
 import PaymentClient from "./PaymentClient";
 
 export default async function Payment() {

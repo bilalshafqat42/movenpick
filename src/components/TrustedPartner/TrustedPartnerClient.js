@@ -5,7 +5,13 @@ import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
-import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_RISE,
+  ENTRANCE_STAGGER,
+  ENTRANCE_START,
+} from "@/lib/motion";
 import styles from "./TrustedPartner.module.css";
 
 /*
@@ -30,23 +36,6 @@ const GROW_VIEWPORTS = 0.9;
  * seen on its own.
  */
 const GROW_ARRIVAL_VIEWPORTS = 0.2;
-
-/*
- * The Accor block introduces itself one line at a time: logo, then
- * eyebrow, then heading, then paragraph.
- *
- * Its own figures rather than the site-wide ENTRANCE_STAGGER, which is
- * 0.15s. Four elements at that spacing land inside half a second, which
- * is close enough to simultaneous that the sequence does not register
- * as one — it just looked like the block fading in. At 0.34s each step
- * is separately legible and the four span a little over a second.
- *
- * The rise is longer than the usual 24px for the same reason: a short
- * travel at speed is easy to miss, and this block is the section's
- * whole first impression.
- */
-const TEXT_REVEAL_STAGGER = 0.34;
-const TEXT_REVEAL_RISE = 44;
 
 export default function TrustedPartnerClient({
   logo,
@@ -101,26 +90,29 @@ export default function TrustedPartnerClient({
             ].filter(Boolean)
           : [];
 
-        gsap.set([...textReveal, ...cardContents, media, card].filter(Boolean), {
-          autoAlpha: 1,
-          y: 0,
-        });
+        gsap.set(
+          [...textReveal, ...cardContents, media, card].filter(Boolean),
+          {
+            autoAlpha: 1,
+            y: 0,
+          },
+        );
 
         return;
       }
 
-      gsap.set(textReveal, { autoAlpha: 0, y: TEXT_REVEAL_RISE });
+      gsap.set(textReveal, { autoAlpha: 0, y: ENTRANCE_RISE });
 
       const textTrigger = revealOnArrival({
         trigger: section,
-        start: "top 78%",
+        start: ENTRANCE_START,
 
         onReveal: () => {
           gsap.to(textReveal, {
             autoAlpha: 1,
             y: 0,
             duration: ENTRANCE_DURATION,
-            stagger: TEXT_REVEAL_STAGGER,
+            stagger: ENTRANCE_STAGGER,
             ease: ENTRANCE_EASE,
           });
         },
@@ -162,11 +154,11 @@ export default function TrustedPartnerClient({
 
         gsap.set(media, { autoAlpha: 0, y: 28 });
         gsap.set(card, { autoAlpha: 0, y: 24 });
-        gsap.set(cardReveal, { autoAlpha: 0, y: TEXT_REVEAL_RISE });
+        gsap.set(cardReveal, { autoAlpha: 0, y: ENTRANCE_RISE });
 
         mediaTrigger = revealOnArrival({
           trigger: media,
-          start: "top 80%",
+          start: ENTRANCE_START,
 
           onReveal: () => {
             gsap
@@ -188,7 +180,7 @@ export default function TrustedPartnerClient({
                   autoAlpha: 1,
                   y: 0,
                   duration: ENTRANCE_DURATION,
-                  stagger: TEXT_REVEAL_STAGGER,
+                  stagger: ENTRANCE_STAGGER,
                 },
                 ENTRANCE_STAGGER * 2,
               );
@@ -320,7 +312,8 @@ export default function TrustedPartnerClient({
            * over it yet.
            */
           trigger: media,
-          start: () => `center center-=${window.innerHeight * GROW_ARRIVAL_VIEWPORTS}`,
+          start: () =>
+            `center center-=${window.innerHeight * GROW_ARRIVAL_VIEWPORTS}`,
           end: () =>
             `center center-=${
               window.innerHeight * (GROW_ARRIVAL_VIEWPORTS + GROW_VIEWPORTS)
@@ -464,7 +457,6 @@ export default function TrustedPartnerClient({
           </div>
         </div>
       </div>
-
     </section>
   );
 }

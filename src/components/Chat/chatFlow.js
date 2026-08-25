@@ -46,13 +46,22 @@ export const ROLES = [
 export const SEARCH_STAGES = [
   {
     id: "actively_looking",
-    label: { en: "Actively looking & ready to book", ar: "أبحث بجدية وجاهز للحجز" },
-    brokerLabel: { en: "Yes — actively closing", ar: "نعم — أعمل على إتمام صفقة" },
+    label: {
+      en: "Actively looking & ready to book",
+      ar: "أبحث بجدية وجاهز للحجز",
+    },
+    brokerLabel: {
+      en: "Yes — actively closing",
+      ar: "نعم — أعمل على إتمام صفقة",
+    },
   },
   {
     id: "shortlisting",
     label: { en: "Shortlisting options", ar: "أضع قائمة مختصرة بالخيارات" },
-    brokerLabel: { en: "Yes — shortlisting for them", ar: "نعم — أضع قائمة مختصرة له" },
+    brokerLabel: {
+      en: "Yes — shortlisting for them",
+      ar: "نعم — أضع قائمة مختصرة له",
+    },
   },
   {
     id: "gathering_info",
@@ -74,10 +83,16 @@ export const UNIT_TYPES = [
 ];
 
 export const BUDGET_BRACKETS = [
-  { id: "500k_1m", label: { en: "AED 500K – AED 1M", ar: "500 ألف – مليون درهم" } },
+  {
+    id: "500k_1m",
+    label: { en: "AED 500K – AED 1M", ar: "500 ألف – مليون درهم" },
+  },
   { id: "1m_2m", label: { en: "AED 1M – AED 2M", ar: "1–2 مليون درهم" } },
   { id: "2m_3m", label: { en: "AED 2M – AED 3M", ar: "2–3 ملايين درهم" } },
-  { id: "3m_plus", label: { en: "AED 3M and Above", ar: "3 ملايين درهم فأكثر" } },
+  {
+    id: "3m_plus",
+    label: { en: "AED 3M and Above", ar: "3 ملايين درهم فأكثر" },
+  },
 ];
 
 export const CLOSE_RULES = {
@@ -164,7 +179,8 @@ export const STRINGS = {
     roleQuestion: "I'm here as a…",
 
     stageQuestion: "What best describes your current buying intent?",
-    stageQuestionBroker: "Do you have a client for {{project_short}} right now?",
+    stageQuestionBroker:
+      "Do you have a client for {{project_short}} right now?",
 
     bedroomsQuestion: "How many bedrooms are you interested in?",
     bedroomsQuestionBroker: "Which unit types are your clients asking for?",
@@ -185,10 +201,12 @@ export const STRINGS = {
 
     phoneQuestion: "Your phone number:",
     phonePlaceholder: "Phone number with country code...",
-    phoneError: "That number doesn't look complete — please include your country code.",
+    phoneError:
+      "That number doesn't look complete — please include your country code.",
     continueCta: "Continue",
 
-    consentText: "By continuing, you agree to be contacted by Refine about this project.",
+    consentText:
+      "By continuing, you agree to be contacted by Refine about this project.",
     consentError: "Please confirm you agree to be contacted before continuing.",
 
     emailQuestion: "And your email address:",
@@ -206,13 +224,15 @@ export const STRINGS = {
     callButtonLabel: "📞 Call now",
     whatsappButtonLabel: "💬 WhatsApp",
 
-    scheduleText: "Our experts are back Mon–Fri, 9 AM–6 PM. When should we call you?",
+    scheduleText:
+      "Our experts are back Mon–Fri, 9 AM–6 PM. When should we call you?",
     slotTomorrowLabel: "Tomorrow",
     slotAnytimeLabel: "Anytime",
     slotConfirmText: "Booked ✅ We'll call you {{slot_label}}.",
     scheduleWhatsappLabel: "💬 Message us — we reply at 9",
 
-    nurtureText: "We'll send you the {{project_name}} brochure and payment plan on WhatsApp.",
+    nurtureText:
+      "We'll send you the {{project_name}} brochure and payment plan on WhatsApp.",
     nurtureTextBroker:
       "We'll send you the broker pack — brochure, payment plan and registration link — on WhatsApp.",
     nurtureWhatsappLabel: "📲 Get it on WhatsApp",
@@ -277,7 +297,8 @@ export const STRINGS = {
     phoneError: "يبدو أن الرقم غير مكتمل — يرجى إدخال رمز الدولة.",
     continueCta: "متابعة",
 
-    consentText: "بالمتابعة، أنت توافق على أن يتواصل معك فريق Refine بخصوص هذا المشروع.",
+    consentText:
+      "بالمتابعة، أنت توافق على أن يتواصل معك فريق Refine بخصوص هذا المشروع.",
     consentError: "يرجى تأكيد موافقتك على التواصل قبل الاستمرار.",
 
     emailQuestion: "وبريدك الإلكتروني:",
@@ -295,14 +316,16 @@ export const STRINGS = {
     callButtonLabel: "📞 اتصل الآن",
     whatsappButtonLabel: "💬 واتساب",
 
-    scheduleText: "خبراؤنا متاحون من الاثنين إلى الجمعة، من 9 صباحاً حتى 6 مساءً. متى نتصل بك؟",
+    scheduleText:
+      "خبراؤنا متاحون من الاثنين إلى الجمعة، من 9 صباحاً حتى 6 مساءً. متى نتصل بك؟",
     slotTomorrowLabel: "غداً",
     slotAnytimeLabel: "أي وقت",
     slotConfirmText: "تم الحجز ✅ سنتصل بك {{slot_label}}.",
     scheduleWhatsappLabel: "💬 راسلنا الآن — سنرد في التاسعة صباحاً",
 
     nurtureText: "سنرسل لك بروشور {{project_name}} وخطة الدفع عبر واتساب.",
-    nurtureTextBroker: "سنرسل لك حزمة الوسيط — البروشور وخطة الدفع ورابط التسجيل — عبر واتساب.",
+    nurtureTextBroker:
+      "سنرسل لك حزمة الوسيط — البروشور وخطة الدفع ورابط التسجيل — عبر واتساب.",
     nurtureWhatsappLabel: "📲 استلمه عبر واتساب",
     nurtureWhatsappLabelBroker: "📲 استلم حزمة الوسيط",
 

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import {
-  ENTRANCE_STAGGER,
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
   HERO_COPY_STAGGER,
@@ -34,7 +33,12 @@ const BLOCKED_SCROLL_KEYS = [
   " ",
 ];
 
-export default function HeaderClient({ menuItems, logoUrl, ctaLabel, ctaHref }) {
+export default function HeaderClient({
+  menuItems,
+  logoUrl,
+  ctaLabel,
+  ctaHref,
+}) {
   const logoMaskStyle = logoUrl
     ? { "--logo-mask-url": `url("${logoUrl}")` }
     : undefined;

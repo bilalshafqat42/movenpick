@@ -4,6 +4,13 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_STAGGER,
+  ENTRANCE_START,
+} from "@/lib/motion";
 import { GALLERY_ITEM_COUNT } from "@/content/sections/gallery";
 import styles from "./Gallery.module.css";
 
@@ -1228,32 +1235,14 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
             gsap.set(revealPieces, { autoAlpha: 0, y: fadeUpDistance });
           }
 
-          const entranceTimeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: "top 80%",
-
-              /*
-               * The section itself is fully in place after a
-               * single scroll into view. The pieces inside it
-               * then play their own one-by-one reveal on top of
-               * that, rather than being tied to further scrolling.
-               *
-               * Scrolling back up past this point reverses the
-               * reveal, so it replays if someone scrolls away
-               * and back again instead of only firing once.
-               */
-              toggleActions: "play none none reverse",
-              invalidateOnRefresh: true,
-            },
-          });
+          const entranceTimeline = gsap.timeline({ paused: true });
 
           entranceTimeline.to(heading.children, {
             autoAlpha: 1,
             y: 0,
-            duration: 0.82,
-            stagger: 0.1,
-            ease: "power3.out",
+            duration: ENTRANCE_DURATION,
+            stagger: ENTRANCE_STAGGER,
+            ease: ENTRANCE_EASE,
           });
 
           if (centreImage) {
@@ -1262,8 +1251,8 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.85,
-                ease: "power3.out",
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
               },
               "-=0.42",
             );
@@ -1276,8 +1265,8 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
                 autoAlpha: 1,
                 y: 0,
                 duration: 0.6,
-                stagger: 0.16,
-                ease: "power3.out",
+                stagger: ENTRANCE_STAGGER,
+                ease: ENTRANCE_EASE,
               },
               "<+=0.16",
             );
@@ -1289,8 +1278,8 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.75,
-                ease: "power3.out",
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
               },
               "<+=0.22",
             );
@@ -1305,10 +1294,24 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
             entranceTimeline.to(rightImage, {
               autoAlpha: 1,
               y: 0,
-              duration: 0.75,
-              ease: "power3.out",
+              duration: ENTRANCE_DURATION,
+              ease: ENTRANCE_EASE,
             });
           }
+
+          /*
+           * Held until the page has settled, like every other
+           * entrance on the site. A ScrollTrigger created during
+           * hydration measures a page whose images have no height
+           * yet, so "top 50%" resolved to roughly zero and this fired
+           * before the section was anywhere near the screen — the
+           * audit caught it firing with 0% of the section visible.
+           */
+          revealOnArrival({
+            trigger: section,
+            start: ENTRANCE_START,
+            onReveal: () => entranceTimeline.play(),
+          });
 
           return () => {
             entranceTimeline.kill();

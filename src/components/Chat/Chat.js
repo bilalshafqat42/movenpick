@@ -159,7 +159,10 @@ function createMessage({ type = "bot", text, meta }) {
 
 function buildInitialMessages(strings, fillProject) {
   return [
-    createMessage({ text: fillProject(strings.greetingTitle), meta: strings.metaBot }),
+    createMessage({
+      text: fillProject(strings.greetingTitle),
+      meta: strings.metaBot,
+    }),
     createMessage({ text: strings.greetingSubtitle, meta: strings.metaBot }),
     createMessage({ text: strings.roleQuestion, meta: strings.metaBot }),
   ];
@@ -211,7 +214,9 @@ export default function Chat({
   );
 
   const [chatStep, setChatStep] = useState(CHAT_STEP.ROLE);
-  const [leadData, setLeadData] = useState(() => createInitialLeadData(projectName));
+  const [leadData, setLeadData] = useState(() =>
+    createInitialLeadData(projectName),
+  );
 
   const [messages, setMessages] = useState(() =>
     buildInitialMessages(STRINGS[DEFAULT_LANGUAGE], fillProject),
@@ -311,7 +316,9 @@ export default function Chat({
           ...message,
           meta:
             message.meta ??
-            (message.type === "visitor" ? strings.metaVisitor : strings.metaBot),
+            (message.type === "visitor"
+              ? strings.metaVisitor
+              : strings.metaBot),
         }),
       ]);
     },
@@ -357,7 +364,8 @@ export default function Chat({
       introRef.current?.contains(document.activeElement) ||
       chatRef.current?.contains(document.activeElement)
     ) {
-      (document.activeElement instanceof HTMLElement) && document.activeElement.blur();
+      document.activeElement instanceof HTMLElement &&
+        document.activeElement.blur();
     }
 
     setWidgetState(WIDGET_STATE.CLOSED);
@@ -728,7 +736,9 @@ export default function Chat({
       });
 
       appendMessage({
-        text: isBroker ? strings.bedroomsQuestionBroker : strings.bedroomsQuestion,
+        text: isBroker
+          ? strings.bedroomsQuestionBroker
+          : strings.bedroomsQuestion,
       });
 
       setChatStep(CHAT_STEP.BEDROOMS);
@@ -747,7 +757,9 @@ export default function Chat({
 
       appendMessage({
         text:
-          leadData.role === "broker" ? strings.budgetQuestionBroker : strings.budgetQuestion,
+          leadData.role === "broker"
+            ? strings.budgetQuestionBroker
+            : strings.budgetQuestion,
       });
 
       setChatStep(CHAT_STEP.BUDGET);
@@ -891,7 +903,9 @@ export default function Chat({
         setSlotState("idle");
 
         appendMessage({
-          text: fillTemplate(strings.thanksLine, { first_name: lead.firstName }),
+          text: fillTemplate(strings.thanksLine, {
+            first_name: lead.firstName,
+          }),
         });
 
         setChatStep(CHAT_STEP.CLOSE);
@@ -981,7 +995,15 @@ export default function Chat({
         submitLead(finalLead);
       }
     },
-    [appendMessage, chatStep, currentInput, inputValue, leadData, strings, submitLead],
+    [
+      appendMessage,
+      chatStep,
+      currentInput,
+      inputValue,
+      leadData,
+      strings,
+      submitLead,
+    ],
   );
 
   const handleEditDetails = useCallback(() => {
@@ -1050,13 +1072,21 @@ export default function Chat({
         setSlotState("idle");
       }
     },
-    [language, leadData.email, leadData.firstName, leadData.lastName, leadData.phone, leadData.project, reference, strings],
+    [
+      language,
+      leadData.email,
+      leadData.firstName,
+      leadData.lastName,
+      leadData.phone,
+      leadData.project,
+      reference,
+      strings,
+    ],
   );
 
   const whatsappNumber =
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || DEFAULT_WHATSAPP_NUMBER;
-  const callNumber =
-    process.env.NEXT_PUBLIC_CALL_NUMBER || DEFAULT_CALL_NUMBER;
+  const callNumber = process.env.NEXT_PUBLIC_CALL_NUMBER || DEFAULT_CALL_NUMBER;
 
   const closeWhatsappUrl = useMemo(() => {
     if (!whatsappNumber || !closeVariant) {
@@ -1106,9 +1136,11 @@ export default function Chat({
           className={styles.choiceButton}
           onClick={() => handler(item)}
         >
-          {(leadData.role === "broker" && item.brokerLabel
-            ? item.brokerLabel
-            : item[labelKey])[language]}
+          {
+            (leadData.role === "broker" && item.brokerLabel
+              ? item.brokerLabel
+              : item[labelKey])[language]
+          }
         </button>
       ))}
     </div>
@@ -1180,29 +1212,33 @@ export default function Chat({
             </p>
 
             <div className={styles.closeActions}>
-              {(BUTTON_ORDER_BY_STAGE[leadData.searchStage] ?? ["call", "whatsapp"]).map(
-                (action) =>
-                  action === "call" ? (
-                    <a
-                      key="call"
-                      href={callUrl || undefined}
-                      aria-disabled={!callUrl}
-                      className={styles.primaryButton}
-                    >
-                      {strings.callButtonLabel}
-                    </a>
-                  ) : (
-                    <a
-                      key="whatsapp"
-                      href={closeWhatsappUrl || undefined}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-disabled={!closeWhatsappUrl}
-                      className={styles.whatsappButton}
-                    >
-                      {strings.whatsappButtonLabel}
-                    </a>
-                  ),
+              {(
+                BUTTON_ORDER_BY_STAGE[leadData.searchStage] ?? [
+                  "call",
+                  "whatsapp",
+                ]
+              ).map((action) =>
+                action === "call" ? (
+                  <a
+                    key="call"
+                    href={callUrl || undefined}
+                    aria-disabled={!callUrl}
+                    className={styles.primaryButton}
+                  >
+                    {strings.callButtonLabel}
+                  </a>
+                ) : (
+                  <a
+                    key="whatsapp"
+                    href={closeWhatsappUrl || undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-disabled={!closeWhatsappUrl}
+                    className={styles.whatsappButton}
+                  >
+                    {strings.whatsappButtonLabel}
+                  </a>
+                ),
               )}
             </div>
 
@@ -1268,7 +1304,9 @@ export default function Chat({
         {closeVariant === "nurture" ? (
           <>
             <p className={styles.statusText}>
-              {isBroker ? strings.nurtureTextBroker : fillProject(strings.nurtureText)}
+              {isBroker
+                ? strings.nurtureTextBroker
+                : fillProject(strings.nurtureText)}
             </p>
 
             <a
@@ -1480,8 +1518,20 @@ export default function Chat({
                * current language. Recognizable at a glance regardless of
                * which language is currently active.
                */}
-              <svg viewBox="0 0 22 20" width="20" height="18" aria-hidden="true">
-                <rect x="1" y="1" width="13" height="13" rx="4" fill="#e3ebf1" />
+              <svg
+                viewBox="0 0 22 20"
+                width="20"
+                height="18"
+                aria-hidden="true"
+              >
+                <rect
+                  x="1"
+                  y="1"
+                  width="13"
+                  height="13"
+                  rx="4"
+                  fill="#e3ebf1"
+                />
                 <text
                   x="7.5"
                   y="8"
@@ -1494,7 +1544,14 @@ export default function Chat({
                 >
                   A
                 </text>
-                <rect x="8" y="6" width="13" height="13" rx="4" fill="#073d61" />
+                <rect
+                  x="8"
+                  y="6"
+                  width="13"
+                  height="13"
+                  rx="4"
+                  fill="#073d61"
+                />
                 <text
                   x="14.5"
                   y="13"
@@ -1516,7 +1573,12 @@ export default function Chat({
               aria-label={strings.closeChatAria}
               tabIndex={widgetState === WIDGET_STATE.CHAT ? 0 : -1}
             >
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                aria-hidden="true"
+              >
                 <path
                   d="M6 6l12 12M18 6L6 18"
                   stroke="currentColor"
@@ -1529,7 +1591,13 @@ export default function Chat({
         </div>
 
         {showProgressDots ? (
-          <div className={styles.progressDots} role="progressbar" aria-valuenow={progressIndex + 1} aria-valuemin={1} aria-valuemax={progressSteps.length}>
+          <div
+            className={styles.progressDots}
+            role="progressbar"
+            aria-valuenow={progressIndex + 1}
+            aria-valuemin={1}
+            aria-valuemax={progressSteps.length}
+          >
             {progressSteps.map((step, index) => (
               <span
                 key={step}

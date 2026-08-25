@@ -154,7 +154,7 @@ export default function SeaSectionClient({ image, imageAlt, imageFallback }) {
           <div ref={imageRef} className={styles.imageCanvas}>
             <SafeImage
               src={image}
-          fallbackSrc={imageFallback}
+              fallbackSrc={imageFallback}
               alt={imageAlt}
               fill
               quality={90}

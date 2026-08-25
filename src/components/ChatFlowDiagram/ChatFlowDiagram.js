@@ -146,7 +146,11 @@ export default function ChatFlowDiagram() {
         </p>
       ) : null}
 
-      <div ref={containerRef} className={styles.diagram} aria-hidden={status !== "ready"} />
+      <div
+        ref={containerRef}
+        className={styles.diagram}
+        aria-hidden={status !== "ready"}
+      />
     </div>
   );
 }

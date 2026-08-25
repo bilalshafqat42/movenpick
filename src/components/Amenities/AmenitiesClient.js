@@ -5,7 +5,13 @@ import { useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
-import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_STAGGER,
+  ENTRANCE_START,
+  HERO_COPY_STAGGER,
+} from "@/lib/motion";
 import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Amenities.module.css";
 
@@ -22,7 +28,12 @@ const STAGE_SNAP_DURATION = { min: 0.5, max: 0.8 };
 /* Pause after the scroll stops before the snap takes over. */
 const STAGE_SNAP_DELAY = 0.12;
 
-export default function AmenitiesClient({ heading, introText, items, ctaLabel }) {
+export default function AmenitiesClient({
+  heading,
+  introText,
+  items,
+  ctaLabel,
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const sectionRef = useRef(null);
@@ -89,8 +100,11 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
           reduceMotion: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          const { desktop = false, mobile = false, reduceMotion = false } =
-            context.conditions ?? {};
+          const {
+            desktop = false,
+            mobile = false,
+            reduceMotion = false,
+          } = context.conditions ?? {};
 
           if (reduceMotion) {
             clearVenetianMask(imagePanel);
@@ -123,17 +137,23 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
 
           const contentTimeline = gsap.timeline({ paused: true });
 
+          /*
+           * Heading, then the paragraph under it, then the item list,
+           * then the closing group — on the same spacing the hero and
+           * the project overview use, rather than the site-wide default
+           * this section was still on.
+           */
           contentTimeline.to(contentReveal, {
             autoAlpha: 1,
             y: 0,
             duration: ENTRANCE_DURATION,
-            stagger: ENTRANCE_STAGGER,
+            stagger: HERO_COPY_STAGGER,
             ease: ENTRANCE_EASE,
           });
 
           revealOnArrival({
             trigger: section,
-            start: mobile ? "top 78%" : "top 72%",
+            start: ENTRANCE_START,
             onReveal: () => contentTimeline.play(),
           });
 
@@ -555,7 +575,8 @@ export default function AmenitiesClient({ heading, introText, items, ctaLabel })
     setActiveIndex(index);
 
     const stageProgress = (index + 0.5) / items.length;
-    const targetY = trigger.start + stageProgress * (trigger.end - trigger.start);
+    const targetY =
+      trigger.start + stageProgress * (trigger.end - trigger.start);
 
     gsap.to(window, {
       scrollTo: { y: targetY, autoKill: true },

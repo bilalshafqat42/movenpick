@@ -7,6 +7,13 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { gsap, useGSAP } from "@/lib/gsap";
+import { revealOnArrival } from "@/lib/revealOnArrival";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_START,
+  LIST_STAGGER,
+} from "@/lib/motion";
 import styles from "./MapSection.module.css";
 
 /*
@@ -150,7 +157,12 @@ function createGoogleMapsUrl() {
   return `https://www.google.com/maps/dir/?${parameters.toString()}`;
 }
 
-export default function MapSection({ eyebrow, heading, introText, destinations }) {
+export default function MapSection({
+  eyebrow,
+  heading,
+  introText,
+  destinations,
+}) {
   /*
    * Coordinates, zoom, popup positioning and marker styling stay
    * hardcoded here — they are map geometry, not content. Only the
@@ -428,28 +440,29 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
            * re-hide itself on upward scroll too.
            */
           const headingTimeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: sectionHeader,
-              start: "top 80%",
-              toggleActions: "play none none none",
-              invalidateOnRefresh: true,
-            },
+            paused: true,
+          });
+
+          revealOnArrival({
+            trigger: sectionHeader,
+            start: ENTRANCE_START,
+            onReveal: () => headingTimeline.play(),
           });
 
           headingTimeline
             .to(eyebrow, {
               autoAlpha: 1,
               y: 0,
-              duration: 0.68,
-              ease: "power3.out",
+              duration: ENTRANCE_DURATION,
+              ease: ENTRANCE_EASE,
             })
             .to(
               heading,
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.8,
-                ease: "power3.out",
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
               },
               "-=0.42",
             )
@@ -459,7 +472,7 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
                 autoAlpha: 1,
                 y: 0,
                 duration: 0.78,
-                ease: "power3.out",
+                ease: ENTRANCE_EASE,
               },
               "-=0.36",
             );
@@ -492,7 +505,7 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
 
             scrollTrigger: {
               trigger: mapStage,
-              start: "top 84%",
+              start: "top 56%",
               end: "top 36%",
               scrub: 0.8,
               invalidateOnRefresh: true,
@@ -511,12 +524,13 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
           const destinationStagger = 0.2;
 
           const itemsTimeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: mapStage,
-              start: "top 56%",
-              toggleActions: "play none none none",
-              invalidateOnRefresh: true,
-            },
+            paused: true,
+          });
+
+          revealOnArrival({
+            trigger: mapStage,
+            start: ENTRANCE_START,
+            onReveal: () => itemsTimeline.play(),
           });
 
           travelItems.forEach((item, index) => {
@@ -525,8 +539,8 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
               {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.8,
-                ease: "power3.out",
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
               },
               index * destinationStagger,
             );
@@ -542,7 +556,7 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
               autoAlpha: 1,
               y: 0,
               duration: 0.66,
-              ease: "power3.out",
+              ease: ENTRANCE_EASE,
             },
             travelItems.length * destinationStagger + 0.08,
           );
@@ -557,7 +571,7 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
               autoAlpha: 1,
               y: 0,
               duration: 0.7,
-              ease: "power3.out",
+              ease: ENTRANCE_EASE,
             },
             travelItems.length * destinationStagger + 0.18,
           );
@@ -644,7 +658,7 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
 
             scrollTrigger: {
               trigger: mapStage,
-              start: "top 88%",
+              start: "top 68%",
               end: "top 56%",
               scrub: 0.65,
               invalidateOnRefresh: true,
@@ -661,44 +675,44 @@ export default function MapSection({ eyebrow, heading, introText, destinations }
           const mobileItemsTween = gsap.to(travelItems, {
             autoAlpha: 1,
             y: 0,
-            duration: 0.64,
-            stagger: 0.14,
-            ease: "power3.out",
+            duration: ENTRANCE_DURATION,
+            stagger: LIST_STAGGER,
+            ease: ENTRANCE_EASE,
+            paused: true,
+          });
 
-            scrollTrigger: {
-              trigger: mapStage,
-              start: "top 68%",
-              toggleActions: "play none none none",
-              invalidateOnRefresh: true,
-            },
+          revealOnArrival({
+            trigger: mapStage,
+            start: ENTRANCE_START,
+            onReveal: () => mobileItemsTween.play(),
           });
 
           const mobileResetTween = gsap.to(resetButton, {
             autoAlpha: 1,
             y: 0,
-            duration: 0.58,
-            ease: "power3.out",
+            duration: ENTRANCE_DURATION,
+            ease: ENTRANCE_EASE,
+            paused: true,
+          });
 
-            scrollTrigger: {
-              trigger: mapStage,
-              start: "top 60%",
-              toggleActions: "play none none none",
-              invalidateOnRefresh: true,
-            },
+          revealOnArrival({
+            trigger: mapStage,
+            start: ENTRANCE_START,
+            onReveal: () => mobileResetTween.play(),
           });
 
           const mobileDirectionsTween = gsap.to(directionsLink, {
             autoAlpha: 1,
             y: 0,
-            duration: 0.62,
-            ease: "power3.out",
+            duration: ENTRANCE_DURATION,
+            ease: ENTRANCE_EASE,
+            paused: true,
+          });
 
-            scrollTrigger: {
-              trigger: mapStage,
-              start: "top 57%",
-              toggleActions: "play none none none",
-              invalidateOnRefresh: true,
-            },
+          revealOnArrival({
+            trigger: mapStage,
+            start: ENTRANCE_START,
+            onReveal: () => mobileDirectionsTween.play(),
           });
 
           return () => {

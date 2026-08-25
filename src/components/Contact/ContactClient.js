@@ -18,6 +18,12 @@ import "react-phone-number-input/style.css";
 
 import { gsap, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_START,
+  LIST_STAGGER,
+} from "@/lib/motion";
 import styles from "./Contact.module.css";
 
 const TRACKING_STORAGE_KEY = "movenpick_campaign_tracking";
@@ -321,14 +327,14 @@ export default function ContactClient({
 
             revealOnArrival({
               trigger: section,
-              start: "top 75%",
+              start: ENTRANCE_START,
 
               onReveal: () => {
                 gsap.to(inReadingOrder, {
                   autoAlpha: 1,
-                  duration: 0.55,
-                  stagger: 0.11,
-                  ease: "power2.out",
+                  duration: ENTRANCE_DURATION,
+                  stagger: LIST_STAGGER,
+                  ease: ENTRANCE_EASE,
                 });
               },
             });
@@ -379,20 +385,20 @@ export default function ContactClient({
             gsap.to(inReadingOrder, {
               autoAlpha: 1,
               y: 0,
-              duration: 0.7,
+              duration: ENTRANCE_DURATION,
               /*
                * Wide enough to read as one line after another rather
                * than the whole column arriving at once. An earlier
                * 0.07 spread the whole form over half a second and
                * looked like a single move.
                */
-              stagger: 0.12,
-              ease: "power3.out",
+              stagger: LIST_STAGGER,
+              ease: ENTRANCE_EASE,
             });
 
           revealOnArrival({
             trigger: section,
-            start: "top 60%",
+            start: ENTRANCE_START,
             onReveal: revealDesktop,
           });
         },
@@ -595,15 +601,15 @@ export default function ContactClient({
           noValidate
         >
           {/*
-            * The design sets this as one line, so the eyebrow lives
-            * INSIDE the heading rather than above it. Both content
-            * fields are untouched — "Reach Out" and "To Us" simply read
-            * together now.
-            *
-            * It also fixes the section's accessible name: the h2 is what
-            * aria-labelledby points at, so this section used to announce
-            * itself as just "To Us".
-            */}
+           * The design sets this as one line, so the eyebrow lives
+           * INSIDE the heading rather than above it. Both content
+           * fields are untouched — "Reach Out" and "To Us" simply read
+           * together now.
+           *
+           * It also fixes the section's accessible name: the h2 is what
+           * aria-labelledby points at, so this section used to announce
+           * itself as just "To Us".
+           */}
           <header className={styles.headingGroup}>
             <h2 id="contact-title" className={styles.heading}>
               <span className={styles.eyebrow}>{eyebrow}</span> {heading}
@@ -865,8 +871,9 @@ export default function ContactClient({
             and{" "}
             <a href="/privacy-policy" className={styles.consentLink}>
               Privacy Policy.
-            </a> You consent to Refine contacting you about Movenpick and future
-            opportunities by phone, email, or WhatsApp.            .
+            </a>{" "}
+            You consent to Refine contacting you about Movenpick and future
+            opportunities by phone, email, or WhatsApp. .
           </p>
 
           {/* <p className={styles.consent}>

@@ -5,6 +5,12 @@ import Link from "next/link";
 
 import { gsap, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_START,
+  LIST_STAGGER,
+} from "@/lib/motion";
 import styles from "./Footer.module.css";
 
 export default function FooterClient({
@@ -102,16 +108,16 @@ export default function FooterClient({
             {
               autoAlpha: 1,
               y: 0,
-              duration: 0.85,
-              stagger: 0.08,
-              ease: "power3.out",
+              duration: ENTRANCE_DURATION,
+              stagger: LIST_STAGGER,
+              ease: ENTRANCE_EASE,
               paused: true,
             },
           );
 
           revealOnArrival({
             trigger: footer,
-            start: "top 78%",
+            start: ENTRANCE_START,
             onReveal: () => footerReveal.play(),
           });
         },
@@ -129,11 +135,7 @@ export default function FooterClient({
   return (
     <footer ref={footerRef} className={styles.footer}>
       <div ref={contentRef} className={styles.inner}>
-        <a
-          href="#home"
-          className={styles.logo}
-          aria-label="Movenpick home"
-        >
+        <a href="#home" className={styles.logo} aria-label="Movenpick home">
           <span
             className={styles.logoMark}
             style={logoMaskStyle}

@@ -595,18 +595,17 @@ export default function ContactPopupClient({
           noValidate
         >
           {/*
-            * One line, matching the Contact section: the eyebrow lives
-            * INSIDE the heading rather than above it, so both content
-            * fields are kept and simply read together.
-            *
-            * It also fixes the dialog's accessible name — the h2 is what
-            * aria-labelledby points at, so this used to announce itself
-            * as just "To Us".
-            */}
+           * One line, matching the Contact section: the eyebrow lives
+           * INSIDE the heading rather than above it, so both content
+           * fields are kept and simply read together.
+           *
+           * It also fixes the dialog's accessible name — the h2 is what
+           * aria-labelledby points at, so this used to announce itself
+           * as just "To Us".
+           */}
           <header className={styles.headingGroup}>
             <h2 id="contact-popup-title" className={styles.heading}>
-              <span className={styles.eyebrow}>{eyebrow}</span>{" "}
-              {heading}
+              <span className={styles.eyebrow}>{eyebrow}</span> {heading}
             </h2>
           </header>
 
@@ -859,11 +858,13 @@ export default function ContactPopupClient({
             By submitting this form, you agree to our{" "}
             <a href="/terms-of-use" className={styles.consentLink}>
               Terms of Use
-            </a> and <a href="/privacy-policy" className={styles.consentLink}>
-              Privacy Policy.</a> You consent to Refine contacting you about Movenpick and future
-            opportunities by phone, email, or WhatsApp.
-            
-            .
+            </a>{" "}
+            and{" "}
+            <a href="/privacy-policy" className={styles.consentLink}>
+              Privacy Policy.
+            </a>{" "}
+            You consent to Refine contacting you about Movenpick and future
+            opportunities by phone, email, or WhatsApp. .
           </p>
 
           {/* <p className={styles.consent}>

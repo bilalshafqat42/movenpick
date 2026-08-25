@@ -1,5 +1,8 @@
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
-import { GALLERY_FIELDS, shapeGalleryContent } from "@/content/sections/gallery";
+import {
+  GALLERY_FIELDS,
+  shapeGalleryContent,
+} from "@/content/sections/gallery";
 import GalleryClient from "./GalleryClient";
 
 export default async function Gallery() {

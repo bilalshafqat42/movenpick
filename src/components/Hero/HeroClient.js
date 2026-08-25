@@ -6,7 +6,6 @@ import { useCallback, useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import {
-  ENTRANCE_STAGGER,
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
   HERO_COPY_STAGGER,
@@ -312,12 +311,7 @@ export default function HeroClient({
 
       mobileTimeline
         .fromTo(eyebrowEl, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0 }, 0)
-        .fromTo(
-          titleEl,
-          { autoAlpha: 0, y: 32 },
-          { autoAlpha: 1, y: 0 },
-          step,
-        )
+        .fromTo(titleEl, { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0 }, step)
         .fromTo(
           subtitleEl,
           { autoAlpha: 0, y: 20 },

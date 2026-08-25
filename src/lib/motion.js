@@ -6,9 +6,42 @@
  * just on the JS side since GSAP timelines aren't driven by CSS custom
  * properties.
  */
+/*
+ * Whether a stagger reads as a sequence depends on its size RELATIVE to
+ * the duration, not on the size of the gap alone. Below about a fifth
+ * of the duration, each element is still most of the way through its
+ * own fade when the next one starts, and the group looks like it
+ * arrived together.
+ *
+ * That is what was wrong here. The duration was 0.9s against a 0.15s
+ * gap — 17% — so entrances read as simultaneous. Widening the gaps to
+ * 0.225s and 0.34s made them legible but slow, because it treated the
+ * symptom: the total wait grew while the ratio barely moved.
+ *
+ * Shortening the duration fixes both at once. At 0.6s the same 0.15s
+ * gap is 25% of it, which is comfortably inside the range where a
+ * sequence reads, and every entrance on the site finishes sooner than
+ * it did before.
+ */
 export const ENTRANCE_STAGGER = 0.15;
-export const ENTRANCE_DURATION = 0.9;
+export const ENTRANCE_DURATION = 0.6;
 export const ENTRANCE_EASE = "power3.out";
+
+/*
+ * For runs of six or more — form fields, footer columns, a list of
+ * destinations. At the full ENTRANCE_STAGGER a long list turns into a
+ * queue: nine form fields would take 1.35s to finish arriving. This
+ * keeps the cascade visible without making the reader wait for it.
+ */
+export const LIST_STAGGER = 0.08;
+
+/*
+ * How far an element travels as it fades in. Two values only: text
+ * lifts a little, media a little more, and nothing else invents its
+ * own distance.
+ */
+export const ENTRANCE_RISE = 24;
+export const ENTRANCE_RISE_MEDIA = 32;
 
 /*
  * Page-load intro on the home page, desktop only.
@@ -31,14 +64,27 @@ export const ENTRANCE_EASE = "power3.out";
 export const INTRO_BREAKPOINT = "(min-width: 1025px)";
 
 /*
- * The gap between one line of the opening and the next, used by the
- * hero's copy and by the header's controls so the two read as one
- * continuous sequence rather than two that happen to follow each other.
- *
- * Half again the site-wide ENTRANCE_STAGGER: this is the first thing
- * anyone sees and it is worth reading as a sequence.
+ * The hero's opening uses the same gap as every other section. It was
+ * half again as wide while the durations were long; now that the
+ * durations are short it does not need to be, and the opening is a
+ * second shorter for it.
  */
-export const HERO_COPY_STAGGER = ENTRANCE_STAGGER * 1.5;
+export const HERO_COPY_STAGGER = ENTRANCE_STAGGER;
+
+/*
+ * Where a section's entrance fires, as a ScrollTrigger start.
+ *
+ * "top 50%" means the section's top edge has reached the middle of the
+ * screen, so the section already fills the lower half before anything
+ * animates. The reader is looking at it when it moves.
+ *
+ * The starts these replaced were 72-82%, which fired when the section
+ * filled only its first sliver of the screen: measured at 1440x900,
+ * between 23% and 30% of the viewport. The animation was largely over
+ * by the time the section was properly in view, so it read as content
+ * that simply appeared.
+ */
+export const ENTRANCE_START = "top 50%";
 
 /*
  * How many lines the hero's copy has — eyebrow, heading, description,

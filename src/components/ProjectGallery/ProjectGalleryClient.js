@@ -213,7 +213,9 @@ export default function ProjectGalleryClient({ slides }) {
 
       const arrivalDistance = () => viewport.offsetHeight * ARRIVAL_VIEWPORTS;
       const travelDistance = () =>
-        viewport.offsetHeight * transitionCount * SCROLL_VIEWPORTS_PER_TRANSITION;
+        viewport.offsetHeight *
+        transitionCount *
+        SCROLL_VIEWPORTS_PER_TRANSITION;
 
       /*
        * One gesture, one whole slide — computed from where the section
@@ -353,7 +355,13 @@ export default function ProjectGalleryClient({ slides }) {
       };
     },
     {
-      dependencies: [slideCount, transitionCount, measureTrack, positionTrackFill, setActive],
+      dependencies: [
+        slideCount,
+        transitionCount,
+        measureTrack,
+        positionTrackFill,
+        setActive,
+      ],
       revertOnUpdate: true,
     },
   );

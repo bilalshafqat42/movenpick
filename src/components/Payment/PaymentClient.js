@@ -5,7 +5,12 @@ import { useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
-import { ENTRANCE_STAGGER, ENTRANCE_DURATION, ENTRANCE_EASE } from "@/lib/motion";
+import {
+  ENTRANCE_DURATION,
+  ENTRANCE_EASE,
+  ENTRANCE_STAGGER,
+  ENTRANCE_START,
+} from "@/lib/motion";
 import { applyVenetianMask, clearVenetianMask } from "@/lib/venetianMask";
 import styles from "./Payment.module.css";
 
@@ -72,7 +77,7 @@ export default function PaymentClient({
 
       const introTrigger = revealOnArrival({
         trigger: section,
-        start: "top 78%",
+        start: ENTRANCE_START,
 
         onReveal: () => {
           gsap.to([headingEl, textEl], {
@@ -182,9 +187,7 @@ export default function PaymentClient({
        * legibly one-at-a-time while landing in about two.
        */
       const rows = Array.from(table.children);
-      const rules = rows.map((row) =>
-        row.querySelector(`.${styles.rowRule}`),
-      );
+      const rules = rows.map((row) => row.querySelector(`.${styles.rowRule}`));
 
       const BEAT_STEP = ENTRANCE_STAGGER * 0.8;
       const BEAT_DURATION = ENTRANCE_DURATION * 0.55;
@@ -195,7 +198,7 @@ export default function PaymentClient({
 
       const rowsTrigger = revealOnArrival({
         trigger: table,
-        start: "top 82%",
+        start: ENTRANCE_START,
 
         onReveal: () => {
           const timeline = gsap.timeline({
@@ -279,10 +282,10 @@ export default function PaymentClient({
                 <p className={styles.rowSublabel}>{milestone.sublabel}</p>
 
                 {/*
-                  * Omitted on the last milestone: the rule separates one
-                  * from the next, so there is nothing for it to separate
-                  * after the final one.
-                  */}
+                 * Omitted on the last milestone: the rule separates one
+                 * from the next, so there is nothing for it to separate
+                 * after the final one.
+                 */}
                 {index < milestones.length - 1 ? (
                   <span className={styles.rowRule} aria-hidden="true" />
                 ) : null}

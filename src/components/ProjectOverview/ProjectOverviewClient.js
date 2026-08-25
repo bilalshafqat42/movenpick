@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
 import {
+  ENTRANCE_START,
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
   HERO_COPY_STAGGER,
@@ -105,7 +106,7 @@ export default function ProjectOverviewClient({
 
       revealOnArrival({
         trigger: section,
-        start: "top 78%",
+        start: ENTRANCE_START,
 
         onReveal: () => {
           /*
