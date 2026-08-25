@@ -180,7 +180,7 @@
  * Soft golden blur where the photo meets the solid gold block above it,
  * so the two sections blend instead of cutting off sharply.
  */
-.mediaBlock::before {
+/* .mediaBlock::before {
   content: "";
 
   position: absolute;
@@ -202,7 +202,7 @@
   -webkit-backdrop-filter: blur(18px);
 
   pointer-events: none;
-}
+} */
 
 .card {
   position: absolute;

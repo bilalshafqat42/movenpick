@@ -66,12 +66,20 @@ export default function TrustedPartnerClient({
       const media = mediaRef.current;
       const card = cardRef.current;
 
-      const textReveal = [
-        logoRef.current,
+      /*
+       * The partner's logo is the point of this section, so it lands on
+       * its own and is given a moment before the copy starts arriving
+       * under it — see the doubled gap where these are animated.
+       */
+      const logo = logoRef.current;
+
+      const copyReveal = [
         labelRef.current,
         headingRef.current,
         textRef.current,
       ].filter(Boolean);
+
+      const textReveal = [logo, ...copyReveal].filter(Boolean);
 
       if (!section) {
         return;
@@ -108,12 +116,28 @@ export default function TrustedPartnerClient({
         start: ENTRANCE_START,
 
         onReveal: () => {
-          gsap.to(textReveal, {
+          if (logo) {
+            gsap.to(logo, {
+              autoAlpha: 1,
+              y: 0,
+              duration: ENTRANCE_DURATION,
+              ease: ENTRANCE_EASE,
+            });
+          }
+
+          /*
+           * Twice the usual gap before the copy follows, so the logo is
+           * alone on screen long enough to be read as the subject
+           * rather than as the first line of the block. The copy then
+           * staggers among itself at the site's normal rhythm.
+           */
+          gsap.to(copyReveal, {
             autoAlpha: 1,
             y: 0,
             duration: ENTRANCE_DURATION,
             stagger: ENTRANCE_STAGGER,
             ease: ENTRANCE_EASE,
+            delay: logo ? ENTRANCE_STAGGER * 2 : 0,
           });
         },
       });
