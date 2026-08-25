@@ -11,7 +11,6 @@ import {
   ENTRANCE_STAGGER,
   ENTRANCE_START,
 } from "@/lib/motion";
-import { GALLERY_ITEM_COUNT } from "@/content/sections/gallery";
 import styles from "./Gallery.module.css";
 
 const DRAG_DISTANCE_THRESHOLD = 64;
@@ -33,8 +32,16 @@ const SIDE_ASPECT = 446 / 210;
  */
 const MIN_CENTRE_HEIGHT = 300;
 
-const getLoopedIndex = (index) => {
-  return (index + GALLERY_ITEM_COUNT) % GALLERY_ITEM_COUNT;
+/*
+ * Wraps an index into range for a carousel of `count` items. Takes count
+ * as a real argument rather than reading a module-level constant: this
+ * used to read GALLERY_ITEM_COUNT, a build-time constant computed once
+ * from a hardcoded array, which silently went stale the moment items
+ * became a real add/remove list whose actual length is only known at
+ * render time.
+ */
+const getLoopedIndex = (index, count) => {
+  return (index + count) % count;
 };
 
 export default function GalleryClient({ heading, text, items: galleryItems }) {
@@ -475,16 +482,16 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
       return "centre";
     }
 
-    if (cardIndex === getLoopedIndex(nextActiveIndex - 1)) {
+    if (cardIndex === getLoopedIndex(nextActiveIndex - 1, galleryItems.length)) {
       return "left";
     }
 
-    if (cardIndex === getLoopedIndex(nextActiveIndex + 1)) {
+    if (cardIndex === getLoopedIndex(nextActiveIndex + 1, galleryItems.length)) {
       return "right";
     }
 
     return "hidden";
-  }, []);
+  }, [galleryItems.length]);
 
   const getCardState = useCallback(
     (cardIndex, nextActiveIndex) => {
@@ -843,12 +850,6 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
         }
       });
     },
-    /*
-     * galleryItems.length is a constant: the carousel's loop arithmetic
-     * depends on a stable count, so items cannot be added or removed (only
-     * their content is editable). Listed anyway because it is genuinely read
-     * here, and as a stable primitive it never re-creates the callback.
-     */
     [getCardState, galleryItems.length, getCaptionBlock, getResponsiveSizes],
   );
 
@@ -876,12 +877,12 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
   );
 
   const showPrevious = useCallback(() => {
-    selectSlide(getLoopedIndex(activeIndexRef.current - 1));
-  }, [selectSlide]);
+    selectSlide(getLoopedIndex(activeIndexRef.current - 1, galleryItems.length));
+  }, [selectSlide, galleryItems.length]);
 
   const showNext = useCallback(() => {
-    selectSlide(getLoopedIndex(activeIndexRef.current + 1));
-  }, [selectSlide]);
+    selectSlide(getLoopedIndex(activeIndexRef.current + 1, galleryItems.length));
+  }, [selectSlide, galleryItems.length]);
 
   /*
    * Return cards to their normal position when a drag

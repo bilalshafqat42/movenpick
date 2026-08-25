@@ -647,104 +647,11 @@
           "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         },
         {
-          "key": "item-1-image",
-          "label": "Item 1 — Image",
-          "type": "IMAGE",
-          "defaultValue": "/images/gallery/wellness.avif"
-        },
-        {
-          "key": "item-1-alt",
-          "label": "Item 1 — Image alt text",
-          "type": "TEXT",
-          "defaultValue": "Hot stone wellness treatment"
-        },
-        {
-          "key": "item-1-title",
-          "label": "Item 1 — Title",
-          "type": "TEXT",
-          "defaultValue": "Amenities Name"
-        },
-        {
-          "key": "item-1-description",
-          "label": "Item 1 — Description",
-          "type": "TEXT",
-          "long": true,
-          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-        },
-        {
-          "key": "item-2-image",
-          "label": "Item 2 — Image",
-          "type": "IMAGE",
-          "defaultValue": "/images/gallery/garden.avif"
-        },
-        {
-          "key": "item-2-alt",
-          "label": "Item 2 — Image alt text",
-          "type": "TEXT",
-          "defaultValue": "Woman enjoying an active outdoor lifestyle"
-        },
-        {
-          "key": "item-2-title",
-          "label": "Item 2 — Title",
-          "type": "TEXT",
-          "defaultValue": "Amenities Name"
-        },
-        {
-          "key": "item-2-description",
-          "label": "Item 2 — Description",
-          "type": "TEXT",
-          "long": true,
-          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-        },
-        {
-          "key": "item-3-image",
-          "label": "Item 3 — Image",
-          "type": "IMAGE",
-          "defaultValue": "/images/gallery/yoga.avif"
-        },
-        {
-          "key": "item-3-alt",
-          "label": "Item 3 — Image alt text",
-          "type": "TEXT",
-          "defaultValue": "Landscaped outdoor community retreat"
-        },
-        {
-          "key": "item-3-title",
-          "label": "Item 3 — Title",
-          "type": "TEXT",
-          "defaultValue": "Amenities Name"
-        },
-        {
-          "key": "item-3-description",
-          "label": "Item 3 — Description",
-          "type": "TEXT",
-          "long": true,
-          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-        },
-        {
-          "key": "item-4-image",
-          "label": "Item 4 — Image",
-          "type": "IMAGE",
-          "defaultValue": "/images/gallery/drawing.avif"
-        },
-        {
-          "key": "item-4-alt",
-          "label": "Item 4 — Image alt text",
-          "type": "TEXT",
-          "defaultValue": "Resort-inspired outdoor lifestyle"
-        },
-        {
-          "key": "item-4-title",
-          "label": "Item 4 — Title",
-          "type": "TEXT",
-          "defaultValue": "Amenities Name"
-        },
-        {
-          "key": "item-4-description",
-          "label": "Item 4 — Description",
-          "type": "TEXT",
-          "long": true,
-          "defaultValue": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+          "key": "items",
+          "label": "Items",
+          "type": "LIST",
+          "helperText": "Use + to add an item, the trash icon to remove one. Needs at least 3 items for the carousel's left/right/centre layout to make sense.",
+          "defaultValue": null
         }
       ]
     },
