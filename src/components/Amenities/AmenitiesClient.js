@@ -42,6 +42,15 @@ export default function AmenitiesClient({
   const itemsGroupRef = useRef(null);
   const ctaGroupRef = useRef(null);
   const descriptionRef = useRef(null);
+  /*
+   * The height the closing paragraph had before the current swap.
+   *
+   * Each item's copy is a different length, so React replaces the text
+   * and the paragraph resizes on the same frame — the rule above it and
+   * the Submit button below it jump. Remembering the outgoing height is
+   * what makes it possible to animate from it to the new one instead.
+   */
+  const descriptionHeightRef = useRef(null);
   const stageWrapperRef = useRef(null);
   const imagePanelRef = useRef(null);
   const imageLayerRef = useRef(null);
@@ -460,6 +469,15 @@ export default function AmenitiesClient({
       if (isFirstSwapRef.current) {
         isFirstSwapRef.current = false;
 
+        /*
+         * Seeded here rather than left null, so the very first swap
+         * animates from a real height instead of jumping once and
+         * behaving from then on.
+         */
+        if (descriptionRef.current) {
+          descriptionHeightRef.current = descriptionRef.current.offsetHeight;
+        }
+
         return;
       }
 
@@ -494,6 +512,36 @@ export default function AmenitiesClient({
       }
 
       const blind = layerBlindRef.current[activeIndex];
+
+      /*
+       * Grow or shrink to the new copy's height rather than snapping.
+       *
+       * By the time this runs React has already put the new text in, so
+       * the natural height here is the DESTINATION. The height it is
+       * animated from is the one remembered from before the swap.
+       *
+       * overflow is clamped for the duration so the longer of the two
+       * texts cannot spill past the box while it is still the wrong
+       * size, and both are cleared afterwards so the paragraph goes
+       * back to sizing itself.
+       */
+      const previousHeight = descriptionHeightRef.current;
+      const nextHeight = description.offsetHeight;
+
+      descriptionHeightRef.current = nextHeight;
+
+      if (previousHeight !== null && previousHeight !== nextHeight) {
+        gsap.fromTo(
+          description,
+          { height: previousHeight, overflow: "hidden" },
+          {
+            height: nextHeight,
+            duration: ENTRANCE_DURATION,
+            ease: ENTRANCE_EASE,
+            clearProps: "height,overflow",
+          },
+        );
+      }
 
       gsap.set(description, { autoAlpha: 0, y: 16 });
       applyVenetianMask(layer, 0);

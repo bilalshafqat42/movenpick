@@ -450,7 +450,7 @@
   }
 
   .ctaGroup {
-    gap: 60px;
+    gap: 100px;
   }
 }
 
@@ -576,11 +576,33 @@
    * negative bottom margin cancels .amenities' own bottom padding so
    * the photo's bottom edge is the section's bottom edge.
    */
+  /*
+   * The photograph comes first on a phone, then the copy under it.
+   *
+   * column-reverse rather than reordering the markup: the copy is the
+   * section's substance and belongs first in the document for reading
+   * order and for anyone using a screen reader. Only the visual order
+   * changes here.
+   */
+  .body {
+    flex-direction: column-reverse;
+  }
+
   .imagePanel {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-    margin-bottom: calc(-1 * clamp(60px, 8vw, 110px));
+    /*
+     * Bleeds to the section's TOP edge now that it sits above the copy,
+     * cancelling the section's own top padding. It was a negative
+     * bottom margin while the photo was the last thing in the column.
+     */
+    margin-top: calc(-1 * clamp(60px, 8vw, 110px));
+    margin-bottom: 0;
+
+    /* Half the screen, with the copy taking the other half. */
+    height: 50vh;
+    height: 50svh;
 
     /* Half the screen, so the photo reads as one part of the section
        rather than taking it over. */
