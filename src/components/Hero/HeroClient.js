@@ -180,6 +180,7 @@ export default function HeroClient({
       const content = contentRef.current;
       const scrollIndicator = scrollIndicatorRef.current;
       const patternEl = patternRef.current;
+      const patternImageEl = patternEl?.querySelector("img") ?? patternEl;
       const imageFrameEl = imageFrameRef.current;
 
       if (!section || !content) {
@@ -265,8 +266,6 @@ export default function HeroClient({
          * travel freely inside it, which gives the same entrance with
          * neither side effect.
          */
-        const patternImageEl = patternEl?.querySelector("img") ?? patternEl;
-
         gsap.fromTo(
           patternImageEl,
           { autoAlpha: 0, y: 40 },
@@ -342,9 +341,16 @@ export default function HeroClient({
          * size rather than two that overlap on a phone. Positioned at
          * the shared absolute times rather than at multiples of `step`,
          * because the header sits between them and the copy.
+         *
+         * The IMAGE inside the wrapper, not the wrapper — the same
+         * element desktop animates and the same one the stylesheet
+         * starts hidden. This animated the wrapper for a while, which
+         * left the image at opacity 0 for ever: the wrapper faded in
+         * over an image nothing had revealed, so the pattern never
+         * appeared on a phone at all.
          */
         .fromTo(
-          patternEl,
+          patternImageEl,
           { autoAlpha: 0, y: 28 },
           { autoAlpha: 1, y: 0 },
           INTRO_SCENE_START,
