@@ -132,7 +132,18 @@ export default async function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toSafeJsonLd(jsonLd) }}
         />
-        <Loader logoUrl={appearance.logo} />
+        {/*
+         * Routed through /api/logo when the logo is a genuinely
+         * cross-origin URL — Loader's mask-image (Loader.module.css)
+         * refuses a cross-origin image without a CORS header, same
+         * requirement as the header and footer logos. See
+         * src/app/api/logo/route.js.
+         */}
+        <Loader
+          logoUrl={
+            appearance.logo?.startsWith("http") ? "/api/logo" : appearance.logo
+          }
+        />
         {children}
       </body>
     </html>

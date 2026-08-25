@@ -18,9 +18,15 @@ export default async function Footer() {
     buildDefaultsFromFields(APPEARANCE_FIELDS),
   );
 
+  // Same cross-origin mask-image requirement as the header logo — see
+  // Header/index.js's comment and src/app/api/logo/route.js.
+  const logoUrl = appearanceContent.logo?.startsWith("http")
+    ? "/api/logo"
+    : appearanceContent.logo;
+
   return (
     <FooterClient
-      logoUrl={appearanceContent.logo}
+      logoUrl={logoUrl}
       phoneDisplay={content["phone-display"]}
       phoneHref={content["phone-href"]}
       tollFreeDisplay={content["tollfree-display"]}
