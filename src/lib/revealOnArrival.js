@@ -1,6 +1,7 @@
 "use client";
 
 import { ScrollTrigger } from "@/lib/gsap";
+import { whenLoaderGone } from "@/lib/loaderGate";
 
 /*
  * An entrance that cannot fire before its section is on screen.
@@ -38,9 +39,15 @@ import { ScrollTrigger } from "@/lib/gsap";
  * the two apart at that instant. The only reliable answer is to not
  * answer until the page has settled.
  *
- * Settled means: the load event has fired, the fonts are ready, and the
- * document's height has stopped changing for 300ms. Capped at four
- * seconds so a page that never fully settles still gets its entrances.
+ * Settled means: the load event has fired, the fonts are ready, the
+ * document's height has stopped changing for 300ms, AND the splash
+ * screen has cleared. Capped at four seconds so a page that never fully
+ * settles still gets its entrances.
+ *
+ * The splash screen is part of it because a section that is on screen
+ * at load would otherwise reveal underneath it, and the visitor would
+ * scroll to it later to find it already there — the same thing that
+ * happens to the hero, one section down.
  */
 let hasSettled = false;
 const waitingForSettle = [];
@@ -50,15 +57,26 @@ function markSettled() {
     return;
   }
 
-  hasSettled = true;
-
   /*
-   * Positions are recomputed BEFORE anything is allowed to reveal, so
-   * the first honest evaluation is also an accurate one.
+   * The last of the four conditions. The other three are already met by
+   * the time this is called; this one may not be, so it is waited on
+   * rather than tested.
    */
-  ScrollTrigger.refresh();
+  whenLoaderGone(() => {
+    if (hasSettled) {
+      return;
+    }
 
-  waitingForSettle.splice(0).forEach((callback) => callback());
+    hasSettled = true;
+
+    /*
+     * Positions are recomputed BEFORE anything is allowed to reveal, so
+     * the first honest evaluation is also an accurate one.
+     */
+    ScrollTrigger.refresh();
+
+    waitingForSettle.splice(0).forEach((callback) => callback());
+  });
 }
 
 function whenSettled(callback) {

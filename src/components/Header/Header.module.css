@@ -840,10 +840,22 @@
 .callback {
   opacity: 0;
   visibility: hidden;
+
+  /*
+   * See the matching note in Hero.module.css. If the script that is
+   * meant to reveal these has not arrived, the header still appears.
+   */
+  animation: header-intro-fallback 500ms ease 2000ms forwards;
+}
+
+@keyframes header-intro-fallback {
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 @media (min-width: 1025px) {
-
   /*
    * The divider is drawn open by a scaleX tween rather than faded, so
    * its resting state is collapsed rather than transparent.
@@ -857,6 +869,15 @@
 .divider {
   transform: scaleX(0);
   transform-origin: left center;
+
+  /* Drawn open rather than faded, so its fallback is a scale too. */
+  animation: header-divider-fallback 500ms ease 2000ms forwards;
+}
+
+@keyframes header-divider-fallback {
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @media (scripting: none) {

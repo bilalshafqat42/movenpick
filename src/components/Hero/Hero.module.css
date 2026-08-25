@@ -650,6 +650,29 @@
 .imageFrame {
   opacity: 0;
   visibility: hidden;
+
+  /*
+   * And the safety net for when JavaScript is not off but merely late.
+   * The scripting query below only catches it being disabled; a slow
+   * connection leaves it enabled and absent, which is the same thing
+   * from where the visitor is sitting — measured at 16.7s over Fast 3G
+   * against a production build, all of it spent on a page that had
+   * been deliberately hidden for an entrance that could not run.
+   *
+   * Timed from the stylesheet being parsed, so it needs nothing that
+   * has not already arrived. Set just after the splash's own fallback
+   * begins lifting (Loader.module.css), keeping the same order the
+   * scripted version has. The intro skips itself if this got there
+   * first — see the check in HeroClient.
+   */
+  animation: hero-intro-fallback 500ms ease 2000ms forwards;
+}
+
+@keyframes hero-intro-fallback {
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 @media (scripting: none) {

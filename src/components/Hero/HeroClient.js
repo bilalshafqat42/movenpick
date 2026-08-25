@@ -5,6 +5,7 @@ import SafeImage from "@/components/SafeImage";
 import { useCallback, useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { whenLoaderGone } from "@/lib/loaderGate";
 import {
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
@@ -175,7 +176,7 @@ export default function HeroClient({
   }, []);
 
   useGSAP(
-    () => {
+    (context, contextSafe) => {
       const section = sectionRef.current;
       const content = contentRef.current;
       const scrollIndicator = scrollIndicatorRef.current;
@@ -222,145 +223,192 @@ export default function HeroClient({
       }
 
       /*
-       * Desktop opens in three deliberate beats instead of one cascade:
-       * the copy, then the header's controls (Header runs that one — see
-       * introStepStart in lib/motion), then the pattern and the
-       * building photo. Each group waits for the previous one to land
-       * and then holds for a beat, so the page introduces itself in the
-       * order it wants to be read.
+       * The whole opening waits for the splash screen to clear (see
+       * lib/loaderGate). Without it the sequence below played out under
+       * a full-screen overlay, and a first-time visitor's first sight
+       * of the page was its finished state.
        *
-       * Within the first beat the five lines arrive one at a time —
-       * eyebrow, heading, description, Discover More, Scroll Down —
-       * rather than as one block. They used to move together, which is
-       * why the button in particular looked like it had no entrance of
-       * its own.
+       * contextSafe, because these are created after useGSAP's callback
+       * has already returned. Anything built outside the context is not
+       * tracked by it, and would survive an unmount or a hot reload
+       * instead of being reverted with everything else.
        */
-      if (window.matchMedia(INTRO_BREAKPOINT).matches) {
-        gsap.fromTo(
-          [eyebrowEl, titleEl, subtitleEl, ctaButtonEl, scrollIndicator].filter(
-            Boolean,
-          ),
-          { autoAlpha: 0, y: 32 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: ENTRANCE_DURATION,
-            stagger: HERO_COPY_STAGGER,
-            ease: ENTRANCE_EASE,
-            delay: INTRO_COPY_START,
-          },
-        );
+      const playIntro = contextSafe(() => {
+        /*
+         * The stylesheet's fallback has already revealed the copy (see
+         * the intro block in Hero.module.css), so this script is very
+         * late. Animating from hidden now would take a page the visitor
+         * is already reading and hide it again to introduce it.
+         */
+        if (Number(window.getComputedStyle(titleEl).opacity) > 0.5) {
+          gsap.set(
+            [
+              eyebrowEl,
+              titleEl,
+              subtitleEl,
+              ctaButtonEl,
+              scrollIndicator,
+              imageFrameEl,
+              patternImageEl,
+            ].filter(Boolean),
+            { autoAlpha: 1, y: 0 },
+          );
+
+          return;
+        }
 
         /*
-         * The pattern first, then the building photo one step after it,
-         * continuing the same rhythm the copy and the header just set.
+         * Desktop opens in three deliberate beats instead of one cascade:
+         * the copy, then the header's controls (Header runs that one — see
+         * introStepStart in lib/motion), then the pattern and the
+         * building photo. Each group waits for the previous one to land
+         * and then holds for a beat, so the page introduces itself in the
+         * order it wants to be read.
          *
-         * Both rise into place the same way.
-         *
-         * The rise is applied to the IMAGE inside the pattern's
-         * wrapper, never to the wrapper itself. The wrapper is what is
-         * pinned to the viewport (see .patternPin in the module CSS),
-         * and it also carries the visibility that switches the pattern
-         * off once the hero is past — moving it here would unpin it,
-         * and writing to it would fight that trigger. The image can
-         * travel freely inside it, which gives the same entrance with
-         * neither side effect.
+         * Within the first beat the five lines arrive one at a time —
+         * eyebrow, heading, description, Discover More, Scroll Down —
+         * rather than as one block. They used to move together, which is
+         * why the button in particular looked like it had no entrance of
+         * its own.
          */
-        gsap.fromTo(
-          patternImageEl,
-          { autoAlpha: 0, y: 40 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: ENTRANCE_DURATION,
-            ease: ENTRANCE_EASE,
-            delay: INTRO_SCENE_START,
-          },
-        );
+        if (window.matchMedia(INTRO_BREAKPOINT).matches) {
+          gsap.fromTo(
+            [
+              eyebrowEl,
+              titleEl,
+              subtitleEl,
+              ctaButtonEl,
+              scrollIndicator,
+            ].filter(Boolean),
+            { autoAlpha: 0, y: 32 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: ENTRANCE_DURATION,
+              stagger: HERO_COPY_STAGGER,
+              ease: ENTRANCE_EASE,
+              delay: INTRO_COPY_START,
+            },
+          );
 
-        gsap.fromTo(
-          imageFrameEl,
-          { autoAlpha: 0, y: 40 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: ENTRANCE_DURATION,
-            ease: ENTRANCE_EASE,
-            delay: INTRO_SCENE_START + HERO_COPY_STAGGER,
-          },
-        );
+          /*
+           * The pattern first, then the building photo one step after it,
+           * continuing the same rhythm the copy and the header just set.
+           *
+           * Both rise into place the same way.
+           *
+           * The rise is applied to the IMAGE inside the pattern's
+           * wrapper, never to the wrapper itself. The wrapper is what is
+           * pinned to the viewport (see .patternPin in the module CSS),
+           * and it also carries the visibility that switches the pattern
+           * off once the hero is past — moving it here would unpin it,
+           * and writing to it would fight that trigger. The image can
+           * travel freely inside it, which gives the same entrance with
+           * neither side effect.
+           */
+          gsap.fromTo(
+            patternImageEl,
+            { autoAlpha: 0, y: 40 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: ENTRANCE_DURATION,
+              ease: ENTRANCE_EASE,
+              delay: INTRO_SCENE_START,
+            },
+          );
 
-        return;
-      }
+          gsap.fromTo(
+            imageFrameEl,
+            { autoAlpha: 0, y: 40 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: ENTRANCE_DURATION,
+              ease: ENTRANCE_EASE,
+              delay: INTRO_SCENE_START + HERO_COPY_STAGGER,
+            },
+          );
 
-      /*
-       * Below 1025px, one cascade rather than the desktop's three beats,
-       * which depend on the copy and the photo occupying separate
-       * screens — they do not here.
-       *
-       * Same order and the same widened gap as desktop, and the button
-       * is part of it: it used to be left out of this list entirely, so
-       * on a phone it simply sat there from the first frame while
-       * everything around it arrived.
-       */
-      const step = HERO_COPY_STAGGER;
+          return;
+        }
 
-      const mobileTimeline = gsap.timeline({
-        defaults: { ease: ENTRANCE_EASE, duration: ENTRANCE_DURATION },
+        /*
+         * Below 1025px, one cascade rather than the desktop's three beats,
+         * which depend on the copy and the photo occupying separate
+         * screens — they do not here.
+         *
+         * Same order and the same widened gap as desktop, and the button
+         * is part of it: it used to be left out of this list entirely, so
+         * on a phone it simply sat there from the first frame while
+         * everything around it arrived.
+         */
+        const step = HERO_COPY_STAGGER;
+
+        const mobileTimeline = gsap.timeline({
+          defaults: { ease: ENTRANCE_EASE, duration: ENTRANCE_DURATION },
+        });
+
+        mobileTimeline
+          .fromTo(eyebrowEl, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0 }, 0)
+          .fromTo(
+            titleEl,
+            { autoAlpha: 0, y: 32 },
+            { autoAlpha: 1, y: 0 },
+            step,
+          )
+          .fromTo(
+            subtitleEl,
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0 },
+            step * 2,
+          );
+
+        if (ctaButtonEl) {
+          mobileTimeline.fromTo(
+            ctaButtonEl,
+            { autoAlpha: 0, y: 18 },
+            { autoAlpha: 1, y: 0 },
+            step * 3,
+          );
+        }
+
+        mobileTimeline
+          .fromTo(
+            scrollIndicator,
+            { autoAlpha: 0, y: 14 },
+            { autoAlpha: 1, y: 0 },
+            step * 4,
+          )
+          /*
+           * The pattern and the photo wait for the header, exactly as
+           * they do on desktop, so the opening is one chain at every
+           * size rather than two that overlap on a phone. Positioned at
+           * the shared absolute times rather than at multiples of `step`,
+           * because the header sits between them and the copy.
+           *
+           * The IMAGE inside the wrapper, not the wrapper — the same
+           * element desktop animates and the same one the stylesheet
+           * starts hidden. This animated the wrapper for a while, which
+           * left the image at opacity 0 for ever: the wrapper faded in
+           * over an image nothing had revealed, so the pattern never
+           * appeared on a phone at all.
+           */
+          .fromTo(
+            patternImageEl,
+            { autoAlpha: 0, y: 28 },
+            { autoAlpha: 1, y: 0 },
+            INTRO_SCENE_START,
+          )
+          .fromTo(
+            imageFrameEl,
+            { autoAlpha: 0, y: 28 },
+            { autoAlpha: 1, y: 0 },
+            INTRO_SCENE_START + step,
+          );
       });
 
-      mobileTimeline
-        .fromTo(eyebrowEl, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0 }, 0)
-        .fromTo(titleEl, { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0 }, step)
-        .fromTo(
-          subtitleEl,
-          { autoAlpha: 0, y: 20 },
-          { autoAlpha: 1, y: 0 },
-          step * 2,
-        );
-
-      if (ctaButtonEl) {
-        mobileTimeline.fromTo(
-          ctaButtonEl,
-          { autoAlpha: 0, y: 18 },
-          { autoAlpha: 1, y: 0 },
-          step * 3,
-        );
-      }
-
-      mobileTimeline
-        .fromTo(
-          scrollIndicator,
-          { autoAlpha: 0, y: 14 },
-          { autoAlpha: 1, y: 0 },
-          step * 4,
-        )
-        /*
-         * The pattern and the photo wait for the header, exactly as
-         * they do on desktop, so the opening is one chain at every
-         * size rather than two that overlap on a phone. Positioned at
-         * the shared absolute times rather than at multiples of `step`,
-         * because the header sits between them and the copy.
-         *
-         * The IMAGE inside the wrapper, not the wrapper — the same
-         * element desktop animates and the same one the stylesheet
-         * starts hidden. This animated the wrapper for a while, which
-         * left the image at opacity 0 for ever: the wrapper faded in
-         * over an image nothing had revealed, so the pattern never
-         * appeared on a phone at all.
-         */
-        .fromTo(
-          patternImageEl,
-          { autoAlpha: 0, y: 28 },
-          { autoAlpha: 1, y: 0 },
-          INTRO_SCENE_START,
-        )
-        .fromTo(
-          imageFrameEl,
-          { autoAlpha: 0, y: 28 },
-          { autoAlpha: 1, y: 0 },
-          INTRO_SCENE_START + step,
-        );
+      return whenLoaderGone(playIntro);
     },
     { scope: sectionRef },
   );

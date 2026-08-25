@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { whenLoaderGone } from "@/lib/loaderGate";
 import {
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
@@ -282,7 +283,7 @@ export default function HeaderClient({
    * Header entrance and glassmorphism state.
    */
   useGSAP(
-    () => {
+    (context, contextSafe) => {
       const header = headerRef.current;
 
       if (!header) {
@@ -292,88 +293,118 @@ export default function HeaderClient({
       const reduceMotion = prefersReducedMotion();
 
       let introTimeline;
+      let cancelIntro;
 
       if (!reduceMotion) {
         /*
-         * On the home page, desktop only, these controls are the second
-         * beat of the page-load sequence: they wait for the hero's
-         * opening copy to land, hold for a beat, and then come down.
-         * The photo and pattern follow them.
+         * The entrance waits for the splash screen to clear (see
+         * lib/loaderGate). It used to run under it: the logo landed at
+         * 340ms behind an overlay that did not lift until 2660ms, so a
+         * first-time visitor never saw the header arrive.
          *
-         * Gated on the hero actually being present rather than on the
-         * route, because the other pages (privacy, terms, thank-you)
-         * have no opening copy to wait for — there the header should
-         * simply arrive, as it always has.
-         *
-         * No width condition. The sequence runs at every size, so the
-         * header follows the copy on a phone exactly as it does on a
-         * desktop.
+         * contextSafe, because the timeline is built after useGSAP's
+         * callback has returned and would otherwise not be tracked by
+         * the context that reverts it.
          */
-        const waitsForHero = Boolean(document.getElementById("home"));
+        cancelIntro = whenLoaderGone(
+          contextSafe(() => {
+            /*
+             * The stylesheet's fallback got here first (see the intro
+             * block in Header.module.css) — this script is very late,
+             * and re-hiding a header the visitor can already use to
+             * introduce it would be worse than not animating at all.
+             */
+            const logoEl = header.querySelector(`.${styles.logo}`);
 
-        introTimeline = gsap.timeline({
-          delay: waitsForHero ? INTRO_HEADER_START : 0,
+            if (
+              logoEl &&
+              Number(window.getComputedStyle(logoEl).opacity) > 0.5
+            ) {
+              return;
+            }
 
-          defaults: {
-            ease: ENTRANCE_EASE,
-          },
-        });
+            /*
+             * On the home page, desktop only, these controls are the second
+             * beat of the page-load sequence: they wait for the hero's
+             * opening copy to land, hold for a beat, and then come down.
+             * The photo and pattern follow them.
+             *
+             * Gated on the hero actually being present rather than on the
+             * route, because the other pages (privacy, terms, thank-you)
+             * have no opening copy to wait for — there the header should
+             * simply arrive, as it always has.
+             *
+             * No width condition. The sequence runs at every size, so the
+             * header follows the copy on a phone exactly as it does on a
+             * desktop.
+             */
+            const waitsForHero = Boolean(document.getElementById("home"));
 
-        /*
-         * fromTo, not from. `from` treats the element's CURRENT state as
-         * the destination, and these four now start hidden in CSS so
-         * that nothing flashes before the sequence reaches them (see the
-         * intro block in Header.module.css). Read that way, `from`
-         * animated each control from invisible to invisible and the
-         * header never appeared at all. The destination has to be
-         * stated.
-         */
-        /*
-         * Logo first, then the menu on the left, then the callback link
-         * on the right, then the rule underneath — and ahead of the
-         * hero's copy, so the navigation is present and usable while
-         * the content cascades in beneath it.
-         *
-         * The order used to start with the menu control because that is
-         * the order the markup happens to be in. The logo leads now,
-         * which is the order the eye is meant to take.
-         */
-        /*
-         * A tighter gap than the content below uses. The header is
-         * furniture arriving, not something to be read in sequence, so
-         * the four controls come in quickly and get out of the way.
-         */
-        const step = LIST_STAGGER;
+            introTimeline = gsap.timeline({
+              delay: waitsForHero ? INTRO_HEADER_START : 0,
 
-        introTimeline
-          .fromTo(
-            `.${styles.logo}`,
-            { autoAlpha: 0, y: -14 },
-            { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-            0,
-          )
-          .fromTo(
-            `.${styles.menuControl}`,
-            { autoAlpha: 0, y: -14 },
-            { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-            step,
-          )
-          .fromTo(
-            `.${styles.callback}`,
-            { autoAlpha: 0, y: -14 },
-            { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-            step * 2,
-          )
-          .fromTo(
-            `.${styles.divider}`,
-            { scaleX: 0, transformOrigin: "left center" },
-            {
-              scaleX: 1,
-              transformOrigin: "left center",
-              duration: ENTRANCE_DURATION,
-            },
-            step * 3,
-          );
+              defaults: {
+                ease: ENTRANCE_EASE,
+              },
+            });
+
+            /*
+             * fromTo, not from. `from` treats the element's CURRENT state as
+             * the destination, and these four now start hidden in CSS so
+             * that nothing flashes before the sequence reaches them (see the
+             * intro block in Header.module.css). Read that way, `from`
+             * animated each control from invisible to invisible and the
+             * header never appeared at all. The destination has to be
+             * stated.
+             */
+            /*
+             * Logo first, then the menu on the left, then the callback link
+             * on the right, then the rule underneath — and ahead of the
+             * hero's copy, so the navigation is present and usable while
+             * the content cascades in beneath it.
+             *
+             * The order used to start with the menu control because that is
+             * the order the markup happens to be in. The logo leads now,
+             * which is the order the eye is meant to take.
+             */
+            /*
+             * A tighter gap than the content below uses. The header is
+             * furniture arriving, not something to be read in sequence, so
+             * the four controls come in quickly and get out of the way.
+             */
+            const step = LIST_STAGGER;
+
+            introTimeline
+              .fromTo(
+                `.${styles.logo}`,
+                { autoAlpha: 0, y: -14 },
+                { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+                0,
+              )
+              .fromTo(
+                `.${styles.menuControl}`,
+                { autoAlpha: 0, y: -14 },
+                { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+                step,
+              )
+              .fromTo(
+                `.${styles.callback}`,
+                { autoAlpha: 0, y: -14 },
+                { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
+                step * 2,
+              )
+              .fromTo(
+                `.${styles.divider}`,
+                { scaleX: 0, transformOrigin: "left center" },
+                {
+                  scaleX: 1,
+                  transformOrigin: "left center",
+                  duration: ENTRANCE_DURATION,
+                },
+                step * 3,
+              );
+          }),
+        );
       } else {
         gsap.set(
           [
@@ -404,6 +435,14 @@ export default function HeaderClient({
       });
 
       return () => {
+        /*
+         * Unsubscribing matters as much as killing here: if this
+         * unmounts while the splash screen is still up, the timeline
+         * does not exist yet and there would be nothing to kill — the
+         * pending callback would build it afterwards, on elements that
+         * had already gone.
+         */
+        cancelIntro?.();
         introTimeline?.kill();
         headerScrollTrigger.kill();
       };
