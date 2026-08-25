@@ -302,7 +302,12 @@ export default function AmenitiesClient({
            * continuous progress fill has grown — both a step index and a
            * smooth parallax drift on the photo, all from one number.
            */
-          if (desktop) {
+          /*
+           * Desktop and mobile both run the journey; the tablet tier
+           * between them lays the section out flat and has no stage to
+           * step through.
+           */
+          if (desktop || mobile) {
             const stageWrapper = stageWrapperRef.current;
             const progressFill = progressFillRef.current;
 
@@ -419,9 +424,22 @@ export default function AmenitiesClient({
                     return;
                   }
 
-                  const stepIndex = Math.min(
+                  /*
+                   * Measured in scroll pixels, with a pixel and a half
+                   * of tolerance, because the boundaries are exactly
+                   * where the snap parks and a stage is rarely a whole
+                   * number of pixels. At 375x667 one stage is 500.25px,
+                   * so resting on stage 1 puts the scroll at 500 — half
+                   * a pixel short. A bare floor() reads that as stage
+                   * 0, and the section then looks like it ignored one
+                   * scroll and skipped an amenity on the next.
+                   */
+                  const travel = self.end - self.start;
+                  const stagePixels = travel / items.length;
+                  const stepIndex = gsap.utils.clamp(
+                    0,
                     items.length - 1,
-                    Math.floor(self.progress * items.length),
+                    Math.floor((self.progress * travel + 1.5) / stagePixels),
                   );
 
                   if (stepIndex !== activeIndexRef.current) {

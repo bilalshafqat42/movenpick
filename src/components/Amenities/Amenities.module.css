@@ -480,31 +480,14 @@
    Tablet
    ========================================================= */
 
+/*
+ * Everything below the desktop tier stacks the photograph and the copy
+ * rather than sitting them side by side. Mobile shares these resets: it
+ * keeps the pinned journey, so only the rules that COLLAPSE that
+ * journey are held back for the tablet tier, in the block right after
+ * this one.
+ */
 @media (max-width: 1024px) {
-  /*
-   * The pinned, scroll-driven journey is desktop only — no
-   * ScrollTrigger is created for it below 1025px (see
-   * AmenitiesClient), so the tall inline height that drives the
-   * scroll distance needs cancelling here too, or the section would
-   * just leave a huge empty gap with nothing scrubbing through it.
-   */
-  .stageWrapper {
-    height: auto !important;
-  }
-
-  .stickyViewport {
-    position: static;
-    height: auto;
-  }
-
-  .body {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(40px, 6vw, 90px);
-
-    height: auto;
-  }
-
   .content {
     max-width: 100%;
   }
@@ -549,6 +532,35 @@
 }
 
 /* =========================================================
+   Tablet only — collapse the journey
+   =========================================================
+
+   The tall wrapper and the held screen are what the scroll-driven
+   journey scrubs through. The tablet tier runs no journey (no
+   ScrollTrigger is created for it in AmenitiesClient), so it cancels
+   both and lets the section run at its natural height — otherwise the
+   tall inline height would just leave a huge empty gap with nothing
+   scrubbing through it. Mobile keeps them.
+   ========================================================= */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .stageWrapper {
+    height: auto !important;
+  }
+
+  .stickyViewport {
+    position: static;
+    height: auto;
+  }
+
+  .body {
+    flex-direction: column;
+    gap: clamp(40px, 6vw, 90px);
+
+    height: auto;
+  }
+}
+
+/* =========================================================
    Mobile
    ========================================================= */
 
@@ -562,7 +574,7 @@
   }
 
   .content {
-    gap: 20px;
+    --content-gap: 20px;
   }
 
   /*
@@ -577,6 +589,103 @@
    * the photo's bottom edge is the section's bottom edge.
    */
   /*
+   * The pinned journey, as on desktop: one screen held still while the
+   * scroll steps through the items, a photograph and its copy at a
+   * time.
+   *
+   * The wrapper's height is written inline from the item count (see
+   * AmenitiesClient), so the scroll distance and the number of stages
+   * cannot drift apart. Everything here just holds one screen still
+   * inside it.
+   */
+  .stickyViewport {
+    position: sticky;
+    top: var(--header-height, 90px);
+
+    height: calc(100vh - var(--header-height, 90px));
+    height: calc(100svh - var(--header-height, 90px));
+  }
+
+  /*
+   * Fills the held screen and splits it in half: the photograph on top,
+   * its copy underneath. Percentages rather than svh, so the two halves
+   * are of the HELD BOX and stay exact once the header's height is
+   * taken off the top.
+   */
+  .body {
+    height: 100%;
+    gap: 0;
+  }
+
+  /*
+   * Half the held screen is the target, not a hard rule: on a short
+   * phone the copy takes the few extra pixels it needs and the
+   * photograph gives them up, rather than the button being cut off at
+   * the bottom of the held box. Capped so the photograph always keeps
+   * a real share of the screen.
+   */
+  .content {
+    flex: 0 0 auto;
+
+    min-height: 50%;
+    max-height: 65%;
+
+    /*
+     * The copy starts just under the photograph rather than floating
+     * in the middle of its half. The bottom keeps a little room so the
+     * button never sits on the edge of the held box on a short phone.
+     */
+    justify-content: flex-start;
+
+    padding-top: 40px;
+    padding-bottom: 16px;
+  }
+
+  /*
+   * One heading at a time, not the full list. Half a phone screen
+   * cannot hold four headings plus the paragraph and the button, and
+   * the journey already names the stage you are on — the image, its
+   * heading, its text and the CTA change together.
+   *
+   * The active item stays in flow so it sets the list's height; the
+   * rest overlay it, out of flow, so the swap does not shift anything
+   * around it.
+   */
+  .items {
+    position: relative;
+  }
+
+  /*
+   * The wrapper's 40px top margin and the row's own padding are there
+   * to space a list of four. With one heading showing, they just add
+   * to the gap under the photograph, which .content's padding already
+   * sets on its own.
+   */
+  .itemsWrapper {
+    margin-top: 0;
+  }
+
+  .item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding-block: 0;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: opacity 0.35s ease;
+  }
+
+  .item[data-active="true"] {
+    position: relative;
+
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /*
    * The photograph comes first on a phone, then the copy under it.
    *
    * column-reverse rather than reordering the markup: the copy is the
@@ -588,26 +697,65 @@
     flex-direction: column-reverse;
   }
 
+  /*
+   * On desktop the divider's `margin-top: auto` pushes the closing
+   * group to the bottom of a full-height column. Here the column is
+   * only half a screen, so that would push the button past the held
+   * box — the copy sits together instead.
+   */
+  .divider {
+    margin: 0;
+  }
+
   .imagePanel {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
     /*
-     * Bleeds to the section's TOP edge now that it sits above the copy,
-     * cancelling the section's own top padding. It was a negative
-     * bottom margin while the photo was the last thing in the column.
+     * No negative margin in either direction.
+     *
+     * It carried one while it was the last thing in the column, to
+     * cancel the section's bottom padding and bleed to the edge. When
+     * the order reversed I moved that to the top for the same reason —
+     * but the heading and its paragraph still sit above the photo, so
+     * there is no section padding up there to cancel. All it did was
+     * drag the photo 12px over the last line of the paragraph.
+     *
+     * The gap above now comes from the intro's own bottom margin, which
+     * is what separates the heading from everything below it.
      */
-    margin-top: calc(-1 * clamp(60px, 8vw, 110px));
+    margin-top: 0;
     margin-bottom: 0;
 
-    /* Half the screen, with the copy taking the other half. */
-    height: 50vh;
-    height: 50svh;
+    /*
+     * Takes whatever the copy leaves — half the held screen on a
+     * normal phone, a little less on a short one.
+     */
+    flex: 1 1 auto;
 
-    /* Half the screen, so the photo reads as one part of the section
-       rather than taking it over. */
-    min-height: 50vh;
-    min-height: 50svh;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   Short phones
+   =========================================================
+
+   The copy has to fit in the held screen alongside the photograph. On
+   a short handset the default spacing leaves the button sitting on the
+   bottom edge, so the copy closes up a little and the photograph keeps
+   its share.
+   ========================================================= */
+@media (max-width: 767px) and (max-height: 700px) {
+  .content {
+    --content-gap: 14px;
+
+    padding-top: 24px;
+  }
+
+  .ctaGroup {
+    gap: 20px;
   }
 }
 
