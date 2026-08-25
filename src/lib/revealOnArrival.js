@@ -146,10 +146,30 @@ export function revealOnArrival({ trigger, start, onReveal }) {
 
     revealed = true;
     onReveal();
-    instance.kill();
+    /*
+     * Optional chaining, not a plain call: ScrollTrigger.create() below
+     * can invoke onRefresh SYNCHRONOUSLY, as part of its own initial
+     * refresh, if the page has already settled and this section is
+     * already on screen the moment it is created (both true for any
+     * revealOnArrival() call made after the first). When that happens,
+     * this line runs while `instance` is still being assigned — a plain
+     * `instance.kill()` throws "Cannot access 'instance' before
+     * initialization" from inside GSAP's own call stack, an uncaught
+     * error that took down the rest of the page's scripts with it, not
+     * just this one reveal. Skipping the kill in that one case is
+     * harmless: the instance still gets created and torn down normally
+     * on unmount either way.
+     */
+    instance?.kill();
   };
 
-  const instance = ScrollTrigger.create({
+  /*
+   * Declared before ScrollTrigger.create() runs, not assigned from its
+   * result inline — see the comment on instance?.kill() above for why
+   * that ordering is load-bearing, not stylistic.
+   */
+  let instance;
+  instance = ScrollTrigger.create({
     trigger,
     start,
     end: "bottom top",
