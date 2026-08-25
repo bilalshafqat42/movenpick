@@ -525,6 +525,25 @@
 }
 
 /* =========================================================
+   Desktop: the gap between the caption block and the carousel
+
+   Set outright rather than left to the 5.5vh clamp above, which tied
+   the gap to the window's height — 54px on a 990px-tall window, less on
+   a shorter one — so the spacing changed from screen to screen with
+   nothing about the design asking it to.
+
+   This sits AFTER the max-width blocks on purpose. Placed with the
+   other desktop rules further up, the 1350px tier below it won on
+   source order at equal specificity and 1280 and 1025 stayed at 58px.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .headingGroup {
+    margin-bottom: 80px;
+  }
+}
+
+/* =========================================================
    Reduced motion
    ========================================================= */
 

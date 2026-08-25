@@ -242,11 +242,13 @@
     margin-top: -100svh;
 
     /*
-     * The space above the heading, set outright rather than left to the
-     * section's 8vw clamp. The clamp capped at 110px, which put the
-     * heading only 20px below the fixed header.
+     * Equal space above and below, set outright rather than left to the
+     * section's 8vw clamp, which capped at 110px and varied with the
+     * viewport. 90px matches the header's own height, so the rhythm at
+     * the top of the section echoes the bar above it.
      */
-    padding-top: 160px;
+    padding-top: 90px;
+    padding-bottom: 90px;
   }
 }
 

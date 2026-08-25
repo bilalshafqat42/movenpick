@@ -6,8 +6,8 @@ import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import {
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
-  HERO_COPY_STAGGER,
-  introStepStart,
+  INTRO_HEADER_START,
+  LIST_STAGGER,
 } from "@/lib/motion";
 
 import styles from "./Header.module.css";
@@ -312,7 +312,7 @@ export default function HeaderClient({
         const waitsForHero = Boolean(document.getElementById("home"));
 
         introTimeline = gsap.timeline({
-          delay: waitsForHero ? introStepStart(1) : 0,
+          delay: waitsForHero ? INTRO_HEADER_START : 0,
 
           defaults: {
             ease: ENTRANCE_EASE,
@@ -330,16 +330,20 @@ export default function HeaderClient({
          */
         /*
          * Logo first, then the menu on the left, then the callback link
-         * on the right, then the rule underneath — and on the same
-         * spacing as the hero's copy above, so the opening reads as one
-         * sequence that carries on into the header rather than two that
-         * happen to follow each other.
+         * on the right, then the rule underneath — and ahead of the
+         * hero's copy, so the navigation is present and usable while
+         * the content cascades in beneath it.
          *
          * The order used to start with the menu control because that is
          * the order the markup happens to be in. The logo leads now,
          * which is the order the eye is meant to take.
          */
-        const step = HERO_COPY_STAGGER;
+        /*
+         * A tighter gap than the content below uses. The header is
+         * furniture arriving, not something to be read in sequence, so
+         * the four controls come in quickly and get out of the way.
+         */
+        const step = LIST_STAGGER;
 
         introTimeline
           .fromTo(

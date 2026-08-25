@@ -399,6 +399,16 @@
    ========================================================= */
 
 @media (min-width: 1025px) {
+  /*
+   * Equal space above and below, set outright rather than left to the
+   * section's 8vw clamp, which capped at 110px and varied with the
+   * window. 90px matches the header's height, the same figure the
+   * project overview above uses, so the two sections sit on one rhythm.
+   */
+  .amenities {
+    padding-block: 90px;
+  }
+
   .progressTrack {
     display: none;
   }

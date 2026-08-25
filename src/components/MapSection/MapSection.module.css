@@ -1294,6 +1294,27 @@
 }
 
 /* =========================================================
+   Desktop: the space around the section's heading
+
+   Set outright rather than left to the 10vw/8vw clamps in the base
+   rule, which capped at 165px and 122px and varied with the window's
+   width in between. 90/80 matches the flat figures the sections above
+   now use.
+
+   This sits AFTER the max-width tiers on purpose: placed with the base
+   rule it would still win here, but keeping every flat desktop
+   override in one place below them is what stops the next change to a
+   narrower tier silently undoing it.
+   ========================================================= */
+
+@media (min-width: 1101px) {
+  .sectionHeader {
+    padding-top: 90px;
+    padding-bottom: 80px;
+  }
+}
+
+/* =========================================================
    Reduced motion
    ========================================================= */
 

@@ -621,42 +621,38 @@
 }
 
 /* =========================================================
-   Page-load intro, desktop only
+   Page-load intro
 
    These elements are revealed by the three-beat load sequence (see
-   introStepStart in lib/motion.js), and they start hidden HERE rather
+   the intro starts in lib/motion.js), and they start hidden HERE rather
    than only in the GSAP from-state.
 
    The server sends them visible, and GSAP cannot hide them until React
-   has hydrated. Measured at 1440px, that is a 194ms window in which the
-   finished page is painted — and because the sequence then holds the
-   header back until 1.5s and the photo until 3.15s, the result was a
-   glimpse of everything followed by a second and a half of empty cream.
-   A flash-then-hide reads as a page failing to load, not as an
+   has hydrated. Measured, that is a window in which the finished page
+   is painted and then vanishes to play its own entrance — 195ms on a
+   phone. A flash-then-hide reads as a page failing to load, not as an
    entrance.
 
-   Desktop only, because only desktop runs the sequence; below 1025px
-   the original cascade starts immediately and there is nothing to hide
-   for.
+   Every width, not just desktop. The opening runs at every size, so
+   there is something to hide for at every size; the header's controls
+   already start hidden this way.
 
    The scripting query is the safety net: with JavaScript off, nothing
    will ever reveal these, so they must never have been hidden.
    ========================================================= */
 
-@media (min-width: 1025px) {
-  .eyebrow,
-  .title,
-  .subtitle,
-  .ctaButton,
-  .scrollIndicator,
-  .patternShape,
-  .imageFrame {
-    opacity: 0;
-    visibility: hidden;
-  }
+.eyebrow,
+.title,
+.subtitle,
+.ctaButton,
+.scrollIndicator,
+.patternShape,
+.imageFrame {
+  opacity: 0;
+  visibility: hidden;
 }
 
-@media (min-width: 1025px) and (scripting: none) {
+@media (scripting: none) {
   .eyebrow,
   .title,
   .subtitle,

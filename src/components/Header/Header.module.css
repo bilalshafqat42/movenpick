@@ -809,7 +809,7 @@
    Page-load intro, desktop only
 
    These elements are revealed by the three-beat load sequence (see
-   introStepStart in lib/motion.js), and they start hidden HERE rather
+   the intro starts in lib/motion.js), and they start hidden HERE rather
    than only in the GSAP from-state.
 
    The server sends them visible, and GSAP cannot hide them until React

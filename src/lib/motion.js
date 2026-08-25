@@ -44,80 +44,61 @@ export const ENTRANCE_RISE = 24;
 export const ENTRANCE_RISE_MEDIA = 32;
 
 /*
- * Page-load intro on the home page, desktop only.
- *
- * Three groups arrive in order — the hero's opening copy, then the
- * header's controls, then the pattern and the building photo — all on
- * the load clock, so no scrolling is needed to bring any of them in.
- *
- * These are absolute start times measured from the moment the sequence
- * begins, and the groups deliberately overlap: each one sets off while
- * the one before it is still arriving, which reads as a single
- * unfolding rather than three separate events. They are listed
- * outright rather than derived from durations, because the pacing is a
- * judgement about how the page should feel, not arithmetic.
- *
- * The schedule lives here, not in the components, because the groups
- * are spread across two of them — the copy and the photo belong to
- * Hero, the controls to Header.
- */
-export const INTRO_BREAKPOINT = "(min-width: 1025px)";
-
-/*
- * The hero's opening uses the same gap as every other section. It was
- * half again as wide while the durations were long; now that the
- * durations are short it does not need to be, and the opening is a
- * second shorter for it.
- */
-export const HERO_COPY_STAGGER = ENTRANCE_STAGGER;
-
-/*
  * Where a section's entrance fires, as a ScrollTrigger start.
  *
  * "top 50%" means the section's top edge has reached the middle of the
  * screen, so the section already fills the lower half before anything
  * animates. The reader is looking at it when it moves.
  *
- * The starts these replaced were 72-82%, which fired when the section
- * filled only its first sliver of the screen: measured at 1440x900,
- * between 23% and 30% of the viewport. The animation was largely over
- * by the time the section was properly in view, so it read as content
- * that simply appeared.
+ * The starts this replaced were eight separate figures between 56% and
+ * 90%, which fired when a section filled only its first sliver of the
+ * screen: measured at 1440x900, between 23% and 30% of the viewport.
+ * The animation was largely over by the time the section was properly
+ * in view, so it read as content that simply appeared.
  */
 export const ENTRANCE_START = "top 50%";
 
 /*
- * How many lines the hero's copy has — eyebrow, heading, description,
- * Discover More, Scroll Down. Named because the header's start is
- * derived from it: the header begins one step after the last line of
- * copy, so adding or removing a line moves the header with it instead
- * of leaving a gap or an overlap to notice later.
+ * The hero's opening uses the same gap as every other section. It was
+ * half again as wide while the durations were long; now that the
+ * durations are short it does not need to be.
  */
-const HERO_COPY_LINES = 5;
+export const HERO_COPY_STAGGER = ENTRANCE_STAGGER;
 
 /*
- * How many controls the header introduces — logo, menu, callback,
- * rule. The pattern and photo pick up one step after the last of them,
- * for the same reason the header picks up after the copy: the whole
- * opening is one chain, and every link is derived from the one before
- * it rather than written down separately.
+ * The page-load opening.
+ *
+ * The header leads, then the hero's copy, then the scene behind it.
+ *
+ * That order is deliberate and it is the reverse of what this used to
+ * do. Navigation is furniture, not content: the convention is that it
+ * is present and usable within about 200ms while the content below it
+ * cascades. Running five lines of copy first left the header blank for
+ * 1,378ms — measured — during which the menu and the callback button
+ * did not exist for a keyboard or a screen reader. Tab at 500ms landed
+ * on a gallery button in the middle of the page, and a blank header
+ * reads as a page still loading, which works against the impression
+ * the sequence is there to create.
+ *
+ * The pattern and the photograph are the scene the copy sits in, not
+ * the finale, so they fade in alongside it rather than queuing behind
+ * everything. On desktop the photograph is below the fold while it
+ * animates in any case.
+ *
+ * These are absolute times from the start of the sequence, and the
+ * groups deliberately overlap: each sets off while the one before is
+ * still arriving, which reads as one unfolding rather than a queue.
  */
-const HEADER_CONTROL_LINES = 4;
+export const INTRO_BREAKPOINT = "(min-width: 1025px)";
 
-const INTRO_STEP_STARTS = [
-  /* 0 — the hero's first line of copy */
-  0.1,
-  /*
-   * 1 — the header's controls, picking up one step after the hero's
-   * last line rather than at a figure of their own.
-   */
-  0.1 + HERO_COPY_STAGGER * HERO_COPY_LINES,
-  /* 2 — the pattern, then the building photo one step after it */
-  0.1 +
-    HERO_COPY_STAGGER * HERO_COPY_LINES +
-    HERO_COPY_STAGGER * HEADER_CONTROL_LINES,
-];
+/* The header, immediately. */
+export const INTRO_HEADER_START = 0;
 
-export function introStepStart(index) {
-  return INTRO_STEP_STARTS[index] ?? 0;
-}
+/*
+ * The hero's copy, once the header is essentially in. Late enough that
+ * the two are distinguishable, early enough that nothing feels held up.
+ */
+export const INTRO_COPY_START = 0.3;
+
+/* The pattern, then the photograph one step after it. */
+export const INTRO_SCENE_START = 0.45;

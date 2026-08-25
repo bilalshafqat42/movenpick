@@ -270,7 +270,13 @@
      * instead, which meant the milestone table had to share a single
      * viewport with the heading and never got the room to breathe.
      */
-    padding-top: clamp(44px, 6vh, 110px);
+    /*
+     * Flat, not a 6vh clamp. Tied to the window's height it measured
+     * 59px on a 990px-tall screen and less on a shorter one, so the
+     * space above the heading changed from machine to machine. 90px is
+     * the figure the sections above now use.
+     */
+    padding-top: 90px;
 
     /*
      * Zero, because .body below now ends exactly where the section
@@ -282,7 +288,12 @@
   }
 
   .intro {
-    margin-bottom: clamp(28px, 4vh, 80px);
+    /*
+     * Flat for the same reason: the 4vh clamp put 40px between the
+     * heading block and the table on a 990px-tall window, which read as
+     * cramped against the 90px above it.
+     */
+    margin-bottom: 80px;
   }
 
   /*

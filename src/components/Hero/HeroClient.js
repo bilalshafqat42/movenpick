@@ -10,7 +10,8 @@ import {
   ENTRANCE_EASE,
   HERO_COPY_STAGGER,
   INTRO_BREAKPOINT,
-  introStepStart,
+  INTRO_COPY_START,
+  INTRO_SCENE_START,
 } from "@/lib/motion";
 import styles from "./Hero.module.css";
 
@@ -245,7 +246,7 @@ export default function HeroClient({
             duration: ENTRANCE_DURATION,
             stagger: HERO_COPY_STAGGER,
             ease: ENTRANCE_EASE,
-            delay: introStepStart(0),
+            delay: INTRO_COPY_START,
           },
         );
 
@@ -274,7 +275,7 @@ export default function HeroClient({
             y: 0,
             duration: ENTRANCE_DURATION,
             ease: ENTRANCE_EASE,
-            delay: introStepStart(2),
+            delay: INTRO_SCENE_START,
           },
         );
 
@@ -286,7 +287,7 @@ export default function HeroClient({
             y: 0,
             duration: ENTRANCE_DURATION,
             ease: ENTRANCE_EASE,
-            delay: introStepStart(2) + HERO_COPY_STAGGER,
+            delay: INTRO_SCENE_START + HERO_COPY_STAGGER,
           },
         );
 
@@ -346,13 +347,13 @@ export default function HeroClient({
           patternEl,
           { autoAlpha: 0, y: 28 },
           { autoAlpha: 1, y: 0 },
-          introStepStart(2),
+          INTRO_SCENE_START,
         )
         .fromTo(
           imageFrameEl,
           { autoAlpha: 0, y: 28 },
           { autoAlpha: 1, y: 0 },
-          introStepStart(2) + step,
+          INTRO_SCENE_START + step,
         );
     },
     { scope: sectionRef },

@@ -5,9 +5,9 @@ import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
 import {
-  ENTRANCE_START,
   ENTRANCE_DURATION,
   ENTRANCE_EASE,
+  ENTRANCE_START,
   HERO_COPY_STAGGER,
 } from "@/lib/motion";
 import styles from "./ProjectOverview.module.css";
