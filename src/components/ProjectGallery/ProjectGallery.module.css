@@ -296,5 +296,45 @@
 
     scroll-snap-align: center;
   }
+}
 
+/* =========================================================
+   Desktop: rides over the amenities' held screen
+
+   The amenities section holds its final screen for one extra viewport
+   (see .stageWrapper in the desktop block of Amenities.module.css).
+   This section is pulled back up by exactly that much, so the document
+   is no taller than before and the runway is spent with this section
+   sliding up over the amenities rather than the amenities scrolling
+   away first.
+
+   z-index is what puts it in front: the held screen is a positioned
+   element, and the amenities section carries a stacking position of its
+   own, so without a higher index here this section would slide up
+   UNDERNEATH it and never be seen.
+
+   Same pattern the project overview uses over the hero's pinned
+   photograph — see the note at the end of ProjectOverview.module.css.
+   ========================================================= */
+
+@media (min-width: 1025px) {
+  .gallery {
+    z-index: 4;
+
+    margin-top: -100vh;
+    margin-top: -100svh;
+  }
+}
+
+/*
+ * The same on a phone. Not on the tablet tier in between, where the
+ * amenities lay out flat with nothing held on screen to ride over.
+ */
+@media (max-width: 767px) {
+  .gallery {
+    z-index: 4;
+
+    margin-top: -100vh;
+    margin-top: -100svh;
+  }
 }

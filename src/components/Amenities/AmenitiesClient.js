@@ -52,6 +52,7 @@ export default function AmenitiesClient({
    */
   const descriptionHeightRef = useRef(null);
   const stageWrapperRef = useRef(null);
+  const stagesEndRef = useRef(null);
   const imagePanelRef = useRef(null);
   const imageLayerRef = useRef(null);
   const progressFillRef = useRef(null);
@@ -374,7 +375,22 @@ export default function AmenitiesClient({
               stageTrigger = ScrollTrigger.create({
                 trigger: stageWrapper,
                 start: "top top",
-                end: "bottom bottom",
+
+                /*
+                 * "bottom bottom" would spread the stages across the
+                 * overlay runway too (see .stagesEnd in the stylesheet),
+                 * giving four amenities five screens of scroll and a
+                 * fifth stage with nothing in it. Ending at the marker
+                 * keeps the stages owning exactly their own screens and
+                 * leaves the runway over for the gallery to travel
+                 * across.
+                 */
+                end: () =>
+                  `+=${Math.max(
+                    1,
+                    (stagesEndRef.current?.offsetTop ??
+                      stageWrapper.offsetHeight) - window.innerHeight,
+                  )}`,
                 scrub: 0.3,
                 invalidateOnRefresh: true,
 
@@ -674,8 +690,31 @@ export default function AmenitiesClient({
       <div
         ref={stageWrapperRef}
         className={styles.stageWrapper}
-        style={{ height: `${items.length * 100}vh` }}
+        /*
+         * The stage count, not a height. The height is worked out from
+         * it in the stylesheet, which lets desktop add its overlay
+         * runway on the end (see Amenities.module.css) without an
+         * inline height overriding the rule that does it.
+         */
+        style={{ "--stage-count": items.length }}
       >
+        {/*
+         * Marks where the stages finish and the overlay runway begins.
+         * The stage journey's ScrollTrigger ends here rather than at the
+         * wrapper's bottom edge, which now sits a screen further down.
+         *
+         * A measured element rather than arithmetic on window
+         * dimensions: the runway is a screen of `svh`, and on a phone
+         * `svh` and window.innerHeight are different numbers that drift
+         * apart as the address bar hides. Reading the position off the
+         * page is exact at any moment.
+         */}
+        <span
+          ref={stagesEndRef}
+          className={styles.stagesEnd}
+          aria-hidden="true"
+        />
+
         <div className={styles.stickyViewport}>
           <div className={styles.body}>
             <div className={styles.content}>

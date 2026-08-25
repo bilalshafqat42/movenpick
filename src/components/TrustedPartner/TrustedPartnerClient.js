@@ -111,8 +111,28 @@ export default function TrustedPartnerClient({
 
       gsap.set(textReveal, { autoAlpha: 0, y: ENTRANCE_RISE });
 
+      /*
+       * Triggered on the LOGO, not on the section.
+       *
+       * ENTRANCE_START is "top 50%", which everywhere else on the page
+       * means "the section is half on screen" and "its content is on
+       * screen" at the same moment — those sections are about one
+       * screen tall. This one is three, and its opening screen centres
+       * the logo inside it, so the two moments are nowhere near each
+       * other. Measured against the section: the entrance fired with
+       * the logo box at y 778..928 of a 900px screen, its top edge
+       * barely showing at the very bottom. It had finished long before
+       * anyone scrolled far enough to look at it, which is exactly the
+       * "it animates before I get there" report.
+       *
+       * Anchored to the logo, the same "top 50%" means the logo itself
+       * is halfway up the screen — where the eye already is. It also
+       * stays correct if the section's height or the logo's position
+       * inside it ever changes, which an offset measured from the
+       * section's top edge would not.
+       */
       const textTrigger = revealOnArrival({
-        trigger: section,
+        trigger: logo ?? section,
         start: ENTRANCE_START,
 
         onReveal: () => {
@@ -126,8 +146,12 @@ export default function TrustedPartnerClient({
           }
 
           /*
-           * Twice the usual gap before the copy follows, so the logo is
-           * alone on screen long enough to be read as the subject
+           * The copy starts as the logo lands, not part-way through it.
+           *
+           * Written as the logo's own duration rather than as a
+           * multiple of the stagger, because that is the thing it is
+           * actually waiting for: the partner's mark gets the screen to
+           * itself for its whole entrance and is read as the subject,
            * rather than as the first line of the block. The copy then
            * staggers among itself at the site's normal rhythm.
            */
@@ -137,7 +161,7 @@ export default function TrustedPartnerClient({
             duration: ENTRANCE_DURATION,
             stagger: ENTRANCE_STAGGER,
             ease: ENTRANCE_EASE,
-            delay: logo ? ENTRANCE_STAGGER * 2 : 0,
+            delay: logo ? ENTRANCE_DURATION : 0,
           });
         },
       });
@@ -176,23 +200,42 @@ export default function TrustedPartnerClient({
           card.querySelector(`.${styles.ctaButton}`),
         ].filter(Boolean);
 
-        gsap.set(media, { autoAlpha: 0, y: 28 });
+        /*
+         * The photograph is NOT hidden and faded in. Sliding up over
+         * the held gold panel is its entrance (see .textBlock in the
+         * desktop and mobile blocks of the stylesheet), and a fade on
+         * top of that fought it: measured, the photo stayed at
+         * visibility: hidden for the whole slide — its box travelled
+         * from y 928 up to y 478 of a 900px screen with nothing in it —
+         * and then appeared at once, halfway up. Gold, gold, gold, then
+         * a photograph. That is the "it suddenly appears" report.
+         *
+         * Nothing hides it in CSS either, so leaving it alone means it
+         * is simply there, and the travel is the whole animation. The
+         * same is true of the gallery riding over the amenities, which
+         * is the transition this is being matched to.
+         */
         gsap.set(card, { autoAlpha: 0, y: 24 });
         gsap.set(cardReveal, { autoAlpha: 0, y: ENTRANCE_RISE });
 
+        /*
+         * Triggered on the CARD, not on the photograph around it.
+         *
+         * The photograph spends most of its travel crossing the screen,
+         * so "the photo is half on screen" lands while it is still
+         * moving and the card would arrive mid-slide. The card's own
+         * position puts it at roughly the point the photo settles, so
+         * the section reads as two beats: the photograph travels up
+         * over the gold, then the card arrives inside it.
+         */
         mediaTrigger = revealOnArrival({
-          trigger: media,
+          trigger: card,
           start: ENTRANCE_START,
 
           onReveal: () => {
             gsap
               .timeline({ defaults: { ease: ENTRANCE_EASE } })
-              .to(media, { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION })
-              .to(
-                card,
-                { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION },
-                ENTRANCE_STAGGER,
-              )
+              .to(card, { autoAlpha: 1, y: 0, duration: ENTRANCE_DURATION })
               /*
                * Starts as the card itself lands rather than after it,
                * so the panel and the first line of copy feel like one
@@ -206,7 +249,7 @@ export default function TrustedPartnerClient({
                   duration: ENTRANCE_DURATION,
                   stagger: ENTRANCE_STAGGER,
                 },
-                ENTRANCE_STAGGER * 2,
+                ENTRANCE_STAGGER,
               );
           },
         });

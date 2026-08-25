@@ -51,12 +51,39 @@
   position: relative;
 
   /*
+   * One screen per stage. --stage-count is set inline by
+   * AmenitiesClient from the item count it actually received, so the
+   * scroll distance and the number of stages cannot drift apart.
+   */
+  height: calc(var(--stage-count, 1) * 100vh);
+  height: calc(var(--stage-count, 1) * 100svh);
+
+  /*
    * No snap point. This used to have a "magnetic" entry that pulled a
    * gesture landing near its top into a page-aligned start, but the
    * section is scrolled through freely now and the pull was fighting
    * the reader rather than helping them. The exit snap on ProjectGallery
    * still gives the journey a clean resting point at the far end.
    */
+}
+
+/*
+ * Sits exactly where the stages finish. Everything below it in the
+ * wrapper is the overlay runway that the gallery travels across, and
+ * the stage journey's ScrollTrigger ends here rather than at the
+ * wrapper's bottom edge — see stagesEndRef in AmenitiesClient.
+ *
+ * Zero-sized and absolutely positioned, so it takes part in no layout
+ * and adds no height of its own; it is a position, not a box.
+ */
+.stagesEnd {
+  position: absolute;
+  top: calc(var(--stage-count, 1) * 100vh);
+  top: calc(var(--stage-count, 1) * 100svh);
+  left: 0;
+
+  width: 0;
+  height: 0;
 }
 
 .stickyViewport {
@@ -474,6 +501,28 @@
     position: relative;
     z-index: 3;
   }
+
+  /*
+   * One extra screen on the end, past the last stage.
+   *
+   * .stickyViewport is held by this wrapper, so lengthening the wrapper
+   * keeps the final amenity on screen for a screen longer. That is the
+   * runway the gallery below travels over: the gallery is pulled back
+   * up by the same amount (see ProjectGallery.module.css) and rides
+   * over this held screen instead of the page scrolling away from it
+   * first.
+   *
+   * The document is no taller for it — the runway added here is exactly
+   * what the gallery's negative margin takes away.
+   *
+   * The stage journey itself must NOT stretch to cover this, or a
+   * fifth stage would appear with nothing in it. Its ScrollTrigger ends
+   * at .stagesEnd instead of at the wrapper's bottom edge.
+   */
+  .stageWrapper {
+    height: calc(var(--stage-count, 1) * 100vh + 100vh);
+    height: calc(var(--stage-count, 1) * 100svh + 100svh);
+  }
 }
 
 /* =========================================================
@@ -544,7 +593,7 @@
    ========================================================= */
 @media (max-width: 1024px) and (min-width: 768px) {
   .stageWrapper {
-    height: auto !important;
+    height: auto;
   }
 
   .stickyViewport {
@@ -588,6 +637,22 @@
    * negative bottom margin cancels .amenities' own bottom padding so
    * the photo's bottom edge is the section's bottom edge.
    */
+  /*
+   * The gallery below rides over this section here too — same runway,
+   * same stacking position as the desktop block above. The tablet tier
+   * between them is left out: it runs no journey, so it has no held
+   * screen for anything to ride over.
+   */
+  .amenities {
+    position: relative;
+    z-index: 3;
+  }
+
+  .stageWrapper {
+    height: calc(var(--stage-count, 1) * 100vh + 100vh);
+    height: calc(var(--stage-count, 1) * 100svh + 100svh);
+  }
+
   /*
    * The pinned journey, as on desktop: one screen held still while the
    * scroll steps through the items, a photograph and its copy at a

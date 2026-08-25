@@ -132,6 +132,32 @@
 
     padding-top: var(--header-height, 90px);
     padding-bottom: 0;
+
+    /*
+     * Held while the photo below rides up over it.
+     *
+     * The gold panel stops where it is and the photo screen travels
+     * across it, instead of the two scrolling past together. No
+     * negative margin is needed for this one, unlike the gallery over
+     * the amenities: the photo already starts a screen below this
+     * block, so simply holding this block still turns that screen of
+     * scroll into the overlay.
+     *
+     * Confined by the section, so it releases once the photo is pinned
+     * over it and is never seen sliding away.
+     */
+    position: sticky;
+    top: 0;
+    z-index: 0;
+  }
+
+  /*
+   * In front of the panel it travels over. Both are positioned
+   * elements, so this would win on source order alone, but the order is
+   * what the effect depends on — worth stating rather than inheriting.
+   */
+  .mediaScroll {
+    z-index: 1;
   }
 
   .mediaScroll {
@@ -394,21 +420,40 @@
 
 @media (max-width: 767px) {
   /*
-   * Two screens on mobile: the gold Accor panel, then the photo with
-   * its card. Each is a full screen and each is its own snap target, so
-   * a gesture rests on one or the other rather than half way between.
+   * No snap points on these two blocks.
    *
-   * The snap points go on these two blocks rather than the section,
-   * which only has one edge to offer. The negative scroll-margin
-   * cancels the page's header scroll-padding (see globals.css) — a
-   * block that is deliberately 100svh tall would otherwise rest 90px
-   * down and hang that far below the fold. Each carries its own header
-   * clearance instead.
+   * They used to be one each: two full screens, and a gesture rested on
+   * one or the other rather than half way between. That was right while
+   * they scrolled past each other. It is wrong now that the photo
+   * travels UP OVER the held gold panel, because half way between is
+   * the whole effect — and snapping removed it completely.
+   *
+   * Measured with both snap points in place: asking to scroll 75, 150
+   * or 225px into the section landed back at 0, pulled to the gold
+   * panel; ten real wheel gestures of 90px moved the page 18px in
+   * total; and the next gesture jumped 866px straight to the photo. The
+   * travel could not happen at all, so the photo simply appeared.
+   *
+   * The section scrolls freely here now, exactly as it does on desktop,
+   * which is where this transition was already smooth.
    */
-  .textBlock,
+
+  /*
+   * The same overlay as desktop: the gold panel is held while the photo
+   * screen rides up over it. See the note in the desktop block.
+   *
+   * Sticky does not move an element's layout position, only where it
+   * paints, so the snap point above still resolves to the top of this
+   * block and a gesture still rests on the gold panel.
+   */
+  .textBlock {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+  }
+
   .mediaScroll {
-    scroll-snap-align: start;
-    scroll-margin-top: calc(-1 * var(--header-height, 90px));
+    z-index: 1;
   }
 
   .textBlock {
