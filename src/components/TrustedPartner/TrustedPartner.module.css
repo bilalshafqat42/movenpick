@@ -253,14 +253,27 @@
   padding: clamp(36px, 4vw, 56px) clamp(28px, 4vw, 48px);
 
   background: rgba(var(--color-cream-rgb), 1);
+
   /*
-   * Its own fill is almost the same cream as the page background
-   * behind it, so once it grows to cover the whole photo there'd
-   * otherwise be no visible edge at all to show where it ends —
-   * this border and shadow stay visible even then.
+   * No visible edge, at any size. The card is meant to read as plain
+   * cream, so once it has grown to cover the whole photo it simply
+   * becomes the background rather than a panel sitting on one.
+   *
+   * These used to be a gold hairline and a soft gold drop shadow, there
+   * to keep the card's outline readable against a page background of
+   * nearly the same cream. Grown to full bleed that outline became a
+   * rule drawn across the page and the shadow a band under it, right
+   * where the section meets the one below.
+   *
+   * border-color, not `border: 0`. The card's growth is driven by four
+   * measured insets (see measureInsets in TrustedPartnerClient), and
+   * removing the border outright would take 2px off the box and shift
+   * every one of those measurements. Transparent leaves the geometry
+   * untouched: background-clip defaults to border-box, so the cream
+   * simply paints through where the line used to be.
    */
-  border: 1px solid rgba(var(--color-gold-rgb), 0.25);
-  box-shadow: 0 24px 60px rgba(var(--color-gold-rgb), 0.18);
+  border: 1px solid transparent;
+  box-shadow: none;
 
   backdrop-filter: blur(22px) saturate(140%);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
@@ -279,32 +292,11 @@
 }
 
 /*
- * Desktop: no visible edge on the card.
- *
- * The border above exists so the card still reads as a card once it has
- * grown over the photo, since its cream fill is nearly the page
- * background. On desktop the card now grows to the full screen, so that
- * same border becomes a hairline rectangle drawn around the whole
- * viewport, and where the grown card meets the section after it the two
- * lines read as a stray rule across the page.
- *
- * border-color, not `border: 0`. The card's growth is driven by four
- * measured insets (see TrustedPartnerClient), and removing the border
- * outright would take 2px off the box and shift every one of those
- * measurements. Making it transparent leaves the geometry untouched:
- * background-clip defaults to border-box, so the cream simply paints
- * through where the line used to be.
- *
- * This block sits AFTER the .card rule on purpose. Placed with the
- * other desktop rules further up the file it lost to the later base
- * rule on source order at equal specificity, and the border stayed at
- * rgba(137, 118, 85, 0.25) with no sign anything had been overridden.
+ * Desktop: how wide the card rests before the takeover grows it.
  */
 
 @media (min-width: 1025px) {
   .card {
-    border-color: transparent;
-
     /*
      * Sized so the card rests 685px in from each side of the photo.
      *

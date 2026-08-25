@@ -33,6 +33,23 @@ const SIDE_ASPECT = 446 / 210;
 const MIN_CENTRE_HEIGHT = 300;
 
 /*
+ * Mobile only.
+ *
+ * MOBILE_CENTRE_ASPECT is the centre photo's width as a share of its
+ * height. 0.65 puts it at 310px on a 440x956 phone, down from the 359px
+ * that 0.75 gave — a narrower, more upright card. Expressed as a ratio
+ * rather than a pixel width so it holds its proportions on every
+ * handset instead of only the one it was measured on.
+ *
+ * MOBILE_SIDE_LIFT raises the side photos off the centre card's bottom
+ * edge. They used to sit flush with it; this lifts them clear so they
+ * read as their own thing peeking in rather than as a continuation of
+ * the centre photo's baseline.
+ */
+const MOBILE_CENTRE_ASPECT = 0.65;
+const MOBILE_SIDE_LIFT = 100;
+
+/*
  * Wraps an index into range for a carousel of `count` items. Takes count
  * as a real argument rather than reading a module-level constant: this
  * used to read GALLERY_ITEM_COUNT, a build-time constant computed once
@@ -385,7 +402,10 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
        * on unusually tall/narrow devices.
        */
       const centreHeight = window.innerHeight * 0.5;
-      const centreWidth = Math.min(centreHeight * 0.75, viewportWidth * 0.86);
+      const centreWidth = Math.min(
+        centreHeight * MOBILE_CENTRE_ASPECT,
+        viewportWidth * 0.86,
+      );
 
       const sideWidth = Math.max(48, viewportWidth * 0.11);
       const sideHeight = sideWidth * (446 / 210);
@@ -395,13 +415,21 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
         centreHeight,
         sideWidth,
         sideHeight,
-        sideYOffset: centreHeight - sideHeight,
+        /*
+         * Bottom-aligned with the centre photo, then lifted clear of
+         * it. Floored at 0 so a very short screen cannot push them
+         * above the top of the carousel.
+         */
+        sideYOffset: Math.max(0, centreHeight - sideHeight - MOBILE_SIDE_LIFT),
       };
     }
 
     if (viewportWidth <= 767) {
       const centreHeight = window.innerHeight * 0.5;
-      const centreWidth = Math.min(centreHeight * 0.75, viewportWidth * 0.86);
+      const centreWidth = Math.min(
+        centreHeight * MOBILE_CENTRE_ASPECT,
+        viewportWidth * 0.86,
+      );
 
       const sideWidth = Math.max(62, viewportWidth * 0.13);
       const sideHeight = sideWidth * (446 / 210);
@@ -411,7 +439,8 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
         centreHeight,
         sideWidth,
         sideHeight,
-        sideYOffset: centreHeight - sideHeight,
+        /* See the note on the branch above. */
+        sideYOffset: Math.max(0, centreHeight - sideHeight - MOBILE_SIDE_LIFT),
       };
     }
 
@@ -477,21 +506,28 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
     };
   }, [getSpaceAbovePhoto]);
 
-  const getCardPosition = useCallback((cardIndex, nextActiveIndex) => {
-    if (cardIndex === nextActiveIndex) {
-      return "centre";
-    }
+  const getCardPosition = useCallback(
+    (cardIndex, nextActiveIndex) => {
+      if (cardIndex === nextActiveIndex) {
+        return "centre";
+      }
 
-    if (cardIndex === getLoopedIndex(nextActiveIndex - 1, galleryItems.length)) {
-      return "left";
-    }
+      if (
+        cardIndex === getLoopedIndex(nextActiveIndex - 1, galleryItems.length)
+      ) {
+        return "left";
+      }
 
-    if (cardIndex === getLoopedIndex(nextActiveIndex + 1, galleryItems.length)) {
-      return "right";
-    }
+      if (
+        cardIndex === getLoopedIndex(nextActiveIndex + 1, galleryItems.length)
+      ) {
+        return "right";
+      }
 
-    return "hidden";
-  }, [galleryItems.length]);
+      return "hidden";
+    },
+    [galleryItems.length],
+  );
 
   const getCardState = useCallback(
     (cardIndex, nextActiveIndex) => {
@@ -877,11 +913,15 @@ export default function GalleryClient({ heading, text, items: galleryItems }) {
   );
 
   const showPrevious = useCallback(() => {
-    selectSlide(getLoopedIndex(activeIndexRef.current - 1, galleryItems.length));
+    selectSlide(
+      getLoopedIndex(activeIndexRef.current - 1, galleryItems.length),
+    );
   }, [selectSlide, galleryItems.length]);
 
   const showNext = useCallback(() => {
-    selectSlide(getLoopedIndex(activeIndexRef.current + 1, galleryItems.length));
+    selectSlide(
+      getLoopedIndex(activeIndexRef.current + 1, galleryItems.length),
+    );
   }, [selectSlide, galleryItems.length]);
 
   /*
