@@ -540,28 +540,33 @@
    * now says so rather than leaking it.
    */
   /*
-   * Rests 121px in from the top and bottom of the photo and 63px in
-   * from each side, then grows from there to full bleed.
+   * Proportioned like the desktop card rather than like a phone screen.
    *
-   * Written as the panel less twice each inset, so the two figures
-   * asked for stay literally in the rule and hold at any screen size:
-   * 440 - 126 = 314 wide, 956 - 242 = 714 tall.
+   * It used to be 314 wide and 714 tall — a ratio of 0.44, a tall
+   * narrow strip with slivers of photograph beside it. Desktop's card
+   * sits between 0.69 and 1.04 depending on the window, which is the
+   * shape that was signed off.
    *
-   * min-height rather than height for the vertical. The card is taller
-   * than its copy needs at this width, which is the point — but if the
-   * text ever grew past it, a fixed height would clip it while a
-   * minimum simply gives way.
+   * Two changes get it there. The height is content-driven now, exactly
+   * as it is on desktop: the old `min-height: calc(100% - 242px)`
+   * stretched the card to three quarters of the screen whatever the
+   * copy needed, and that alone is what made it a strip. And the card
+   * is wider, so the paragraph wraps at a comfortable measure instead
+   * of into a column.
    *
-   * No max-width or max-height to go with them: the takeover drives the
-   * card out to the whole panel, and a ceiling would quietly stop it
-   * short of full bleed.
+   * Measured at rest with the 64px gutter below: 376x364 at 440 wide
+   * (ratio 1.03), 326x412 at 390 (0.79), 296x468 at 360 (0.63) — inside
+   * the desktop range at every size, with the photograph showing 32px
+   * either side and 150-300px above and below.
+   *
+   * No max-width or max-height: the takeover drives the card out to the
+   * whole panel, and a ceiling would quietly stop it short of full
+   * bleed.
    */
   .card {
-    width: calc(100% - 126px);
-    min-height: calc(100% - 242px);
+    width: calc(100% - 64px);
 
-    /* padding: 32px 24px; */
-    padding: 48px 36px;
+    padding: 44px 32px;
   }
 }
 
