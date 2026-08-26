@@ -42,6 +42,29 @@ const isDev = process.env.NODE_ENV !== "production";
  * Read at BUILD time, not runtime: changing it requires a rebuild, not
  * just a restart. Wildcards are supported by remotePatterns (*.example.com).
  */
+/*
+ * On-demand image optimisation, and the switch to turn it off again.
+ *
+ * ON by default: an editor uploading a photograph from a phone or a
+ * camera roll has no way to produce per-breakpoint sizes, so without
+ * this a 4000px original is what every visitor downloads, on every
+ * device. With it, Next.js resizes and re-encodes each upload to the
+ * widths in deviceSizes below and serves the smallest one that fits.
+ *
+ * It is an env var rather than a plain `false` because this was
+ * previously turned OFF after a real incident, and that reason has not
+ * gone away: on a 0.5 CPU / 512 MB instance the optimiser began
+ * returning 502 at three concurrent /_next/image requests, and a browser
+ * opens six. If that returns, set OPTIMISE_IMAGES=false and redeploy —
+ * no code change, no rebuild of anything but the config.
+ *
+ * What makes it safer this time is the cache header added for
+ * /_next/image in headers() below. Each variant is now encoded once and
+ * then served by the CDN, so the expensive work happens on the first
+ * request for a size and never again, rather than on every request.
+ */
+const optimiseImages = process.env.OPTIMISE_IMAGES !== "false";
+
 const imageHosts = (process.env.IMAGE_HOSTS ?? "")
   .split(",")
   .map((host) => host.trim())
@@ -191,6 +214,29 @@ const nextConfig = {
       },
       {
         /*
+         * Cache the optimiser's output at the CDN.
+         *
+         * This is what makes on-demand optimisation affordable on a
+         * small instance. Without it every visitor's request for every
+         * size reaches the container and re-runs sharp; with it the
+         * origin encodes each variant once and Cloudflare serves the
+         * rest.
+         *
+         * `immutable` is safe here where it was not for /images: the URL
+         * carries the source path, the width and the quality, so a
+         * replaced photograph is a different URL rather than the same
+         * one with new bytes.
+         */
+        source: "/_next/image",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, s-maxage=31536000, immutable",
+          },
+        ],
+      },
+      {
+        /*
          * Fonts are genuinely immutable — the filenames are content-hashed by
          * the build, so a changed font is a changed URL.
          */
@@ -215,7 +261,11 @@ const nextConfig = {
 
   images: {
     /*
-     * On-demand image optimisation is OFF, deliberately.
+     * Set only when OPTIMISE_IMAGES=false. See the note on
+     * `optimiseImages` at the top of this file for why the escape hatch
+     * exists and when to use it.
+     *
+     * The history, kept because it is the reason for the switch:
      *
      * next/image normally re-encodes and resizes images per request. On this
      * deployment that could not work: the instance has 0.5 CPU and 512 MB, and
@@ -236,12 +286,11 @@ const nextConfig = {
      * a real cost, accepted because the alternative is images that do not
      * appear at all.
      *
-     * To restore optimisation later, delete `unoptimized` and move to an
-     * instance with more CPU. deviceSizes/qualities/formats below are kept
-     * configured and correct for exactly that, and are simply unused while
-     * this flag is set.
+     * That was written when this ran on a CPU-starved instance with no
+     * CDN caching of /_next/image. The header added above closes the
+     * second half of that; the first half is still worth watching.
      */
-    unoptimized: true,
+    ...(optimiseImages ? {} : { unoptimized: true }),
 
     /*
      * Hosts allowed to serve images, from IMAGE_HOSTS. Next.js 16 requires

@@ -17,6 +17,7 @@ import { SEO_FIELDS } from "@/content/sections/seo";
 import { ROBOTS_FIELDS } from "@/content/sections/robotsTxt";
 import { PRIVACY_FIELDS } from "@/content/sections/privacy";
 import { TERMS_FIELDS } from "@/content/sections/terms";
+import { COOKIES_FIELDS } from "@/content/sections/cookies";
 
 /*
  * Every editable section registers itself here: a slug (used in the
@@ -137,6 +138,17 @@ export const SECTION_REGISTRY = {
     fields: TERMS_FIELDS,
     viewLiveHref: "/terms",
     viewLiveLabel: "View live page",
+  },
+  /*
+   * ADMIN, same reasoning as Privacy/Terms above: the cookie banner is a
+   * legal statement about what this site actually does with a visitor's
+   * data, not ordinary marketing copy.
+   */
+  cookies: {
+    label: "Cookie Banner",
+    group: "content",
+    minRole: "ADMIN",
+    fields: COOKIES_FIELDS,
   },
   seo: {
     label: "SEO & Sharing",
