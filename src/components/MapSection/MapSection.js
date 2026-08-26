@@ -346,6 +346,7 @@ export default function MapSection({
 
       const mapStage = mapStageRef.current;
       const overlayBackground = overlayBackgroundRef.current;
+      const mapContainer = mapContainerRef.current;
       const travelList = travelListRef.current;
       const resetButton = resetRef.current;
       const directionsLink = directionsRef.current;
@@ -408,6 +409,10 @@ export default function MapSection({
               y: 0,
               clearProps: "transform",
             });
+
+            if (mapContainer) {
+              gsap.set(mapContainer, { autoAlpha: 1, y: 0 });
+            }
 
             return undefined;
           }
@@ -484,6 +489,20 @@ export default function MapSection({
             clipPath: "inset(0% 100% 0% 0%)",
           });
 
+          /*
+           * The map arrives rather than simply being there.
+           *
+           * Everything around it animated in — eyebrow, heading,
+           * paragraph, the beige panel and its destinations — while the
+           * map itself was already drawn, so the section read as copy
+           * assembling around something that had beaten it there. It
+           * now takes its turn in the order asked for: heading,
+           * paragraph, map, then the panel wiping across it.
+           */
+          if (mapContainer) {
+            gsap.set(mapContainer, { autoAlpha: 0, y: 36 });
+          }
+
           gsap.set(travelItems, {
             autoAlpha: 0,
             y: 42,
@@ -505,8 +524,15 @@ export default function MapSection({
 
             scrollTrigger: {
               trigger: mapStage,
-              start: "top 56%",
-              end: "top 36%",
+              /*
+               * Later than the map's own arrival, which fires at
+               * ENTRANCE_START ("top 50%"). This began at "top 56%" —
+               * a HIGHER percentage is an EARLIER moment — so the beige
+               * panel started wiping across before the map beneath it
+               * had appeared at all.
+               */
+              start: "top 40%",
+              end: "top 18%",
               scrub: 0.8,
               invalidateOnRefresh: true,
             },
@@ -533,6 +559,25 @@ export default function MapSection({
             onReveal: () => itemsTimeline.play(),
           });
 
+          /*
+           * The map leads this timeline; the destinations follow it
+           * rather than arriving alongside it.
+           */
+          if (mapContainer) {
+            itemsTimeline.to(
+              mapContainer,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
+              },
+              0,
+            );
+          }
+
+          const destinationsStart = mapContainer ? ENTRANCE_DURATION : 0;
+
           travelItems.forEach((item, index) => {
             itemsTimeline.to(
               item,
@@ -542,7 +587,7 @@ export default function MapSection({
                 duration: ENTRANCE_DURATION,
                 ease: ENTRANCE_EASE,
               },
-              index * destinationStagger,
+              destinationsStart + index * destinationStagger,
             );
           });
 
@@ -619,15 +664,62 @@ export default function MapSection({
               clearProps: "transform",
             });
 
+            if (mapContainer) {
+              gsap.set(mapContainer, { autoAlpha: 1, y: 0 });
+            }
+
             return undefined;
           }
 
           /*
-           * Mobile section heading remains immediately visible.
+           * The heading arrives one line at a time here too, rather
+           * than being on screen from the start. It used to be set
+           * visible immediately on a phone, so the section opened with
+           * its copy already in place and only the panel below it
+           * animating — the order asked for is eyebrow, heading,
+           * paragraph, then the map, then the panel.
+           *
+           * The same overlap as desktop, so the two read as one move at
+           * different widths rather than two separate treatments.
            */
-          gsap.set([eyebrow, heading, description], {
-            autoAlpha: 1,
-            y: 0,
+          gsap.set(eyebrow, { autoAlpha: 0, y: 18 });
+          gsap.set(heading, { autoAlpha: 0, y: 26 });
+          gsap.set(description, { autoAlpha: 0, y: 20 });
+
+          const mobileHeadingTimeline = gsap.timeline({ paused: true });
+
+          mobileHeadingTimeline
+            .to(eyebrow, {
+              autoAlpha: 1,
+              y: 0,
+              duration: ENTRANCE_DURATION,
+              ease: ENTRANCE_EASE,
+            })
+            .to(
+              heading,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
+              },
+              "-=0.42",
+            )
+            .to(
+              description,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.78,
+                ease: ENTRANCE_EASE,
+              },
+              "-=0.36",
+            );
+
+          revealOnArrival({
+            trigger: sectionHeader,
+            start: ENTRANCE_START,
+            onReveal: () => mobileHeadingTimeline.play(),
           });
 
           /*
@@ -636,6 +728,11 @@ export default function MapSection({
           gsap.set(overlayBackground, {
             clipPath: "inset(0% 0% 100% 0%)",
           });
+
+          /* The map arrives here too — see the desktop branch above. */
+          if (mapContainer) {
+            gsap.set(mapContainer, { autoAlpha: 0, y: 24 });
+          }
 
           gsap.set(travelItems, {
             autoAlpha: 0,
@@ -658,8 +755,12 @@ export default function MapSection({
 
             scrollTrigger: {
               trigger: mapStage,
-              start: "top 68%",
-              end: "top 56%",
+              /*
+               * Later than the map's arrival at ENTRANCE_START, for the
+               * reason given on the desktop wipe above.
+               */
+              start: "top 44%",
+              end: "top 30%",
               scrub: 0.65,
               invalidateOnRefresh: true,
             },
@@ -672,6 +773,16 @@ export default function MapSection({
            * don't re-hide on upward scroll, same reasoning as the
            * desktop timelines above.
            */
+          const mobileMapTween = mapContainer
+            ? gsap.to(mapContainer, {
+                autoAlpha: 1,
+                y: 0,
+                duration: ENTRANCE_DURATION,
+                ease: ENTRANCE_EASE,
+                paused: true,
+              })
+            : null;
+
           const mobileItemsTween = gsap.to(travelItems, {
             autoAlpha: 1,
             y: 0,
@@ -679,12 +790,17 @@ export default function MapSection({
             stagger: LIST_STAGGER,
             ease: ENTRANCE_EASE,
             paused: true,
+            /* The cards follow the map rather than arriving with it. */
+            delay: mapContainer ? ENTRANCE_DURATION : 0,
           });
 
           revealOnArrival({
             trigger: mapStage,
             start: ENTRANCE_START,
-            onReveal: () => mobileItemsTween.play(),
+            onReveal: () => {
+              mobileMapTween?.play();
+              mobileItemsTween.play();
+            },
           });
 
           const mobileResetTween = gsap.to(resetButton, {

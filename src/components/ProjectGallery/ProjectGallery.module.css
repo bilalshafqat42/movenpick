@@ -98,6 +98,14 @@
 
   flex: 1 0 0;
   height: 100%;
+
+  /*
+   * The frame the photograph drifts inside. Without this the overhang
+   * below would simply spill into the neighbouring slide instead of
+   * being cropped, and the parallax would read as the photos overlapping
+   * rather than as depth.
+   */
+  overflow: hidden;
 }
 
 .image {

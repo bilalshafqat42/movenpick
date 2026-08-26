@@ -208,76 +208,37 @@ export default function AmenitiesClient({
             transformOrigin: "center center",
           });
 
+          /*
+           * The tweens are built BEFORE the ScrollTrigger, and the
+           * trigger is attached to the finished timeline rather than
+           * declared inside gsap.timeline().
+           *
+           * This ordering is the whole fix for a photo that sometimes
+           * never appeared. Declared the other way round, the trigger
+           * was created while the timeline was still empty, measured a
+           * zero-length animation, and cached its progress as 1.
+           * Adding the tweens afterwards did not tell it anything had
+           * changed, so every later refresh computed the same 1, saw no
+           * change, and never rendered — the onUpdate below never ran,
+           * and the closed mask applied a few lines above was never
+           * replaced.
+           *
+           * Scrolling down through the range from above hid it, because
+           * that drives progress 1 -> 0 -> 1 and forces a render. It
+           * only showed when a visitor ARRIVED past the range with no
+           * render to correct it: a reload part way down the page, the
+           * browser restoring a position on back-navigation, a menu
+           * jump, a deep link. Measured on a reload inside the section:
+           * the panel's mask sat at zero opaque stops — invisible — and
+           * stayed there through six seconds and any amount of local
+           * scrolling. Only a trip back to the top of the page brought
+           * the photograph back.
+           */
+          const blind = { progress: 0 };
+
           const imageTimeline = gsap.timeline({
             defaults: { ease: "none" },
-
-            scrollTrigger: {
-              trigger: section,
-              /*
-               * Ranged against when the PHOTO is on screen, not when
-               * the section is.
-               *
-               * .imagePanel is absolutely positioned well below the
-               * section's own top edge, so the original "top bottom"
-               * to "top top" window was almost entirely spent while
-               * the photo was still below the fold. The blind was
-               * already a fifth open before any of it was visible and
-               * finished as the panel settled, so all a visitor saw
-               * was the tail. Starting at "top 62%" puts progress 0
-               * at the moment the panel's top edge reaches the
-               * viewport bottom, and "top -20%" lands the last slat
-               * just before the pinned stage journey below takes
-               * over - roughly a full viewport height of scroll to
-               * play out across, the same as Payment's.
-               */
-              start: "top 62%",
-              /*
-               * Ends exactly where the section comes to rest, given as
-               * an absolute scroll position rather than a geometric
-               * offset.
-               *
-               * The header's scroll-padding means a section rests with
-               * its top 90px below the viewport top, and a menu jump
-               * now lands on precisely that position so the intro copy
-               * is not tucked under the bar. This reveal is scrubbed
-               * against scroll, so "finished" has to be that same
-               * position or a visitor arriving from the menu meets a
-               * half-drawn blind: measured at 68% open before this, and
-               * still 81% when the end was merely nudged up by the
-               * header's height.
-               *
-               * The honest cost is that the reveal now plays out over
-               * about half a viewport instead of a full one. That is
-               * the trade: it cannot both start when the photograph
-               * becomes visible AND run a full viewport AND be finished
-               * by the time the section settles, because those three
-               * describe a longer stretch of scroll than actually
-               * exists between them. Starting earlier was the
-               * alternative, and it is the worse one — it is what this
-               * trigger was moved AWAY from, because the blind was then
-               * a fifth open before any of it was on screen.
-               */
-              end: () => {
-                const headerHeight =
-                  parseFloat(
-                    getComputedStyle(document.documentElement).getPropertyValue(
-                      "--header-height",
-                    ),
-                  ) || 90;
-
-                return Math.max(
-                  1,
-                  section.getBoundingClientRect().top +
-                    window.scrollY -
-                    headerHeight,
-                );
-              },
-              scrub: mobile ? 0.55 : 0.8,
-              invalidateOnRefresh: true,
-            },
           });
-
-          const blind = { progress: 0 };
 
           imageTimeline
             .to(
@@ -290,6 +251,86 @@ export default function AmenitiesClient({
               0,
             )
             .to(imageLayer, { scale: 1, xPercent: 0, duration: 1 }, 0);
+
+          ScrollTrigger.create({
+            animation: imageTimeline,
+            trigger: section,
+            /*
+             * Ranged against when the PHOTO is on screen, not when
+             * the section is.
+             *
+             * .imagePanel is absolutely positioned well below the
+             * section's own top edge, so the original "top bottom"
+             * to "top top" window was almost entirely spent while
+             * the photo was still below the fold. The blind was
+             * already a fifth open before any of it was visible and
+             * finished as the panel settled, so all a visitor saw
+             * was the tail. Starting at "top 62%" puts progress 0
+             * at the moment the panel's top edge reaches the
+             * viewport bottom, and "top -20%" lands the last slat
+             * just before the pinned stage journey below takes
+             * over - roughly a full viewport height of scroll to
+             * play out across, the same as Payment's.
+             */
+            start: "top 62%",
+            /*
+             * Ends exactly where the section comes to rest, given as
+             * an absolute scroll position rather than a geometric
+             * offset.
+             *
+             * The header's scroll-padding means a section rests with
+             * its top 90px below the viewport top, and a menu jump
+             * now lands on precisely that position so the intro copy
+             * is not tucked under the bar. This reveal is scrubbed
+             * against scroll, so "finished" has to be that same
+             * position or a visitor arriving from the menu meets a
+             * half-drawn blind: measured at 68% open before this, and
+             * still 81% when the end was merely nudged up by the
+             * header's height.
+             *
+             * The honest cost is that the reveal now plays out over
+             * about half a viewport instead of a full one. That is
+             * the trade: it cannot both start when the photograph
+             * becomes visible AND run a full viewport AND be finished
+             * by the time the section settles, because those three
+             * describe a longer stretch of scroll than actually
+             * exists between them. Starting earlier was the
+             * alternative, and it is the worse one — it is what this
+             * trigger was moved AWAY from, because the blind was then
+             * a fifth open before any of it was on screen.
+             */
+            end: () => {
+              const headerHeight =
+                parseFloat(
+                  getComputedStyle(document.documentElement).getPropertyValue(
+                    "--header-height",
+                  ),
+                ) || 90;
+
+              return Math.max(
+                1,
+                section.getBoundingClientRect().top +
+                  window.scrollY -
+                  headerHeight,
+              );
+            },
+            scrub: mobile ? 0.55 : 0.8,
+            invalidateOnRefresh: true,
+
+            /*
+             * The mask is written straight to the DOM, so it can drift
+             * from what the scroll position says whenever the scrub has
+             * no reason to render — the case above, and any refresh
+             * that lands on the progress the timeline already holds
+             * (a resize, the page growing as images load). Restating it
+             * here on every refresh means the photograph always agrees
+             * with where the visitor actually is.
+             */
+            onRefresh: (self) => {
+              blind.progress = self.progress;
+              applyVenetianMask(imagePanel, self.progress);
+            },
+          });
 
           let stageTrigger;
 

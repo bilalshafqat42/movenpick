@@ -321,24 +321,6 @@
      */
     width: clamp(340px, calc(100% - 1370px), 420px);
   }
-
-  /*
-   * The copy keeps the width it has at rest, even once the card behind
-   * it has grown to fill the screen.
-   *
-   * --tp-card-content-width is measured and published by
-   * TrustedPartnerClient at the one moment the card is at its resting
-   * size. Without it the heading and paragraph stretched with the card
-   * and re-wrapped as it grew, so the finished state showed the same
-   * words in a different shape from the one that was designed.
-   *
-   * The button is not listed: it sizes to its own label and is centred,
-   * so it never re-wrapped in the first place.
-   */
-  .cardHeading,
-  .cardText {
-    width: var(--tp-card-content-width, auto);
-  }
 }
 
 .cardHeading {
@@ -363,6 +345,31 @@
   line-height: 1.6;
 
   color: rgba(137, 118, 85, 0.75);
+}
+
+/*
+ * The copy keeps the width it has at rest, even once the card behind it
+ * has grown to fill the screen.
+ *
+ * --tp-card-content-width is measured and published by
+ * TrustedPartnerClient at the one moment the card is at its resting
+ * size. Without it the heading and paragraph stretch WITH the card as it
+ * grows and re-centre as they widen, so the finished state shows the
+ * same words in a different shape from the one that was designed.
+ *
+ * Applies at every width. It used to be inside the desktop block, which
+ * is why the takeover looked right on a laptop and wrong on a phone:
+ * measured on mobile, the heading drifted 31px sideways and grew from
+ * 314px to 372px wide across the grow, while on desktop it held exactly
+ * still at 244px. Nothing about the reason for the rule was ever
+ * desktop-specific — the variable is published at every width.
+ *
+ * The button is not listed: it sizes to its own label and is centred, so
+ * it never re-wrapped in the first place.
+ */
+.cardHeading,
+.cardText {
+  width: var(--tp-card-content-width, auto);
 }
 
 .ctaButton {

@@ -19,6 +19,37 @@ import styles from "./ProjectGallery.module.css";
 const SCROLL_VIEWPORTS_PER_TRANSITION = 1.4;
 
 /*
+ * How far each photograph drifts inside its own frame as the rail
+ * carries it across, as a share of the frame's width.
+ *
+ * The rail used to move the slides as one solid strip, so every photo
+ * travelled at exactly the speed of the gesture and the whole thing read
+ * as a filmstrip being dragged. Letting each photo lag its frame a
+ * little gives the slides depth: the frame arrives first and the image
+ * settles into it.
+ *
+ * The overhang it drifts into comes from SLIDE_PARALLAX_SCALE below.
+ * Both are shares of the frame's width — xPercent is measured against
+ * the element's own layout box, which for a `fill` image is exactly the
+ * frame — so the drift must stay under the overhang each side, which is
+ * (scale - 1) / 2. At a scale of 1.3 that ceiling is 15%; 10% leaves a
+ * margin, so a rounding error can never pull an edge into view.
+ */
+const SLIDE_PARALLAX_PERCENT = 10;
+
+/*
+ * How much wider than its frame each photograph is drawn.
+ *
+ * Done with a transform rather than a width, because next/image writes
+ * `width` and `height` inline for a `fill` image and a stylesheet rule
+ * lost to it — measured, the photo stayed exactly frame-width and every
+ * pixel of drift pulled an empty edge into view. A transform is
+ * untouched by those inline styles, and it composes with the drift below
+ * instead of fighting it.
+ */
+const SLIDE_PARALLAX_SCALE = 1.3;
+
+/*
  * Viewport heights the section is held, filling the screen, BEFORE any
  * horizontal travel begins.
  *
@@ -197,6 +228,41 @@ export default function ProjectGalleryClient({ slides }) {
       positionTrackFill(0);
 
       /*
+       * The photographs, which drift inside their frames as the rail
+       * carries them. Read once here rather than per frame.
+       */
+      const slideImages = [...rail.querySelectorAll(`.${styles.image}`)];
+
+      /* The overhang the drift below travels into. */
+      gsap.set(slideImages, {
+        scale: SLIDE_PARALLAX_SCALE,
+        transformOrigin: "center center",
+      });
+
+      /*
+       * Each photo's offset is its own frame's distance from the centre
+       * of the screen, so a slide leads as it arrives and trails as it
+       * leaves, and the one being looked at sits square in its frame.
+       *
+       * Driven off the rail's progress rather than measured from the DOM
+       * every frame: the rail is transformed, so reading rects here
+       * would be both slower and a frame behind the scrub.
+       */
+      const applySlideParallax = (progress) => {
+        const railPosition = progress * transitionCount;
+
+        slideImages.forEach((image, index) => {
+          const distance = gsap.utils.clamp(-1, 1, index - railPosition);
+
+          gsap.set(image, {
+            xPercent: distance * SLIDE_PARALLAX_PERCENT,
+          });
+        });
+      };
+
+      applySlideParallax(0);
+
+      /*
        * .rail is slideCount viewports wide, and xPercent is a share of
        * the element's OWN width, so one slide of travel is
        * 100 / slideCount percent rather than a flat 100. Expressed as a
@@ -339,6 +405,7 @@ export default function ProjectGalleryClient({ slides }) {
 
           onUpdate: (self) => {
             positionTrackFill(self.progress);
+            applySlideParallax(self.progress);
             setActive(Math.round(self.progress * transitionCount));
           },
         },
