@@ -28,12 +28,16 @@ const SCROLL_VIEWPORTS_PER_TRANSITION = 1.4;
  * little gives the slides depth: the frame arrives first and the image
  * settles into it.
  *
- * The overhang it drifts into comes from SLIDE_PARALLAX_SCALE below.
- * Both are shares of the frame's width — xPercent is measured against
- * the element's own layout box, which for a `fill` image is exactly the
- * frame — so the drift must stay under the overhang each side, which is
- * (scale - 1) / 2. At a scale of 1.3 that ceiling is 15%; 10% leaves a
- * margin, so a rounding error can never pull an edge into view.
+ * Applied to the photograph inside the slide that is arriving: it
+ * starts pushed back within its frame and settles square as the slide
+ * finishes covering. That lag is what gives the move depth — without it
+ * the incoming slide is a flat card sliding over another flat card.
+ *
+ * A share of the frame's width, because xPercent is measured against
+ * the element's own layout box and a `fill` image's box IS the frame.
+ * It must stay under the overhang each side, which is
+ * (SLIDE_PARALLAX_SCALE - 1) / 2 — 15% at 1.3. 10% leaves a margin, so
+ * a rounding error can never pull an edge into view.
  */
 const SLIDE_PARALLAX_PERCENT = 10;
 
@@ -44,10 +48,19 @@ const SLIDE_PARALLAX_PERCENT = 10;
  * `width` and `height` inline for a `fill` image and a stylesheet rule
  * lost to it — measured, the photo stayed exactly frame-width and every
  * pixel of drift pulled an empty edge into view. A transform is
- * untouched by those inline styles, and it composes with the drift below
+ * untouched by those inline styles, and it composes with the drift
  * instead of fighting it.
  */
 const SLIDE_PARALLAX_SCALE = 1.3;
+
+/*
+ * How much of the scrubber is filled on the first slide.
+ *
+ * The old sliding thumb was 16% of the track wide, so starting the fill
+ * at the same figure keeps both ends of the scrubber looking exactly as
+ * they did: a short mark on slide one, a full track on the last.
+ */
+const TRACK_START_FRACTION = 0.16;
 
 /*
  * Viewport heights the section is held, filling the screen, BEFORE any
@@ -135,7 +148,6 @@ export default function ProjectGalleryClient({ slides }) {
    * layout, which is exactly the stutter this section is meant not to
    * have.
    */
-  const trackTravelRef = useRef(0);
 
   const setActive = useCallback((index) => {
     if (index === activeIndexRef.current) {
@@ -153,6 +165,19 @@ export default function ProjectGalleryClient({ slides }) {
    * compositable property — every frame invalidated layout for the
    * whole pagination row to move a 150px bar.
    */
+  /*
+   * The scrubber fills from the left rather than sliding along.
+   *
+   * It used to be a short thumb moved with `x`, which marked where you
+   * were but left the track empty on both sides — nothing showed how
+   * much of the gallery you had already come through. It now grows, so
+   * the travelled part of the path is solid behind you.
+   *
+   * The leading edge lands in exactly the same place the thumb's right
+   * edge used to: the fill starts at the thumb's own width rather than
+   * at nothing, so the first slide still reads as "a little way in"
+   * instead of an empty track, and the last still fills it completely.
+   */
   const positionTrackFill = useCallback((progress) => {
     const trackFill = trackFillRef.current;
 
@@ -160,21 +185,11 @@ export default function ProjectGalleryClient({ slides }) {
       return;
     }
 
-    gsap.set(trackFill, { x: progress * trackTravelRef.current });
-  }, []);
-
-  const measureTrack = useCallback(() => {
-    const track = trackRef.current;
-    const trackFill = trackFillRef.current;
-
-    if (!track || !trackFill) {
-      return;
-    }
-
-    trackTravelRef.current = Math.max(
-      0,
-      track.offsetWidth - trackFill.offsetWidth,
-    );
+    gsap.set(trackFill, {
+      scaleX:
+        TRACK_START_FRACTION +
+        gsap.utils.clamp(0, 1, progress) * (1 - TRACK_START_FRACTION),
+    });
   }, []);
 
   useGSAP(
@@ -191,8 +206,6 @@ export default function ProjectGalleryClient({ slides }) {
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
-
-      measureTrack();
 
       /*
        * Reduced motion gets no scroll-driven movement at all. The CSS
@@ -216,11 +229,9 @@ export default function ProjectGalleryClient({ slides }) {
         };
 
         rail.addEventListener("scroll", handleRailScroll, { passive: true });
-        window.addEventListener("resize", measureTrack);
 
         return () => {
           rail.removeEventListener("scroll", handleRailScroll);
-          window.removeEventListener("resize", measureTrack);
         };
       }
 
@@ -228,48 +239,70 @@ export default function ProjectGalleryClient({ slides }) {
       positionTrackFill(0);
 
       /*
-       * The photographs, which drift inside their frames as the rail
-       * carries them. Read once here rather than per frame.
+       * Slides stack rather than sitting side by side in a strip.
+       *
+       * The strip moved every slide at once, so a change read as the
+       * whole filmstrip being dragged sideways. Stacked, the slide you
+       * are on holds still and the next one travels across and covers
+       * it — the same move the gallery makes over the amenities and the
+       * photo makes over the gold panel, so the page has one idea of
+       * what a transition is rather than three.
+       *
+       * Set as an attribute rather than in the stylesheet outright,
+       * because reduced motion above needs the slides left in flow: it
+       * turns .rail into a native horizontal scroller, which absolutely
+       * positioned children would break.
        */
+      rail.dataset.stacked = "true";
+
+      const slideElements = [...rail.querySelectorAll(`.${styles.slide}`)];
       const slideImages = [...rail.querySelectorAll(`.${styles.image}`)];
 
-      /* The overhang the drift below travels into. */
+      /*
+       * Later slides sit above earlier ones, so each new arrival covers
+       * what is already there rather than sliding underneath it.
+       */
+      slideElements.forEach((slide, index) => {
+        gsap.set(slide, { zIndex: index });
+      });
+
+      /* The overhang the photographs settle within. */
       gsap.set(slideImages, {
         scale: SLIDE_PARALLAX_SCALE,
         transformOrigin: "center center",
       });
 
       /*
-       * Each photo's offset is its own frame's distance from the centre
-       * of the screen, so a slide leads as it arrives and trails as it
-       * leaves, and the one being looked at sits square in its frame.
+       * Slide n is fully off to the right until the journey reaches
+       * n - 1, then travels across as the transition into it plays out,
+       * and stays put once it has arrived. Slide 0 never moves: it is
+       * the one everything else covers.
        *
-       * Driven off the rail's progress rather than measured from the DOM
-       * every frame: the rail is transformed, so reading rects here
-       * would be both slower and a frame behind the scrub.
+       * Its photograph lags the slide it is in, starting pushed back in
+       * its frame and settling square as the cover completes. That lag
+       * is the parallax — the frame arrives first, the image catches up.
        */
-      const applySlideParallax = (progress) => {
-        const railPosition = progress * transitionCount;
+      const applySlideCover = (progress) => {
+        const journey = gsap.utils.clamp(0, 1, progress) * transitionCount;
 
-        slideImages.forEach((image, index) => {
-          const distance = gsap.utils.clamp(-1, 1, index - railPosition);
+        slideElements.forEach((slide, index) => {
+          const covered =
+            index === 0 ? 1 : gsap.utils.clamp(0, 1, journey - (index - 1));
 
-          gsap.set(image, {
-            xPercent: distance * SLIDE_PARALLAX_PERCENT,
-          });
+          gsap.set(slide, { xPercent: (1 - covered) * 100 });
+
+          const image = slideImages[index];
+
+          if (image) {
+            gsap.set(image, {
+              xPercent: -(1 - covered) * SLIDE_PARALLAX_PERCENT,
+            });
+          }
         });
       };
 
-      applySlideParallax(0);
+      applySlideCover(0);
 
-      /*
-       * .rail is slideCount viewports wide, and xPercent is a share of
-       * the element's OWN width, so one slide of travel is
-       * 100 / slideCount percent rather than a flat 100. Expressed as a
-       * share rather than in pixels so it survives a resize without
-       * needing to be recalculated.
-       */
-      const railTravelPercent = (100 * transitionCount) / slideCount;
       const increment = 1 / transitionCount;
 
       const arrivalDistance = () => viewport.offsetHeight * ARRIVAL_VIEWPORTS;
@@ -317,8 +350,18 @@ export default function ProjectGalleryClient({ slides }) {
         return gsap.utils.clamp(0, 1, index * increment);
       };
 
-      const drift = gsap.to(rail, {
-        xPercent: -railTravelPercent,
+      /*
+       * A proxy, not the rail. The slides are positioned individually
+       * now, so there is nothing left to translate as one piece — but
+       * the value still has to run through the tween rather than be
+       * read off self.progress, because that is what `scrub` smooths.
+       * Reading the raw scroll here would drop the smoothing entirely.
+       */
+      const coverProxy = { value: 0 };
+
+      const drift = gsap.to(coverProxy, {
+        value: 1,
+        onUpdate: () => applySlideCover(coverProxy.value),
 
         /*
          * Linear, with the smoothing left to scrub. An ease here would
@@ -356,7 +399,6 @@ export default function ProjectGalleryClient({ slides }) {
            */
           scrub: 0.3,
           invalidateOnRefresh: true,
-          onRefresh: measureTrack,
 
           snap: {
             snapTo: snapToSlide,
@@ -405,7 +447,6 @@ export default function ProjectGalleryClient({ slides }) {
 
           onUpdate: (self) => {
             positionTrackFill(self.progress);
-            applySlideParallax(self.progress);
             setActive(Math.round(self.progress * transitionCount));
           },
         },
@@ -414,16 +455,11 @@ export default function ProjectGalleryClient({ slides }) {
       return () => {
         drift.scrollTrigger?.kill();
         drift.kill();
+        delete rail.dataset.stacked;
       };
     },
     {
-      dependencies: [
-        slideCount,
-        transitionCount,
-        measureTrack,
-        positionTrackFill,
-        setActive,
-      ],
+      dependencies: [slideCount, transitionCount, positionTrackFill, setActive],
       revertOnUpdate: true,
     },
   );
