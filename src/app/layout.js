@@ -1,6 +1,9 @@
+import { draftMode } from "next/headers";
 import "./globals.css";
 import { inter, kinan, minervaModern, gloock, notoSans } from "@/lib/fonts";
 import Loader from "@/components/Loader";
+import CookieConsent from "@/components/CookieConsent";
+import PreviewBanner from "@/components/PreviewBanner";
 
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
 import { SEO_FIELDS } from "@/content/sections/seo";
@@ -95,6 +98,7 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }) {
   const seo = await getSeoContent();
   const appearance = await getAppearanceContent();
+  const isPreview = (await draftMode()).isEnabled;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -132,6 +136,7 @@ export default async function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toSafeJsonLd(jsonLd) }}
         />
+        {isPreview ? <PreviewBanner /> : null}
         {/*
          * Routed through /api/logo when the logo is a genuinely
          * cross-origin URL — Loader's mask-image (Loader.module.css)
@@ -145,6 +150,14 @@ export default async function RootLayout({ children }) {
           }
         />
         {children}
+
+        {/*
+         * After {children} so it is last in the DOM: it is the last thing
+         * a screen reader reaches rather than an interruption before the
+         * page has been announced, and it needs no z-index race with the
+         * sections above it.
+         */}
+        <CookieConsent />
       </body>
     </html>
   );

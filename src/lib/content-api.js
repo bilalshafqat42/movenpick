@@ -1,9 +1,11 @@
 import "server-only";
 
 import { cache } from "react";
+import { cookies, draftMode } from "next/headers";
 
 import { getSiteKey } from "@/lib/site-key";
 import { normaliseContentPayload } from "@/lib/content-shape";
+import { PREVIEW_TOKEN_COOKIE } from "@/lib/preview-mode";
 
 /*
  * Reads site content over HTTP from the admin service's content API.
@@ -126,7 +128,7 @@ function isWorthRetrying(response, error) {
   return response.status >= 500 || response.status === 429;
 }
 
-async function requestContentOnce(url, token) {
+async function requestContentOnce(url, token, { isPreview = false } = {}) {
   return fetch(url, {
     /*
      * Both header styles are sent deliberately.
@@ -148,15 +150,17 @@ async function requestContentOnce(url, token) {
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     /*
-     * fetch is NOT cached by default in this version of Next.js, so caching
-     * has to be opted into explicitly — without `next`, every page render
-     * would make a live HTTP call. Tagged so the revalidation webhook can
-     * invalidate it on demand the moment an editor saves.
+     * A preview request must never be cached, by this layer or Next's own
+     * fetch cache — the whole point is always showing the current draft,
+     * not whatever it looked like at the moment draft mode was entered.
+     * Ordinary requests still opt into caching explicitly (fetch is NOT
+     * cached by default in this version of Next.js), tagged so the
+     * revalidation webhook can invalidate it on demand the moment an editor
+     * publishes.
      */
-    next: {
-      revalidate: cacheSeconds(),
-      tags: [CONTENT_CACHE_TAG],
-    },
+    ...(isPreview
+      ? { cache: "no-store" }
+      : { next: { revalidate: cacheSeconds(), tags: [CONTENT_CACHE_TAG] } }),
   });
 }
 
@@ -187,6 +191,30 @@ export const fetchAllContent = cache(async () => {
     const url = new URL(`${baseUrl.replace(/\/+$/, "")}/api/content`);
     url.searchParams.set("site", getSiteKey());
 
+    /*
+     * Draft mode is Next's own signal that this request is for a preview
+     * (see /api/preview's route — entering it is the only way this is ever
+     * true); the actual token travels in its own cookie alongside it,
+     * since draftMode()'s cookie only carries an on/off flag. Both must be
+     * present: draft mode without a token means the cookie expired or was
+     * cleared, and falling through to ordinary published content here is
+     * the same fail-open behaviour the panel's own /api/content applies to
+     * an invalid token.
+     */
+    const draft = await draftMode();
+    let isPreview = false;
+
+    if (draft.isEnabled) {
+      const cookieStore = await cookies();
+      const previewToken = cookieStore.get(PREVIEW_TOKEN_COOKIE)?.value;
+
+      if (previewToken) {
+        url.searchParams.set("status", "draft");
+        url.searchParams.set("token", previewToken);
+        isPreview = true;
+      }
+    }
+
     let response = null;
     let lastError = null;
 
@@ -196,7 +224,7 @@ export const fetchAllContent = cache(async () => {
       }
 
       try {
-        response = await requestContentOnce(url, token);
+        response = await requestContentOnce(url, token, { isPreview });
         lastError = null;
       } catch (requestError) {
         if (isFrameworkSignal(requestError)) {
