@@ -26,12 +26,22 @@ export default function ThankYouPage() {
         </h1>
 
         <p className={styles.description}>
-          Thank you for your interest in Movenpick. A member of our
-          dedicated team will contact you shortly.
+          Thank you for your interest in Movenpick. A member of our dedicated
+          team will contact you shortly.
         </p>
 
         <Link href="/" className={styles.homeLink}>
           <span>Return To Home</span>
+
+          {/*
+           * The same arrow the hero's CTA carries, so the two links read
+           * as the same control. aria-hidden because "Return To Home"
+           * already says where it goes — a screen reader announcing an
+           * arrow adds nothing.
+           */}
+          <span className={styles.homeIcon} aria-hidden="true">
+            &#8594;
+          </span>
         </Link>
       </section>
     </main>

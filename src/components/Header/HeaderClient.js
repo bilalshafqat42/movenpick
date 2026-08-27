@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
@@ -622,16 +623,58 @@ export default function HeaderClient({
     timeline.reverse();
   }, [unlockPageScroll]);
 
+  /*
+   * Every navigation target on this site is a section of the home page,
+   * written as a bare "#anchor". That only works while the visitor is on
+   * the home page. On /privacy or /terms none of those sections exist,
+   * so the anchor resolved to nothing and the handlers below called
+   * preventDefault() anyway — which left the logo and all five menu
+   * links doing nothing at all on those pages.
+   *
+   * Away from home, the same href becomes a link back to the home page.
+   */
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  const resolveHref = useCallback(
+    (href) => {
+      if (!href || !href.startsWith("#")) {
+        return href;
+      }
+
+      return isHome ? href : `/${href}`;
+    },
+    [isHome],
+  );
+
   const handleHeaderNavigation = useCallback(
     (event, href) => {
+      /*
+       * Off the home page this is a real link to another document, so it
+       * is left alone — preventing the default here is precisely what
+       * broke it.
+       */
+      if (!isHome) {
+        return;
+      }
+
       event.preventDefault();
       scrollToSection(href);
     },
-    [scrollToSection],
+    [scrollToSection, isHome],
   );
 
   const handleMenuNavigation = useCallback(
     (event, href) => {
+      /*
+       * Same as the header: away from home this is a genuine link, so it
+       * is followed rather than intercepted. The menu unmounts with the
+       * page, so there is nothing to close first.
+       */
+      if (!isHome) {
+        return;
+      }
+
       event.preventDefault();
 
       pendingNavigationRef.current = href;
@@ -650,7 +693,7 @@ export default function HeaderClient({
 
       timeline.reverse();
     },
-    [scrollToSection, unlockPageScroll],
+    [scrollToSection, unlockPageScroll, isHome],
   );
 
   /*
@@ -815,10 +858,20 @@ export default function HeaderClient({
             <span className={styles.menuText}>Menu</span>
           </button>
 
+          {/*
+           * Plain "/" rather than "/#home" when away from the home page:
+           * the hero is the top of that page, so there is no anchor to
+           * be precise about, and a bare path lands there without
+           * depending on a hash resolving correctly during load.
+           */}
           <a
-            href="#home"
+            href={isHome ? "#home" : "/"}
             className={styles.logo}
-            aria-label="Return to the Movenpick Hero section"
+            aria-label={
+              isHome
+                ? "Return to the top of the page"
+                : "Return to the Movenpick home page"
+            }
             onClick={(event) => handleHeaderNavigation(event, "#home")}
           >
             <span
@@ -867,9 +920,13 @@ export default function HeaderClient({
           </button>
 
           <a
-            href="#home"
+            href={isHome ? "#home" : "/"}
             className={styles.menuLogo}
-            aria-label="Return to the Movenpick Hero section"
+            aria-label={
+              isHome
+                ? "Return to the top of the page"
+                : "Return to the Movenpick home page"
+            }
             onClick={(event) => handleMenuNavigation(event, "#home")}
             tabIndex={menuOpen ? 0 : -1}
           >
@@ -885,7 +942,7 @@ export default function HeaderClient({
               {menuItems.map((item) => (
                 <li key={item.href} className={styles.menuItem}>
                   <a
-                    href={item.href}
+                    href={resolveHref(item.href)}
                     className={styles.menuLink}
                     onClick={(event) => handleMenuNavigation(event, item.href)}
                     tabIndex={menuOpen ? 0 : -1}
