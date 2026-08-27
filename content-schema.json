@@ -1000,7 +1000,7 @@
       "slug": "cookies",
       "label": "Cookie Banner",
       "group": "content",
-      "minRole": "ADMIN",
+      "minRole": "EDITOR",
       "fields": [
         {
           "key": "title",

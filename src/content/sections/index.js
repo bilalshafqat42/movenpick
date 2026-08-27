@@ -140,14 +140,17 @@ export const SECTION_REGISTRY = {
     viewLiveLabel: "View live page",
   },
   /*
-   * ADMIN, same reasoning as Privacy/Terms above: the cookie banner is a
-   * legal statement about what this site actually does with a visitor's
-   * data, not ordinary marketing copy.
+   * EDITOR, not ADMIN. Consent copy is legal-adjacent, same as Privacy and
+   * Terms above, but gating it at ADMIN in practice meant nobody but a
+   * site Admin could ever update it — Oceara's own cookie notice, built
+   * independently, was registered at EDITOR from the start, and the
+   * managers who actually maintain day-to-day site copy need to reach
+   * this too. Matches Oceara's precedent rather than Privacy/Terms'.
    */
   cookies: {
     label: "Cookie Banner",
     group: "content",
-    minRole: "ADMIN",
+    minRole: "EDITOR",
     fields: COOKIES_FIELDS,
   },
   seo: {
