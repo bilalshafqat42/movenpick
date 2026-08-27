@@ -1,19 +1,25 @@
 /*
- * Sits above the page rather than inside it, and above the chat teaser
- * and back-to-top controls that also live in that corner — a question
- * that must be answered should not be obscured by a widget.
- */
-/*
  * A full-width bar across the foot of the screen rather than a floating
  * card. No padding of its own: the cream has to reach both edges, so the
  * gutter belongs to .inner, inside the background.
+ *
+ * Above the page, below the corner controls. 900 puts it under the chat
+ * widget and the back-to-top button, which both sit at 999; at 2000 it
+ * hid them completely for as long as the banner was open.
+ *
+ * There is no cost to giving way here. The copy and the buttons occupy
+ * the left six columns and those controls sit bottom-right, so nothing
+ * that has to be read or clicked ends up underneath them.
+ *
+ * Still below the navigation overlay at 1000 — an open menu should cover
+ * this rather than compete with it.
  */
 .banner {
   position: fixed;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 2000;
+  z-index: 900;
 
   pointer-events: none;
 }
