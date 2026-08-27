@@ -75,6 +75,26 @@
   grid-column: 1 / span 6;
 }
 
+/*
+ * A little more room on desktop.
+ *
+ * 33px rather than 28px top and bottom, which is 10px on a bar that
+ * measures 202px closed at every width from 1280 up — 5% taller, as
+ * asked. Added as padding rather than a height so it applies equally to
+ * the closed bar and the taller one with the category toggles open,
+ * where a fixed height would have had to be two numbers.
+ *
+ * Desktop only. Below 1025px the bar is already a larger share of a
+ * smaller screen, and the mobile block further down keeps its own
+ * tighter padding.
+ */
+@media (min-width: 1025px) {
+  .inner {
+    padding-top: 33px;
+    padding-bottom: max(33px, env(safe-area-inset-bottom));
+  }
+}
+
 .copy {
   display: flex;
   flex-direction: column;
