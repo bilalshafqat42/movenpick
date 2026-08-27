@@ -782,12 +782,37 @@ export default function AmenitiesClient({
                 </ul>
               </div>
 
+              {/*
+               * Spacers, not margins.
+               *
+               * The space above the divider and the space above the
+               * button were fixed figures, and a fixed figure cannot
+               * give way: once the copy grew past the height of the
+               * held screen, the column simply overflowed and pushed
+               * the closing group out of view. Measured at 1440x900,
+               * the column needed 811px in a 720px box, which put the
+               * button exactly on the bottom edge — and further out
+               * with longer copy.
+               *
+               * As flex items they hold their designed size whenever
+               * there is room and shrink towards nothing when there is
+               * not, so the copy gives up whitespace rather than the
+               * layout giving up the divider and the button.
+               *
+               * aria-hidden and empty: they are spacing, and a screen
+               * reader has no use for them.
+               */}
+              <div className={styles.dividerSpace} aria-hidden="true" />
+
               <hr className={styles.divider} />
 
               <div ref={ctaGroupRef} className={styles.ctaGroup}>
                 <p ref={descriptionRef} className={styles.ctaText}>
                   {activeItem.description}
                 </p>
+
+                {/* See the note above: the same, between the copy and the button. */}
+                <div className={styles.ctaSpace} aria-hidden="true" />
 
                 <button
                   type="button"

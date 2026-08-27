@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 
+import { openConsentManager } from "@/lib/cookieConsent";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
 import {
@@ -183,7 +184,18 @@ export default function FooterClient({
         <p className={styles.copyright}>{copyright}</p>
 
         <div className={styles.legalRow}>
-          <button type="button" className={styles.cookiesButton}>
+          {/*
+           * Reopens the consent banner with the visitor's current
+           * settings loaded. This button existed before with no handler
+           * at all, which is a compliance problem rather than a cosmetic
+           * one: consent has to be as easy to withdraw as it was to
+           * give, and there was no way to withdraw it.
+           */}
+          <button
+            type="button"
+            className={styles.cookiesButton}
+            onClick={openConsentManager}
+          >
             {cookiesButtonLabel}
           </button>
           <Link href="/privacy" className={styles.legalLink}>

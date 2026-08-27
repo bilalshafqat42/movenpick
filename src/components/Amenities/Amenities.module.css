@@ -228,6 +228,20 @@
   color: var(--color-gold);
 }
 
+/*
+ * The shrinkable space above the divider, and above the button.
+ *
+ * Zero everywhere except desktop, which is the only tier that asks for
+ * the large gaps. See the note in AmenitiesClient for why these are flex
+ * items rather than margins.
+ */
+.dividerSpace,
+.ctaSpace {
+  flex: 0 0 0;
+
+  height: 0;
+}
+
 .divider {
   width: 100%;
   height: 1px;
@@ -472,12 +486,43 @@
    * 150px margin measured 198px on screen, which is 150 plus the 48 the
    * flex column had already put there.
    */
-  .divider {
-    margin-top: calc(150px - var(--content-gap));
+  /*
+   * 150px between the list and the divider, as before — but as a
+   * flex-basis that shrinks rather than a margin that cannot.
+   *
+   * Twice the column gap is subtracted, not once: the spacer now sits
+   * BETWEEN the list and the divider, so the column's own gap falls on
+   * both sides of it. The old margin had the gap on one side only.
+   */
+  .dividerSpace {
+    flex: 0 1 calc(150px - var(--content-gap) * 2);
+
+    min-height: 0;
   }
 
-  .ctaGroup {
-    gap: 100px;
+  .divider {
+    margin-top: 0;
+  }
+
+  /*
+   * 100px between the paragraph and the button, held by a spacer for
+   * the same reason. The group keeps its base 32px gap, which now falls
+   * either side of the spacer, so the spacer carries the remainder.
+   */
+  .ctaSpace {
+    flex: 0 1 36px;
+
+    min-height: 0;
+  }
+
+  /*
+   * The list gives way last. Without this it has an automatic minimum
+   * equal to its content and cannot shrink at all, so a flex column
+   * under pressure would still overflow no matter how far the spacers
+   * collapsed.
+   */
+  .itemsWrapper {
+    min-height: 0;
   }
 }
 

@@ -3,6 +3,11 @@
  * and back-to-top controls that also live in that corner — a question
  * that must be answered should not be obscured by a widget.
  */
+/*
+ * A full-width bar across the foot of the screen rather than a floating
+ * card. No padding of its own: the cream has to reach both edges, so the
+ * gutter belongs to .inner, inside the background.
+ */
 .banner {
   position: fixed;
   right: 0;
@@ -10,41 +15,56 @@
   left: 0;
   z-index: 2000;
 
-  padding: 0 var(--page-gutter) max(20px, env(safe-area-inset-bottom));
-
   pointer-events: none;
 }
 
+/*
+ * The page's twelve-column grid, so the banner lines up with the
+ * sections above it rather than being centred on its own axis.
+ *
+ * The copy sits in columns 3 to 8 — two columns clear on the left, four
+ * on the right. Every child is placed on the same span, which is what
+ * keeps the heading, the toggles and the buttons on one left edge.
+ */
 .inner {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 24px;
+  row-gap: 20px;
 
   width: 100%;
-  max-width: 720px;
 
-  margin-inline: auto;
-  padding: 28px;
+  padding: 28px var(--page-gutter) max(28px, env(safe-area-inset-bottom));
 
-  border: 1px solid rgba(var(--color-gold-rgb), 0.25);
-  border-radius: 4px;
+  /*
+   * A single rule along the top, not a box. Edge to edge, the border
+   * that made it read as a card now reads as a seam.
+   */
+  border-top: 1px solid rgba(var(--color-gold-rgb), 0.25);
 
   background: var(--color-cream);
 
   /*
-   * The one place on this site a shadow earns its keep: the banner
-   * floats over photographs of every brightness, and the border alone
-   * disappears against a light one.
+   * Cast upward, since the bar is anchored to the bottom edge — the
+   * page it needs separating from is above it.
    */
-  box-shadow: 0 18px 50px rgba(var(--color-gold-rgb), 0.28);
+  box-shadow: 0 -14px 40px rgba(var(--color-gold-rgb), 0.18);
 
   pointer-events: auto;
+}
+
+.copy,
+.categories,
+.actions {
+  grid-column: 3 / span 6;
 }
 
 .copy {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  text-align: left;
 }
 
 .title {
@@ -180,13 +200,14 @@
    ========================================================= */
 
 /*
- * Wraps rather than scrolls or shrinks. Three buttons at a readable size
- * do not fit across a 320px phone, and a button that has been squeezed
- * to fit is worse than one on its own line.
+ * Left aligned and sized to their labels, so the row starts on the same
+ * edge as the copy above it. Wraps rather than shrinks: a button
+ * squeezed to fit is worse than one on its own line.
  */
 .actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-start;
   gap: 10px;
 }
 
@@ -200,7 +221,12 @@
  */
 .primary,
 .secondary {
-  flex: 1 1 auto;
+  /*
+   * Sized to the label rather than stretched to fill the row. Stretching
+   * pushed the three buttons apart to the full width of the column,
+   * which broke the left edge the copy sets.
+   */
+  flex: 0 0 auto;
 
   /*
    * 44px is the accessible minimum for a touch target; this is the one
@@ -253,15 +279,24 @@
    Mobile
    ========================================================= */
 
-@media (max-width: 767px) {
-  .banner {
-    padding-inline: 12px;
+/*
+ * Below the desktop tier the copy takes the full width between the
+ * gutters. Six of twelve columns on a phone is about 150px, which is
+ * narrower than the words.
+ */
+@media (max-width: 1024px) {
+  .copy,
+  .categories,
+  .actions {
+    grid-column: 1 / -1;
   }
+}
 
+@media (max-width: 767px) {
   .inner {
-    gap: 16px;
+    row-gap: 16px;
 
-    padding: 20px;
+    padding: 20px var(--page-gutter) max(20px, env(safe-area-inset-bottom));
   }
 
   .title {
