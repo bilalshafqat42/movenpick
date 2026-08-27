@@ -43,27 +43,45 @@ const isDev = process.env.NODE_ENV !== "production";
  * just a restart. Wildcards are supported by remotePatterns (*.example.com).
  */
 /*
- * On-demand image optimisation, and the switch to turn it off again.
+ * On-demand image optimisation. OFF unless explicitly asked for.
  *
- * ON by default: an editor uploading a photograph from a phone or a
- * camera roll has no way to produce per-breakpoint sizes, so without
- * this a 4000px original is what every visitor downloads, on every
- * device. With it, Next.js resizes and re-encodes each upload to the
- * widths in deviceSizes below and serves the smallest one that fits.
+ * Turned on briefly and reverted on 27 August 2026 after the live site
+ * returned 502. The reasoning for turning it on was that a CDN cache
+ * header for /_next/image would mean each variant is encoded once and
+ * served from Cloudflare thereafter. Measured against production, that
+ * header never took effect:
  *
- * It is an env var rather than a plain `false` because this was
- * previously turned OFF after a real incident, and that reason has not
- * gone away: on a 0.5 CPU / 512 MB instance the optimiser began
- * returning 502 at three concurrent /_next/image requests, and a browser
- * opens six. If that returns, set OPTIMISE_IMAGES=false and redeploy —
- * no code change, no rebuild of anything but the config.
+ *   /images/...     cache-control: ...s-maxage=86400...   cf-cache-status: HIT
+ *   /_next/image    cache-control: ...must-revalidate     cf-cache-status: DYNAMIC
  *
- * What makes it safer this time is the cache header added for
- * /_next/image in headers() below. Each variant is now encoded once and
- * then served by the CDN, so the expensive work happens on the first
- * request for a size and never again, rather than on every request.
+ * Next.js sets its own Cache-Control on the image route and it wins over
+ * anything declared in headers() below. Without s-maxage, and with
+ * must-revalidate, Cloudflare will not cache it — so DYNAMIC means every
+ * image request from every visitor passed through to the container.
+ *
+ * That is exactly the condition behind the original incident: on a
+ * 0.5 CPU / 512 MB instance the optimiser returns 502 at three
+ * concurrent /_next/image requests, and a browser opens six.
+ *
+ * Opt-in rather than opt-out, deliberately. Defaulting to on left the
+ * safe state depending on an env var being present in the deployment
+ * environment; if it is ever missing, the failure is a site that 502s
+ * under load. Off by default fails the other way — larger images, which
+ * nobody notices.
+ *
+ * Before setting OPTIMISE_IMAGES=true again, one of these has to be
+ * true:
+ *
+ * - A Cloudflare Cache Rule on /_next/image* with Edge TTL set to
+ *   override the origin header, so the caching actually happens; or
+ * - a custom images.loader pointing at Cloudflare's own resizing, so
+ *   /_next/image is never used and the container never encodes anything;
+ * - or an instance with meaningfully more CPU.
+ *
+ * Verify with `curl -I` that cf-cache-status is HIT, not DYNAMIC, before
+ * trusting it.
  */
-const optimiseImages = process.env.OPTIMISE_IMAGES !== "false";
+const optimiseImages = process.env.OPTIMISE_IMAGES === "true";
 
 const imageHosts = (process.env.IMAGE_HOSTS ?? "")
   .split(",")
@@ -212,29 +230,19 @@ const nextConfig = {
           },
         ],
       },
-      {
-        /*
-         * Cache the optimiser's output at the CDN.
-         *
-         * This is what makes on-demand optimisation affordable on a
-         * small instance. Without it every visitor's request for every
-         * size reaches the container and re-runs sharp; with it the
-         * origin encodes each variant once and Cloudflare serves the
-         * rest.
-         *
-         * `immutable` is safe here where it was not for /images: the URL
-         * carries the source path, the width and the quality, so a
-         * replaced photograph is a different URL rather than the same
-         * one with new bytes.
-         */
-        source: "/_next/image",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, s-maxage=31536000, immutable",
-          },
-        ],
-      },
+      /*
+       * There is deliberately no Cache-Control entry for /_next/image
+       * here.
+       *
+       * One was added and removed again: Next.js sets its own header on
+       * that route and overrides anything declared here, so the rule
+       * looked correct in the config while production still reported
+       * cf-cache-status: DYNAMIC. A rule that cannot work is worse than
+       * no rule, because it reads as protection that is not there.
+       *
+       * If optimisation is turned back on, the caching has to be forced
+       * from Cloudflare's side with a Cache Rule on /_next/image*.
+       */
       {
         /*
          * Fonts are genuinely immutable — the filenames are content-hashed by
@@ -261,11 +269,11 @@ const nextConfig = {
 
   images: {
     /*
-     * Set only when OPTIMISE_IMAGES=false. See the note on
-     * `optimiseImages` at the top of this file for why the escape hatch
-     * exists and when to use it.
+     * Set unless OPTIMISE_IMAGES=true. See the note on `optimiseImages`
+     * at the top of this file for what has to be in place before that
+     * is safe.
      *
-     * The history, kept because it is the reason for the switch:
+     * The original reasoning, which still stands:
      *
      * next/image normally re-encodes and resizes images per request. On this
      * deployment that could not work: the instance has 0.5 CPU and 512 MB, and
@@ -286,9 +294,8 @@ const nextConfig = {
      * a real cost, accepted because the alternative is images that do not
      * appear at all.
      *
-     * That was written when this ran on a CPU-starved instance with no
-     * CDN caching of /_next/image. The header added above closes the
-     * second half of that; the first half is still worth watching.
+     * Both halves of that are still true: the instance is unchanged, and
+     * /_next/image is still uncached at the CDN.
      */
     ...(optimiseImages ? {} : { unoptimized: true }),
 
