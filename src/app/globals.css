@@ -103,11 +103,23 @@ html {
  * the hero's pinned photograph, and a snap point in the middle of that
  * handover fought the gesture that was driving it.
  */
+/*
+ * #contact is deliberately NOT in this list either, for the same reason
+ * as #project-overview above: the footer now rides up over it and it is
+ * held in place by position: sticky while that happens.
+ *
+ * A sticky element takes its snap area with it. Once this section stuck
+ * to the top of the viewport, its snap point sat permanently under the
+ * scroll position and kept pulling the page back to it — so the page
+ * could not be scrolled past. Measured: the bottom of the page became
+ * unreachable by 735px on a 440x956 phone and 660px on a 1024x768
+ * tablet, which is the whole footer. With the snap point removed the
+ * page reaches the bottom exactly.
+ */
 #trusted-partner,
 #gallery,
 #location-map,
-#payment-plan,
-#contact {
+#payment-plan {
   scroll-snap-align: start;
 }
 
@@ -180,7 +192,6 @@ html {
     scroll-margin-top: calc(-1 * var(--header-height, 90px));
   }
 }
-
 
 .font-heading {
   font-family: var(--font-heading);

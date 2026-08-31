@@ -1,5 +1,18 @@
+/*
+ * Rides up over the contact section, which is held behind it (see
+ * .contact in Contact.module.css).
+ *
+ * z-index is what puts it in front: both are positioned elements, so the
+ * later sibling would win on source order alone — but the order is what
+ * the effect depends on, which is worth stating rather than inheriting.
+ *
+ * The gold fill is doing real work here too. It is what the cream
+ * section disappears behind; without an opaque background the form would
+ * read straight through the footer's copy.
+ */
 .footer {
   position: relative;
+  z-index: 1;
 
   width: 100%;
 
@@ -344,8 +357,7 @@ a.value:focus-visible,
 
     min-height: auto;
 
-    padding: clamp(48px, 8svh, 70px) var(--page-gutter)
-      calc(24px + 56px + 14px);
+    padding: clamp(48px, 8svh, 70px) var(--page-gutter) calc(24px + 56px + 14px);
 
     gap: clamp(28px, 4.2svh, 42px);
   }

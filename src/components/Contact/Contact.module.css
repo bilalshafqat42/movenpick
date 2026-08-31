@@ -1,5 +1,24 @@
+/*
+ * Held while the footer rides up over it — the same move the gallery
+ * makes over the amenities and the photo makes over the gold panel, so
+ * the page has one idea of what a section transition is.
+ *
+ * Stuck by its BOTTOM edge, not its top. This section runs a little
+ * taller than the screen at several sizes (1.25 screens at 1280x800,
+ * 1.11 at 390x844), and sticking the top would pin it the moment its
+ * top reached the viewport — leaving the last couple of hundred pixels,
+ * which is where the submit button lives, permanently below the fold and
+ * unreachable. Sticking the bottom lets the whole form scroll into view
+ * first and then holds it there, with the button still on screen.
+ *
+ * The footer is the runway: it is the last child of <main>, so this
+ * section's sticky range is exactly the footer's own height — between
+ * 0.6 and 0.85 of a screen, which is the travel the footer covers it in.
+ */
 .contact {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 0;
 
   width: 100%;
 
