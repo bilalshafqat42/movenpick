@@ -27,14 +27,28 @@ export const CHAT_AGENT_FIELDS = [
   },
   {
     key: "project-name",
-    label: "Project name, in full — used in the chat header and every message that names the project",
+    label:
+      "Project name, in full — used in the chat header and every message that names the project",
     type: "TEXT",
-    defaultValue: "[Movenpick Project Name]",
+    /*
+     * A real name for the same reason as project-short-name below: this
+     * feeds the chat header and the greeting a visitor reads first, and
+     * a bracketed placeholder there is visible to them.
+     */
+    defaultValue: "Movenpick",
   },
   {
     key: "project-short-name",
-    label: "Project name, shortened — used only where space is tight (the teaser bubble, one broker question)",
+    label:
+      "Project name, shortened — used only where space is tight (the teaser bubble, one broker question)",
     type: "TEXT",
-    defaultValue: "[Movenpick Project]",
+    /*
+     * A real name, not a bracketed placeholder. This field feeds the
+     * teaser bubble, and while it was unset every visitor on production
+     * was offered the payment plan for "[Movenpick Project]". A default
+     * that is already correct means an unset field is never visible to
+     * a visitor; marketing can still override it here.
+     */
+    defaultValue: "Movenpick",
   },
 ];

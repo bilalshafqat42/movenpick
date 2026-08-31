@@ -116,8 +116,27 @@ const SNAP_DURATION = { min: 0.6, max: 0.9 };
  */
 const SNAP_DELAY = 0.12;
 
-const CAPTION_OUT_DURATION = 0.28;
 const CAPTION_IN_DURATION = 0.55;
+
+/*
+ * How far from a settled slide the caption starts and finishes fading,
+ * measured in slides — 0 is settled, 0.5 is exactly between two.
+ *
+ * The caption used to fade on a tween fired by the snap starting, which
+ * worked when a gesture triggered a snap but not when someone scrolled
+ * through by hand: measured, the slide changed while the caption was
+ * still 64% visible, so the words swapped in front of the reader.
+ *
+ * Driving the fade from scroll position instead means the caption is
+ * always fully clear at the halfway point — which is exactly where the
+ * text swaps — however slowly or quickly the page is scrolled.
+ *
+ * The hold keeps it at full strength either side of a settled slide, so
+ * a small scroll nudge does not dim the text it is sitting on.
+ */
+const CAPTION_HOLD = 0.14;
+const CAPTION_FADED_BY = 0.4;
+const CAPTION_RISE = 10;
 
 export default function ProjectGalleryClient({ slides }) {
   /*
@@ -301,7 +320,37 @@ export default function ProjectGalleryClient({ slides }) {
         });
       };
 
+      /*
+       * Fades the caption as the rail leaves a slide and back in as it
+       * arrives, from the same value that positions the photographs — so
+       * the text and the images move on one clock rather than two.
+       */
+      const applyCaptionFade = (progress) => {
+        const journey = gsap.utils.clamp(0, 1, progress) * transitionCount;
+        const distance = Math.abs(journey - Math.round(journey));
+
+        const faded = gsap.utils.clamp(
+          0,
+          1,
+          (distance - CAPTION_HOLD) / (CAPTION_FADED_BY - CAPTION_HOLD),
+        );
+
+        gsap.set(caption, {
+          autoAlpha: 1 - faded,
+          y: -CAPTION_RISE * faded,
+        });
+
+        /*
+         * The slide index changes on the same value, so the swap always
+         * lands at the halfway point where the caption is fully clear.
+         * Reading it off the raw scroll position instead would let the
+         * text change a frame or two before the fade caught up.
+         */
+        setActive(Math.round(journey));
+      };
+
       applySlideCover(0);
+      applyCaptionFade(0);
 
       const increment = 1 / transitionCount;
 
@@ -361,7 +410,10 @@ export default function ProjectGalleryClient({ slides }) {
 
       const drift = gsap.to(coverProxy, {
         value: 1,
-        onUpdate: () => applySlideCover(coverProxy.value),
+        onUpdate: () => {
+          applySlideCover(coverProxy.value);
+          applyCaptionFade(coverProxy.value);
+        },
 
         /*
          * Linear, with the smoothing left to scrub. An ease here would
@@ -407,47 +459,24 @@ export default function ProjectGalleryClient({ slides }) {
             ease: "power2.inOut",
 
             /*
-             * The caption steps aside while the photo travels, rather
-             * than the old text being swapped out from under the
-             * reader mid-move. Fading out is tied to the snap starting;
-             * fading back in is tied to the index changing (below), so
-             * the text cannot be left invisible if a snap is
-             * interrupted before it completes.
+             * No caption handling here any more.
+             *
+             * It used to fade out on the snap starting and back in on
+             * the snap completing, which left the text at whatever
+             * opacity an interrupted snap happened to stop at — and did
+             * nothing at all for someone scrolling through by hand.
+             * applyCaptionFade above now owns it, from scroll position,
+             * so every path through the section gets the same fade.
              */
-            onStart: () => {
-              gsap.to(caption, {
-                autoAlpha: 0,
-                y: -8,
-                duration: CAPTION_OUT_DURATION,
-                ease: "power2.in",
-                overwrite: "auto",
-              });
-            },
-
-            onInterrupt: () => {
-              gsap.to(caption, {
-                autoAlpha: 1,
-                y: 0,
-                duration: CAPTION_IN_DURATION,
-                ease: ENTRANCE_EASE,
-                overwrite: "auto",
-              });
-            },
-
-            onComplete: () => {
-              gsap.to(caption, {
-                autoAlpha: 1,
-                y: 0,
-                duration: CAPTION_IN_DURATION,
-                ease: ENTRANCE_EASE,
-                overwrite: "auto",
-              });
-            },
           },
 
+          /*
+           * The scrubber tracks the raw scroll so it answers the gesture
+           * immediately. The caption and the slide index deliberately do
+           * not — they run off the scrubbed value, with the photographs.
+           */
           onUpdate: (self) => {
             positionTrackFill(self.progress);
-            setActive(Math.round(self.progress * transitionCount));
           },
         },
       });
@@ -465,9 +494,16 @@ export default function ProjectGalleryClient({ slides }) {
   );
 
   /*
-   * Bring the caption back as the new slide's text lands. Keyed to the
-   * index rather than to the snap finishing, so the text is always
-   * restored by the same thing that changed it.
+   * Reduced motion only: keep the caption visible as the native
+   * scroller changes slides.
+   *
+   * There is deliberately no fade here for everyone else. This used to
+   * play a fromTo from autoAlpha 0 on every index change, which is the
+   * right idea when the caption is only ever swapped by a completed
+   * snap — but it now fights applyCaptionFade, which is already holding
+   * the caption at the opacity the scroll position calls for. Two
+   * animations writing the same property is how a caption ends up
+   * flickering.
    */
   useGSAP(
     () => {
@@ -483,21 +519,7 @@ export default function ProjectGalleryClient({ slides }) {
 
       if (reduceMotion) {
         gsap.set(caption, { autoAlpha: 1, y: 0 });
-
-        return;
       }
-
-      gsap.fromTo(
-        caption,
-        { autoAlpha: 0, y: 10 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: CAPTION_IN_DURATION,
-          ease: ENTRANCE_EASE,
-          overwrite: "auto",
-        },
-      );
     },
     { dependencies: [activeIndex] },
   );

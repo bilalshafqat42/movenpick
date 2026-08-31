@@ -19,9 +19,19 @@ export const TEASER = {
   enabled: true,
   delaySeconds: 15,
   scrollPercent: 40,
+  /*
+   * {{project_short}} is a panel field, so marketing can change the
+   * project name here and in the other 21 strings that name it from one
+   * place. Its default is the real name rather than a placeholder (see
+   * chatAgent.js), which is what stopped this reading "[Movenpick
+   * Project]" on production.
+   *
+   * No emoji: a waving hand suits a consumer chat widget, and this is a
+   * property enquiry.
+   */
   text: {
-    en: "👋 Want the {{project_short}} payment plan?",
-    ar: "👋 هل تريد الاطلاع على خطة الدفع لمشروع {{project_short}}؟",
+    en: "Want the {{project_short}} project's payment plan?",
+    ar: "هل تريد الاطلاع على خطة الدفع لمشروع {{project_short}}؟",
   },
 };
 
