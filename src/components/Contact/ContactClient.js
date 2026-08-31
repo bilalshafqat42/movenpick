@@ -111,6 +111,68 @@ export default function ContactClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /*
+   * Sticky offset, measured rather than assumed.
+   *
+   * This section is held in place while the footer rides up over it. A
+   * plain `top: 0` sticks it by the TOP edge, which is only correct
+   * while the section fits on screen. It does not: measured at 1005px
+   * against a 900px viewport, 1000px against 768px, 939px against 844px
+   * — between 1.0 and 1.4 screens tall depending on the device.
+   *
+   * Sticking the top of something taller than the screen pins it the
+   * instant its top arrives, stranding everything below the fold
+   * permanently out of reach. The submit button lives at the very
+   * bottom, so it was the part that got stranded: at 1366x768 and
+   * 1280x800 there was NO scroll position at all where the button was
+   * both fully visible and not covered by the footer.
+   *
+   * A negative offset equal to the overflow sticks it by the BOTTOM edge
+   * instead. The section scrolls through normally until its last line
+   * reaches the bottom of the screen, and only then holds — so the whole
+   * form has been seen, button included, before anything covers it.
+   *
+   * It has to be measured because the height is content-driven (the
+   * admin panel supplies the copy, and a validation message can add a
+   * line), and it has to be re-measured on resize because the offset is
+   * relative to a viewport height that changes — including when mobile
+   * browser chrome slides away.
+   */
+  useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section || typeof window === "undefined") {
+      return;
+    }
+
+    const applyStickyOffset = () => {
+      const overflow = section.offsetHeight - window.innerHeight;
+
+      /*
+       * Zero, not a positive number, when the section already fits:
+       * a positive `top` would push it down the screen rather than
+       * holding it against the top.
+       */
+      const offset = overflow > 0 ? -overflow : 0;
+
+      section.style.setProperty("--contact-sticky-top", `${offset}px`);
+    };
+
+    applyStickyOffset();
+
+    const observer = new ResizeObserver(applyStickyOffset);
+    observer.observe(section);
+
+    window.addEventListener("resize", applyStickyOffset);
+    window.addEventListener("orientationchange", applyStickyOffset);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", applyStickyOffset);
+      window.removeEventListener("orientationchange", applyStickyOffset);
+    };
+  }, []);
+
+  /*
    * Capture and preserve campaign attribution.
    */
   useEffect(() => {

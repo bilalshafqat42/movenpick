@@ -3,24 +3,33 @@
  * makes over the amenities and the photo makes over the gold panel, so
  * the page has one idea of what a section transition is.
  *
- * Stuck by its BOTTOM edge, not its top. This section runs a little
- * taller than the screen at several sizes (1.25 screens at 1280x800,
- * 1.11 at 390x844), and sticking the top would pin it the moment its
- * top reached the viewport — leaving the last couple of hundred pixels,
- * which is where the submit button lives, permanently below the fold and
- * unreachable. Sticking the bottom lets the whole form scroll into view
- * first and then holds it there, with the button still on screen.
+ * TWO things make that safe, because this section runs taller than the
+ * screen at most sizes (1.12 screens at 1440x900, 1.30 at 1366x768,
+ * 1.41 at 375x667):
  *
- * The footer is the runway: it is the last child of <main>, so this
- * section's sticky range is exactly the footer's own height — between
- * 0.6 and 0.85 of a screen, which is the travel the footer covers it in.
+ * 1. It sticks by its BOTTOM edge, via a negative --contact-sticky-top
+ *    measured in ContactClient (see the comment there). Sticking the top
+ *    of something taller than the screen pins it the moment its top
+ *    arrives and strands the rest below the fold forever. The submit
+ *    button is the last thing in the form, so it was exactly what got
+ *    stranded — unreachable at 1366x768 and 1280x800, and clickable in
+ *    only 2 of 19 scroll positions at 1440x900.
+ *
+ * 2. --contact-hold buys a beat before the footer arrives. The footer is
+ *    the next thing in the flow, so without it the footer starts
+ *    covering the button at the same instant the button finishes
+ *    arriving — a window of zero. The hold is flow space after this
+ *    section; the section is stuck across it, so nothing shows through,
+ *    it simply gives the reader room to finish the form.
  */
 .contact {
   position: sticky;
-  top: 0;
+  top: var(--contact-sticky-top, 0px);
   z-index: 0;
 
   width: 100%;
+  /* The runway before the footer starts to overlap. */
+  margin-bottom: var(--contact-hold, 45vh);
 
   overflow: hidden;
 
