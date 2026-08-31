@@ -29,20 +29,44 @@
  * colour a shade further down, and clears the threshold with room spare.
  */
 
+/*
+ * The site grid, not a centred reading column.
+ *
+ * These pages used to be `width: min(100%, 760px); margin: 0 auto`, which
+ * is the ordinary way to set a legal document but left it floating in the
+ * middle of the viewport, lining up with nothing else on the site. The
+ * header is a full-bleed row with `padding-inline: var(--page-gutter)`,
+ * so its MENU sits hard against the gutter and the document started far
+ * to the right of it.
+ *
+ * Same gutter and the same twelve columns as the header and the cookie
+ * banner now, with the text taking the first ten. Column 1 puts the
+ * heading directly under MENU; the two columns left free on the right
+ * keep the measure from running the full width, which is what the old
+ * 760px cap was really for.
+ */
 .page {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
+
+  padding-inline: var(--page-gutter);
+
+  box-sizing: border-box;
 
   background: var(--color-cream);
   color: var(--color-gold);
 }
 
 .content {
-  width: min(100%, 760px);
-  margin: 0 auto;
+  grid-column: 1 / span 10;
 
-  padding: clamp(96px, 12vw, 148px) 24px clamp(72px, 8vw, 120px);
+  /* Horizontal padding would break the alignment; the gutter and the two
+     free columns already do that job. */
+  padding: clamp(96px, 12vw, 148px) 0 clamp(72px, 8vw, 120px);
 }
 
 /*
@@ -174,9 +198,20 @@
   background: rgba(var(--color-gold-rgb), 0.28);
 }
 
+/*
+ * Below the desktop grid there is no room to give two columns away: the
+ * ten-column measure would leave the copy in a narrow strip. Full width
+ * inside the gutter from here down.
+ */
+@media (max-width: 1024px) {
+  .content {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 767px) {
   .content {
-    padding: 88px 20px 64px;
+    padding: 88px 0 64px;
   }
 
   .body h2 {
