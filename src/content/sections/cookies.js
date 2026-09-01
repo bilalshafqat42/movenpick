@@ -113,6 +113,10 @@ export const COOKIES_FIELDS = [
     key: "privacy-href",
     label: "Privacy policy link",
     type: "LINK",
-    defaultValue: "/privacy-policy",
+    // Was "/privacy-policy", which 404s — this site's real route is
+    // "/privacy" (see src/content/sections/privacy.js's own viewLiveHref).
+    // Never touched after the section was set up, so the wrong default
+    // was still what every visitor's cookie banner linked to.
+    defaultValue: "/privacy",
   },
 ];

@@ -573,7 +573,7 @@
           "key": "brochure-url",
           "label": "Brochure file link",
           "type": "LINK",
-          "defaultValue": "/pdf/oceara-brochure.pdf"
+          "defaultValue": "https://media.refinedubai.com/movenpick/1787663749778-233b107bb8d0b8a3c2b13c0d36eca7d9.pdf"
         },
         {
           "key": "description",
@@ -946,13 +946,13 @@
           "key": "project-name",
           "label": "Project name, in full — used in the chat header and every message that names the project",
           "type": "TEXT",
-          "defaultValue": "[Movenpick Project Name]"
+          "defaultValue": "Movenpick"
         },
         {
           "key": "project-short-name",
           "label": "Project name, shortened — used only where space is tight (the teaser bubble, one broker question)",
           "type": "TEXT",
-          "defaultValue": "[Movenpick Project]"
+          "defaultValue": "Movenpick"
         }
       ]
     },
@@ -1088,7 +1088,7 @@
           "key": "privacy-href",
           "label": "Privacy policy link",
           "type": "LINK",
-          "defaultValue": "/privacy-policy"
+          "defaultValue": "/privacy"
         }
       ]
     },

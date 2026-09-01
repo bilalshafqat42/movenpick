@@ -21,7 +21,17 @@ export const PROJECT_FIELDS = [
     key: "brochure-url",
     label: "Brochure file link",
     type: "LINK",
-    defaultValue: "/pdf/oceara-brochure.pdf",
+    /*
+     * Was "/pdf/oceara-brochure.pdf" — Oceara's own file, copy-pasted into
+     * this project's field defaults and never corrected, serving a
+     * different development's brochure under this site's own "Download
+     * Brochure" button. This site's actual brochure was already uploaded
+     * correctly (see projectOverview's cta-2-href, uploaded through the
+     * panel to this site's own R2 prefix); reused here rather than
+     * uploading a duplicate copy of the same file under a second name.
+     */
+    defaultValue:
+      "https://media.refinedubai.com/movenpick/1787663749778-233b107bb8d0b8a3c2b13c0d36eca7d9.pdf",
   },
   {
     key: "description",
