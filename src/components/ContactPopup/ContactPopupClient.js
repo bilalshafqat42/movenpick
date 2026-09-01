@@ -856,11 +856,11 @@ export default function ContactPopupClient({
 
           <p className={styles.consent}>
             By submitting this form, you agree to our{" "}
-            <a href="/terms-of-use" className={styles.consentLink}>
+            <a href="/terms" className={styles.consentLink}>
               Terms of Use
             </a>{" "}
             and{" "}
-            <a href="/privacy-policy" className={styles.consentLink}>
+            <a href="/privacy" className={styles.consentLink}>
               Privacy Policy.
             </a>{" "}
             You consent to Refine contacting you about Movenpick and future
