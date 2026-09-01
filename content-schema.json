@@ -127,6 +127,7 @@
           "key": "main-image",
           "label": "Main image",
           "type": "IMAGE",
+          "helperText": "Recommended: 1920×1080px or larger. Fills the whole screen — a smaller image will look blurry.",
           "defaultValue": "/images/hero/main.avif"
         },
         {
@@ -322,6 +323,7 @@
           "key": "logo",
           "label": "Partner logo",
           "type": "IMAGE",
+          "helperText": "Recommended: 300×300px. SVG or transparent PNG preferred.",
           "defaultValue": "/images/accor-logo.svg"
         },
         {
@@ -353,6 +355,7 @@
           "key": "image",
           "label": "Photo",
           "type": "IMAGE",
+          "helperText": "Recommended: 1920×660px. Full-width banner photo.",
           "defaultValue": "/images/trust.avif"
         },
         {
@@ -593,6 +596,7 @@
           "key": "building-image",
           "label": "Building image (used in both the desktop and mobile hero scene)",
           "type": "IMAGE",
+          "helperText": "Recommended: 2560×1440px. Fills the whole screen in both scenes.",
           "defaultValue": "/images/project/building.jpg"
         },
         {
@@ -605,6 +609,7 @@
           "key": "landscape-image",
           "label": "Landscape editorial image",
           "type": "IMAGE",
+          "helperText": "Recommended: 1920×940px. Wide crop.",
           "defaultValue": "/images/project/dubai-islands.avif"
         },
         {
@@ -617,6 +622,7 @@
           "key": "portrait-image",
           "label": "Portrait editorial image",
           "type": "IMAGE",
+          "helperText": "Recommended: 1536×2160px. Tall crop.",
           "defaultValue": "/images/project/oceara-park.avif"
         },
         {
@@ -698,6 +704,7 @@
           "key": "image",
           "label": "Image",
           "type": "IMAGE",
+          "helperText": "Recommended: 1920×1080px or larger. Fills the whole screen.",
           "defaultValue": "/images/sea/sea.avif"
         },
         {
@@ -731,6 +738,7 @@
           "key": "image",
           "label": "Image",
           "type": "IMAGE",
+          "helperText": "Recommended: 1920×1200px or taller. Panel height follows the payment table, so a tall image crops best.",
           "defaultValue": "/images/payment/payment-plan.avif"
         },
         {
@@ -934,12 +942,14 @@
           "key": "agent-photo",
           "label": "Intro card photo — shown before the chat opens (portrait)",
           "type": "IMAGE",
+          "helperText": "Recommended: 520×720px.",
           "defaultValue": "/images/agent/avatar.avif"
         },
         {
           "key": "agent-photo-square",
           "label": "Chat header avatar — square, shown once the chat is open",
           "type": "IMAGE",
+          "helperText": "Recommended: 80×80px.",
           "defaultValue": "/images/agent/avatar-square.avif"
         },
         {

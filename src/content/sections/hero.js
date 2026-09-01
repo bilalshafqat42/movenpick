@@ -7,6 +7,7 @@ export const HERO_FIELDS = [
     key: "main-image",
     label: "Main image",
     type: "IMAGE",
+    helperText: "Recommended: 1920×1080px or larger. Fills the whole screen — a smaller image will look blurry.",
     defaultValue: "/images/hero/main.avif",
   },
   {

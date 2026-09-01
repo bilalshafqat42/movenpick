@@ -62,7 +62,12 @@ export const GALLERY_FIELDS = [
     helperText:
       "Use + to add an item, the trash icon to remove one. Needs at least 3 items for the carousel's left/right/centre layout to make sense.",
     itemFields: [
-      { key: "image", label: "Image", type: "IMAGE" },
+      {
+        key: "image",
+        label: "Image",
+        type: "IMAGE",
+        helperText: "Recommended: 900×600px.",
+      },
       { key: "alt", label: "Image alt text", type: "TEXT" },
       { key: "title", label: "Title", type: "TEXT" },
       { key: "description", label: "Description", type: "TEXT", long: true },

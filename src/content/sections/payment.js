@@ -68,6 +68,7 @@ export const PAYMENT_FIELDS = [
     key: "image",
     label: "Image",
     type: "IMAGE",
+    helperText: "Recommended: 1920×1200px or taller. Panel height follows the payment table, so a tall image crops best.",
     defaultValue: "/images/payment/payment-plan.avif",
   },
   {

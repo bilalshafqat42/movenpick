@@ -41,7 +41,12 @@ export const PROJECT_GALLERY_FIELDS = [
     helperText:
       "Use + to add a slide, the trash icon to remove one. Each slide needs an image; heading and caption are optional.",
     itemFields: [
-      { key: "image", label: "Image", type: "IMAGE" },
+      {
+        key: "image",
+        label: "Image",
+        type: "IMAGE",
+        helperText: "Recommended: 1920×1080px. Each slide fills the whole screen.",
+      },
       { key: "alt", label: "Image alt text", type: "TEXT" },
       { key: "heading", label: "Heading", type: "TEXT" },
       { key: "text", label: "Caption", type: "TEXT", long: true },

@@ -66,7 +66,12 @@ export const AMENITIES_FIELDS = [
     itemFields: [
       { key: "title", label: "Title", type: "TEXT" },
       { key: "description", label: "Description", type: "TEXT", long: true },
-      { key: "image", label: "Image", type: "IMAGE" },
+      {
+        key: "image",
+        label: "Image",
+        type: "IMAGE",
+        helperText: "Recommended: 1600×1800px.",
+      },
       { key: "imageAlt", label: "Image alt text", type: "TEXT" },
     ],
   },

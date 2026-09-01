@@ -17,12 +17,14 @@ export const CHAT_AGENT_FIELDS = [
     key: "agent-photo",
     label: "Intro card photo — shown before the chat opens (portrait)",
     type: "IMAGE",
+    helperText: "Recommended: 520×720px.",
     defaultValue: "/images/agent/avatar.avif",
   },
   {
     key: "agent-photo-square",
     label: "Chat header avatar — square, shown once the chat is open",
     type: "IMAGE",
+    helperText: "Recommended: 80×80px.",
     defaultValue: "/images/agent/avatar-square.avif",
   },
   {

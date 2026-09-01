@@ -9,6 +9,7 @@ export const TRUSTED_PARTNER_FIELDS = [
     key: "logo",
     label: "Partner logo",
     type: "IMAGE",
+    helperText: "Recommended: 300×300px. SVG or transparent PNG preferred.",
     defaultValue: "/images/accor-logo.svg",
   },
   {
@@ -41,6 +42,7 @@ export const TRUSTED_PARTNER_FIELDS = [
     key: "image",
     label: "Photo",
     type: "IMAGE",
+    helperText: "Recommended: 1920×660px. Full-width banner photo.",
     defaultValue: "/images/trust.avif",
   },
   {

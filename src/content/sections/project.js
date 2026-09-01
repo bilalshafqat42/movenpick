@@ -53,6 +53,7 @@ export const PROJECT_FIELDS = [
     key: "building-image",
     label: "Building image (used in both the desktop and mobile hero scene)",
     type: "IMAGE",
+    helperText: "Recommended: 2560×1440px. Fills the whole screen in both scenes.",
     defaultValue: "/images/project/building.jpg",
   },
   {
@@ -65,6 +66,7 @@ export const PROJECT_FIELDS = [
     key: "landscape-image",
     label: "Landscape editorial image",
     type: "IMAGE",
+    helperText: "Recommended: 1920×940px. Wide crop.",
     defaultValue: "/images/project/dubai-islands.avif",
   },
   {
@@ -77,6 +79,14 @@ export const PROJECT_FIELDS = [
     key: "portrait-image",
     label: "Portrait editorial image",
     type: "IMAGE",
+    helperText: "Recommended: 1536×2160px. Tall crop.",
+    /*
+     * This file (/images/project/oceara-park.avif) does not exist in this
+     * repo's public/images/project/ — it is a leftover from the template
+     * this project was set up from and currently 404s on the live site.
+     * Left as-is rather than guessed at: this needs a real Movenpick photo,
+     * not an invented placeholder path.
+     */
     defaultValue: "/images/project/oceara-park.avif",
   },
   {
