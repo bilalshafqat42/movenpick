@@ -92,6 +92,13 @@ export const SEO_FIELDS = [
     key: "google-site-verification",
     label: "Google Search Console verification code",
     type: "TEXT",
+    /*
+     * SUPER_ADMIN, not this section's usual ADMIN: same reasoning as the
+     * Tracking section's own minRole (see src/content/sections/tracking.js)
+     * — a Google integration credential Refine manages on the client's
+     * behalf, not this site's own Admin's to hold.
+     */
+    minRole: "SUPER_ADMIN",
     defaultValue: "",
   },
   {

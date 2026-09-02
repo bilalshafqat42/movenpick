@@ -1229,7 +1229,7 @@
       "slug": "tracking",
       "label": "Tracking",
       "group": "seo",
-      "minRole": "ADMIN",
+      "minRole": "SUPER_ADMIN",
       "fields": [
         {
           "key": "gtm-container-id",

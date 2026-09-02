@@ -177,13 +177,17 @@ export const SECTION_REGISTRY = {
     viewLiveLabel: "View / download sitemap.xml",
   },
   /*
-   * ADMIN, same reasoning as SEO & Sharing above: a third-party tracking ID
-   * is site-level technical configuration, not day-to-day content.
+   * SUPER_ADMIN, not ADMIN: this site's own Admin (a customer account, e.g.
+   * German) is deliberately not the right person to hold a Google Tag
+   * Manager container ID. Not about trust — a wrong or swapped ID silently
+   * breaks analytics for everyone, invisibly, and this is Refine's own
+   * integration to manage on the client's behalf, the same reasoning
+   * MIN_ROLE_VALUES documents in src/lib/manifest/schema.mjs.
    */
   tracking: {
     label: "Tracking",
     group: "seo",
-    minRole: "ADMIN",
+    minRole: "SUPER_ADMIN",
     fields: TRACKING_FIELDS,
   },
 };
