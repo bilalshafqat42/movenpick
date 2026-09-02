@@ -18,7 +18,7 @@ import { ROBOTS_FIELDS } from "@/content/sections/robotsTxt";
 import { PRIVACY_FIELDS } from "@/content/sections/privacy";
 import { TERMS_FIELDS } from "@/content/sections/terms";
 import { COOKIES_FIELDS } from "@/content/sections/cookies";
-import { TRACKING_FIELDS } from "@/content/sections/tracking";
+import { INTEGRATIONS_FIELDS } from "@/content/sections/integrations";
 
 /*
  * Every editable section registers itself here: a slug (used in the
@@ -178,17 +178,23 @@ export const SECTION_REGISTRY = {
   },
   /*
    * SUPER_ADMIN, not ADMIN: this site's own Admin (a customer account, e.g.
-   * German) is deliberately not the right person to hold a Google Tag
-   * Manager container ID. Not about trust — a wrong or swapped ID silently
-   * breaks analytics for everyone, invisibly, and this is Refine's own
-   * integration to manage on the client's behalf, the same reasoning
-   * MIN_ROLE_VALUES documents in src/lib/manifest/schema.mjs.
+   * German) is deliberately not the right person to hold any of these three
+   * Google integrations. Not about trust — a wrong or swapped ID silently
+   * breaks analytics or search verification for everyone, invisibly, and
+   * these are Refine's own integrations to manage on the client's behalf,
+   * the same reasoning MIN_ROLE_VALUES documents in
+   * src/lib/manifest/schema.mjs.
+   *
+   * One page for all three (Search Console, GTM, GA4) rather than Search
+   * Console living on the SEO page and the other two here — see
+   * integrations.js's own comment for why that split was the actual
+   * confusion, not any one field being hard to find.
    */
-  tracking: {
-    label: "Tracking",
+  integrations: {
+    label: "Integrations",
     group: "seo",
     minRole: "SUPER_ADMIN",
-    fields: TRACKING_FIELDS,
+    fields: INTEGRATIONS_FIELDS,
   },
 };
 

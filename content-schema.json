@@ -1185,12 +1185,6 @@
           "defaultValue": "https://www.refinedubai.com"
         },
         {
-          "key": "google-site-verification",
-          "label": "Google Search Console verification code",
-          "type": "TEXT",
-          "defaultValue": ""
-        },
-        {
           "key": "bing-site-verification",
           "label": "Bing Webmaster Tools verification code",
           "type": "TEXT",
@@ -1226,11 +1220,18 @@
       "fields": []
     },
     {
-      "slug": "tracking",
-      "label": "Tracking",
+      "slug": "integrations",
+      "label": "Integrations",
       "group": "seo",
       "minRole": "SUPER_ADMIN",
       "fields": [
+        {
+          "key": "google-site-verification",
+          "label": "Google Search Console verification code",
+          "type": "TEXT",
+          "helperText": "The content value of the verification meta tag, not the whole tag. From search.google.com/search-console — add a property, choose HTML tag verification, and copy only the value inside content=\"...\".",
+          "defaultValue": ""
+        },
         {
           "key": "gtm-container-id",
           "label": "Google Tag Manager container ID",

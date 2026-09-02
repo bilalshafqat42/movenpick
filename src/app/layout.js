@@ -8,6 +8,7 @@ import PreviewBanner from "@/components/PreviewBanner";
 
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
 import { SEO_FIELDS } from "@/content/sections/seo";
+import { INTEGRATIONS_FIELDS } from "@/content/sections/integrations";
 import { APPEARANCE_FIELDS } from "@/content/sections/appearance";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -15,6 +16,16 @@ const siteUrl = getSiteUrl();
 
 async function getSeoContent() {
   return getSectionContent("seo", buildDefaultsFromFields(SEO_FIELDS));
+}
+
+// Google Search Console verification moved here from the "seo" section — see
+// integrations.js's own comment for why. Metadata still needs its value, so
+// this is fetched alongside seo content rather than folded into it.
+async function getIntegrationsContent() {
+  return getSectionContent(
+    "integrations",
+    buildDefaultsFromFields(INTEGRATIONS_FIELDS),
+  );
 }
 
 async function getAppearanceContent() {
@@ -48,6 +59,7 @@ function toSafeJsonLd(data) {
 
 export async function generateMetadata() {
   const seo = await getSeoContent();
+  const integrations = await getIntegrationsContent();
   const ogImage = resolveImageUrl(seo["og-image"]);
 
   /*
@@ -58,8 +70,8 @@ export async function generateMetadata() {
    */
   const verification = {};
 
-  if (seo["google-site-verification"]) {
-    verification.google = seo["google-site-verification"];
+  if (integrations["google-site-verification"]) {
+    verification.google = integrations["google-site-verification"];
   }
 
   if (seo["bing-site-verification"]) {

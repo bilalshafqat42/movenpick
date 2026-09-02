@@ -88,19 +88,15 @@ export const SEO_FIELDS = [
     type: "LINK",
     defaultValue: "https://www.refinedubai.com",
   },
-  {
-    key: "google-site-verification",
-    label: "Google Search Console verification code",
-    type: "TEXT",
-    /*
-     * SUPER_ADMIN, not this section's usual ADMIN: same reasoning as the
-     * Tracking section's own minRole (see src/content/sections/tracking.js)
-     * — a Google integration credential Refine manages on the client's
-     * behalf, not this site's own Admin's to hold.
-     */
-    minRole: "SUPER_ADMIN",
-    defaultValue: "",
-  },
+  /*
+   * Google Search Console verification moved to the Integrations section
+   * (src/content/sections/integrations.js) — it lived here as a TEXT field
+   * with its own SUPER_ADMIN override, but a client's Bilal-equivalent kept
+   * landing on this SEO page looking for it alongside GTM and GA4, which
+   * were on an entirely separate page. One page for every Google
+   * integration is the fix; Bing's own field stays here, since it isn't
+   * one of the three that caused the confusion.
+   */
   {
     key: "bing-site-verification",
     label: "Bing Webmaster Tools verification code",
