@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 
 import { openConsentManager } from "@/lib/cookieConsent";
+import { trackEvent } from "@/lib/analytics";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
 import {
@@ -147,7 +148,11 @@ export default function FooterClient({
         <div className={`${styles.contactBlock} ${styles.telephone}`}>
           <p className={styles.label}>Tel</p>
 
-          <a href={phoneHref} className={styles.value}>
+          <a
+            href={phoneHref}
+            className={styles.value}
+            onClick={() => trackEvent("call_click", { location: "footer_main" })}
+          >
             {phoneDisplay}
           </a>
         </div>
@@ -155,7 +160,11 @@ export default function FooterClient({
         <div className={`${styles.contactBlock} ${styles.tollFree}`}>
           <p className={styles.label}>UAE Toll Free:</p>
 
-          <a href={tollFreeHref} className={styles.value}>
+          <a
+            href={tollFreeHref}
+            className={styles.value}
+            onClick={() => trackEvent("call_click", { location: "footer_tollfree" })}
+          >
             {tollFreeDisplay}
           </a>
         </div>

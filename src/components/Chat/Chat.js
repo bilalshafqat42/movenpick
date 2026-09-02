@@ -29,6 +29,7 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import { isWithinBusinessHours } from "@/lib/time/businessHours";
 import { validateMovenpickLead } from "@/lib/validation/movenpickLead";
 import { createWhatsAppLink } from "@/lib/whatsapp/createWhatsAppLink";
+import { trackEvent } from "@/lib/analytics";
 
 import ChatMessage from "./ChatMessage";
 import {
@@ -344,11 +345,13 @@ export default function Chat({
   }, []);
 
   const handleToggleClick = useCallback(() => {
-    setWidgetState((currentState) =>
-      currentState === WIDGET_STATE.CLOSED
-        ? WIDGET_STATE.INTRO
-        : WIDGET_STATE.CLOSED,
-    );
+    setWidgetState((currentState) => {
+      if (currentState === WIDGET_STATE.CLOSED) {
+        trackEvent("chat_open", { trigger: "toggle_button" });
+        return WIDGET_STATE.INTRO;
+      }
+      return WIDGET_STATE.CLOSED;
+    });
   }, []);
 
   const openChat = useCallback(() => {
@@ -356,6 +359,7 @@ export default function Chat({
       textUsButtonRef.current.blur();
     }
 
+    trackEvent("chat_open", { trigger: "text_us_button" });
     setWidgetState(WIDGET_STATE.CHAT);
   }, []);
 
@@ -1224,6 +1228,9 @@ export default function Chat({
                     href={callUrl || undefined}
                     aria-disabled={!callUrl}
                     className={styles.primaryButton}
+                    onClick={() =>
+                      trackEvent("call_click", { location: "chat_widget_talk_now" })
+                    }
                   >
                     {strings.callButtonLabel}
                   </a>
@@ -1235,6 +1242,11 @@ export default function Chat({
                     rel="noopener noreferrer"
                     aria-disabled={!closeWhatsappUrl}
                     className={styles.whatsappButton}
+                    onClick={() =>
+                      trackEvent("whatsapp_click", {
+                        location: "chat_widget_talk_now",
+                      })
+                    }
                   >
                     {strings.whatsappButtonLabel}
                   </a>
@@ -1295,6 +1307,9 @@ export default function Chat({
               rel="noopener noreferrer"
               aria-disabled={!closeWhatsappUrl}
               className={styles.whatsappButton}
+              onClick={() =>
+                trackEvent("whatsapp_click", { location: "chat_widget_schedule" })
+              }
             >
               {strings.scheduleWhatsappLabel}
             </a>
@@ -1315,6 +1330,9 @@ export default function Chat({
               rel="noopener noreferrer"
               aria-disabled={!closeWhatsappUrl}
               className={styles.whatsappButton}
+              onClick={() =>
+                trackEvent("whatsapp_click", { location: "chat_widget_nurture" })
+              }
             >
               {isBroker
                 ? strings.nurtureWhatsappLabelBroker

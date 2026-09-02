@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRef } from "react";
 
+import { trackEvent } from "@/lib/analytics";
 import { gsap, useGSAP } from "@/lib/gsap";
 import styles from "./Project.module.css";
 
@@ -781,6 +782,9 @@ export default function ProjectClient({
                 href={brochureUrl}
                 download="movenpick-brochure.pdf"
                 className={styles.requestLink}
+                onClick={() =>
+                  trackEvent("brochure_download", { location: "project_intro" })
+                }
               >
                 {buttonLabel}
 
@@ -875,6 +879,9 @@ export default function ProjectClient({
                   href={brochureUrl}
                   download="movenpick-brochure.pdf"
                   className={styles.mobileBrochureLink}
+                  onClick={() =>
+                    trackEvent("brochure_download", { location: "project_intro_mobile" })
+                  }
                 >
                   {buttonLabel}
 

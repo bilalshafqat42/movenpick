@@ -7,6 +7,7 @@ import PhoneInput from "react-phone-number-input";
 // image host — see the same import in Contact/ContactClient.js.
 import flags from "react-phone-number-input/flags";
 import { parsePhoneNumberFromString } from "libphonenumber-js/max";
+import { trackEvent } from "@/lib/analytics";
 
 import "react-phone-number-input/style.css";
 
@@ -529,6 +530,8 @@ export default function ContactPopupClient({
       if (!response.ok) {
         throw new Error("Lead submission failed");
       }
+
+      trackEvent("contact_submit", { form_source: "contact_popup" });
 
       /*
        * Record a basic submission confirmation.

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import PhoneInput from "react-phone-number-input";
+import { trackEvent } from "@/lib/analytics";
 /*
  * Bundled flag components rather than the library's default, which
  * fetches each flag as an image from a third-party GitHub Pages host at
@@ -615,6 +616,8 @@ export default function ContactClient({
       if (!response.ok) {
         throw new Error("Lead submission failed");
       }
+
+      trackEvent("contact_submit", { form_source: "contact" });
 
       /*
        * Store only non-sensitive confirmation data.

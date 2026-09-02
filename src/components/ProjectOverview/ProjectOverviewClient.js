@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 
+import { trackEvent } from "@/lib/analytics";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { revealOnArrival } from "@/lib/revealOnArrival";
 import {
@@ -263,6 +264,9 @@ export default function ProjectOverviewClient({
           href={cta2Href}
           download="movenpick-brochure.pdf"
           className={styles.ctaButton}
+          onClick={() =>
+            trackEvent("brochure_download", { location: "project_overview" })
+          }
         >
           <span>{cta2Label}</span>
           <span className={styles.downloadIcon} aria-hidden="true" />
