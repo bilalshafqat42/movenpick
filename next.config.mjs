@@ -92,13 +92,24 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   // 'unsafe-eval' is dev-only: Turbopack's HMR runtime needs it. It is
   // never emitted in a production build.
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  //
+  // googletagmanager.com carries both GTM's own script and, once a tag
+  // inside the container loads GA4, gtag.js — both are served from this
+  // one host, so no separate Google Analytics script origin is needed
+  // here. Only reached at all once a visitor allows the Analytics cookie
+  // category (src/components/GoogleTagManager); the origin still has to
+  // be allowlisted regardless of that runtime gate, since CSP is evaluated
+  // before any application code decides whether to load the script.
+  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: https://api.mapbox.com${imageHosts
+  `img-src 'self' data: blob: https://api.mapbox.com https://www.googletagmanager.com https://www.google-analytics.com${imageHosts
     .map((host) => ` https://${host}`)
     .join("")}`,
   "font-src 'self' data:",
-  "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
+  // google-analytics.com and analytics.google.com (both wildcarded: GA4
+  // sends hits to a region-specific subdomain of each) are where gtag.js
+  // actually reports to once GTM has loaded it.
+  "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com",
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "frame-src 'self' https://www.google.com",

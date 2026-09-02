@@ -18,6 +18,7 @@ import { ROBOTS_FIELDS } from "@/content/sections/robotsTxt";
 import { PRIVACY_FIELDS } from "@/content/sections/privacy";
 import { TERMS_FIELDS } from "@/content/sections/terms";
 import { COOKIES_FIELDS } from "@/content/sections/cookies";
+import { TRACKING_FIELDS } from "@/content/sections/tracking";
 
 /*
  * Every editable section registers itself here: a slug (used in the
@@ -174,6 +175,16 @@ export const SECTION_REGISTRY = {
     fields: [],
     viewLiveHref: "/sitemap.xml",
     viewLiveLabel: "View / download sitemap.xml",
+  },
+  /*
+   * ADMIN, same reasoning as SEO & Sharing above: a third-party tracking ID
+   * is site-level technical configuration, not day-to-day content.
+   */
+  tracking: {
+    label: "Tracking",
+    group: "seo",
+    minRole: "ADMIN",
+    fields: TRACKING_FIELDS,
   },
 };
 

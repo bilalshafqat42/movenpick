@@ -87,7 +87,7 @@ export const COOKIES_FIELDS = [
     type: "TEXT",
     long: true,
     defaultValue:
-      "[Describe the analytics cookies — which tool, what it measures, how long the data is kept.]",
+      "We use Google Analytics to understand how visitors use this site. Only loads if you allow it here — nothing is loaded until you agree.",
   },
   {
     key: "marketing-title",

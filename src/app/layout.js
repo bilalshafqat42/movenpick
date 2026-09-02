@@ -3,6 +3,7 @@ import "./globals.css";
 import { inter, kinan, minervaModern, gloock, notoSans } from "@/lib/fonts";
 import Loader from "@/components/Loader";
 import CookieConsent from "@/components/CookieConsent";
+import GoogleTagManager from "@/components/GoogleTagManager";
 import PreviewBanner from "@/components/PreviewBanner";
 
 import { getSectionContent, buildDefaultsFromFields } from "@/lib/content";
@@ -132,6 +133,7 @@ export default async function RootLayout({ children }) {
       ].join(" ")}
     >
       <body>
+        <GoogleTagManager />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toSafeJsonLd(jsonLd) }}
