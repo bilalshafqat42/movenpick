@@ -1235,7 +1235,14 @@
           "key": "gtm-container-id",
           "label": "Google Tag Manager container ID",
           "type": "TEXT",
-          "helperText": "e.g. GTM-XXXXXXX. Configure Google Analytics (GA4) as a tag inside your GTM container's own dashboard — no separate GA4 field is needed here. Only loads once a visitor allows the Analytics cookie category.",
+          "helperText": "e.g. GTM-XXXXXXX. Recommended: configure Google Analytics (GA4) as a tag inside your GTM container's own dashboard rather than filling in the GA4 field below too — see this section's own note on why not both. Only loads once a visitor allows the Analytics cookie category.",
+          "defaultValue": ""
+        },
+        {
+          "key": "ga4-measurement-id",
+          "label": "Google Analytics (GA4) measurement ID",
+          "type": "TEXT",
+          "helperText": "e.g. G-XXXXXXXXXX. Only needed if you are not using GTM to load GA4 — leave blank if GA4 is already configured as a tag inside your GTM container above. Only loads once a visitor allows the Analytics cookie category.",
           "defaultValue": ""
         }
       ]
