@@ -78,6 +78,19 @@ export default function AmenitiesClient({
   const stageTriggerRef = useRef(null);
   const isJumpingRef = useRef(false);
 
+  /*
+   * Where the last gesture came to rest, in stages. The snap steps ONE
+   * stage from this rather than from wherever the scroll happens to be
+   * (see snapToStage), so it is the snap's memory of the journey.
+   *
+   * A ref, not a closure variable, because jumpToStage has to write to
+   * it too: clicking a heading moves the page several stages at once,
+   * and a snap that afterwards still believes the reader is where they
+   * started will step one stage from THERE and drag them somewhere
+   * neither the click nor the scroll asked for.
+   */
+  const settledStageRef = useRef(0);
+
   useGSAP(
     () => {
       const section = sectionRef.current;
@@ -396,9 +409,8 @@ export default function AmenitiesClient({
                * Stepping from the settled stage instead makes the size
                * of the gesture irrelevant.
                */
-              let settledStage = 0;
-
               const snapToStage = (naturalValue, self) => {
+                const settledStage = settledStageRef.current;
                 const raw = self.progress / stageIncrement;
                 const forward = self.direction !== -1;
                 const travelled = Math.abs(raw - settledStage);
@@ -442,7 +454,9 @@ export default function AmenitiesClient({
                   ease: "power2.inOut",
 
                   onComplete: (self) => {
-                    settledStage = Math.round(self.progress / stageIncrement);
+                    settledStageRef.current = Math.round(
+                      self.progress / stageIncrement,
+                    );
                   },
                 },
 
@@ -454,7 +468,7 @@ export default function AmenitiesClient({
                  */
                 onToggle: (self) => {
                   if (!self.isActive) {
-                    settledStage = gsap.utils.clamp(
+                    settledStageRef.current = gsap.utils.clamp(
                       0,
                       items.length,
                       Math.round(self.progress / stageIncrement),
@@ -697,7 +711,32 @@ export default function AmenitiesClient({
     activeIndexRef.current = index;
     setActiveIndex(index);
 
-    const stageProgress = (index + 0.5) / items.length;
+    /*
+     * Tell the snap where the reader now is, BEFORE the scroll starts.
+     *
+     * The snap does not move to the nearest stage — it deliberately
+     * steps exactly one stage from the last settled one, so that the
+     * size of a trackpad flick cannot fling past several photographs.
+     * That makes it entirely dependent on settledStage being true, and
+     * a click is the one thing that moves several stages at once.
+     *
+     * Left stale, the snap fired at the end of the jump and stepped one
+     * stage from the ORIGINAL position: clicking the first heading from
+     * the third landed on the first and was then dragged to the second.
+     * Clicking the fourth from the first landed on the fourth and was
+     * dragged back to the second. Both reverted to the same place
+     * because both were "one stage from where you were".
+     */
+    settledStageRef.current = index;
+
+    /*
+     * The stage's own boundary, which is exactly where the snap parks a
+     * settled stage. Aiming at the middle of the stage instead left the
+     * snap with half a stage of travel to account for, and half a stage
+     * is well past STAGE_COMMIT_THRESHOLD — so it would step again on
+     * arrival even once it knew where it was.
+     */
+    const stageProgress = index / items.length;
     const targetY =
       trigger.start + stageProgress * (trigger.end - trigger.start);
 

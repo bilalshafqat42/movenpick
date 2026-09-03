@@ -270,9 +270,27 @@
    */
   margin: auto 0 0;
 
+  /*
+   * Never shrinks.
+   *
+   * A 1px flex item still has flex-shrink: 1, so once the spacers had
+   * collapsed the divider itself was the last thing left with any
+   * height to give and the browser took it: measured 0.16px at 1600x760
+   * with a 5-line paragraph, and a flat 0px at 6 lines. The line simply
+   * vanished, which is what a long amenity description did to it.
+   */
+  flex-shrink: 0;
+
   border: 0;
 
-  background: rgba(137, 118, 85, 0.28);
+  /*
+   * 0.28 was too faint to survive a scaled display. A 1px line lands on
+   * a fractional device row at anything other than 100% zoom, so the
+   * browser splits it across two rows at roughly half strength each —
+   * and half of a barely-there line is nothing at all. This is the same
+   * hairline, just dark enough to still read after that split.
+   */
+  background: rgba(137, 118, 85, 0.45);
 }
 
 .ctaGroup {
