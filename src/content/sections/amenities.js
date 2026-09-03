@@ -87,8 +87,21 @@ export const AMENITIES_FIELDS = [
  * Reshapes the flat key -> value content map (what getSectionContent()
  * returns) into the prop shape AmenitiesClient actually renders.
  */
+/*
+ * A slide with no photograph is not a slide.
+ *
+ * See the note in gallery.js: the panel creates a list item the moment an
+ * editor adds one and the image is filled in afterwards, so a half-made
+ * entry reaches the page with `image` empty and renders <img src="">,
+ * which browsers draw as the broken-image placeholder.
+ */
+const hasImage = (item) =>
+  typeof item?.image === "string" && item.image.trim() !== "";
+
 export function shapeAmenitiesContent(content) {
-  const rawItems = Array.isArray(content.items) ? content.items : [];
+  const rawItems = (Array.isArray(content.items) ? content.items : []).filter(
+    hasImage,
+  );
 
   const items =
     rawItems.length > 0

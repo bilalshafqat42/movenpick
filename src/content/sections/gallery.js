@@ -75,8 +75,27 @@ export const GALLERY_FIELDS = [
   },
 ];
 
+/*
+ * A slide with no photograph is not a slide.
+ *
+ * The panel creates a list item as soon as an editor adds one, and the
+ * image is filled in afterwards — so a half-finished entry reaches the
+ * page with `image` empty. Passed through, that renders <img src="">,
+ * which every browser draws as its broken-image placeholder: a grey box
+ * with a torn-picture icon, live on the site for every visitor. One
+ * slide in the wellness gallery ("Rise Above") was showing exactly that.
+ *
+ * Dropping the entry instead means an unfinished slide is simply not
+ * there yet, which is what an editor mid-edit expects, and what a
+ * visitor should see.
+ */
+const hasImage = (item) =>
+  typeof item?.image === "string" && item.image.trim() !== "";
+
 export function shapeGalleryContent(content) {
-  const rawItems = Array.isArray(content.items) ? content.items : [];
+  const rawItems = (Array.isArray(content.items) ? content.items : []).filter(
+    hasImage,
+  );
 
   const items =
     rawItems.length > 0

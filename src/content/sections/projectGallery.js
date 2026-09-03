@@ -54,8 +54,21 @@ export const PROJECT_GALLERY_FIELDS = [
   },
 ];
 
+/*
+ * A slide with no photograph is not a slide.
+ *
+ * See the note in gallery.js: the panel creates a list item the moment an
+ * editor adds one and the image is filled in afterwards, so a half-made
+ * entry reaches the page with `image` empty and renders <img src="">,
+ * which browsers draw as the broken-image placeholder.
+ */
+const hasImage = (item) =>
+  typeof item?.image === "string" && item.image.trim() !== "";
+
 export function shapeProjectGalleryContent(content) {
-  const items = Array.isArray(content.slides) ? content.slides : [];
+  const items = (Array.isArray(content.slides) ? content.slides : []).filter(
+    hasImage,
+  );
 
   if (items.length > 0) {
     return items.map((item) => ({
