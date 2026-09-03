@@ -130,7 +130,24 @@
    * (align-items: stretch), which is what lets .divider's margin-top:
    * auto below push the closing group all the way to the bottom.
    */
-  max-width: calc(50vw - var(--page-gutter) * 3);
+  /*
+   * --page-gutter is 8.3334vw until it caps at 140px, so three of them
+   * is 25vw and this formula is really `50vw - 25vw` — a flat QUARTER of
+   * the window at every width below 1680px. The photo takes the other
+   * half, so the text column narrowed in step with the screen while the
+   * 24px display type did not, and the titles wrapped further at every
+   * size down: 2 lines at 1366, 3 lines at 1152. That extra height is
+   * what drove the closing group up into the list.
+   *
+   * Measured column widths under the old formula: 540px at 1920, 384px
+   * at 1536, 341px at 1366, 288px at 1152.
+   *
+   * One gutter, not three, plus a fixed 60px channel before the photo's
+   * edge — capped at the 540px the design was drawn at, so 1920 is
+   * unchanged and the sizes below it stop collapsing: 540 at 1536, 509
+   * at 1366, 420 at 1152.
+   */
+  max-width: min(540px, calc(50vw - var(--page-gutter) - 60px));
 }
 
 /*
@@ -516,13 +533,25 @@
   }
 
   /*
-   * The list gives way last. Without this it has an automatic minimum
-   * equal to its content and cannot shrink at all, so a flex column
-   * under pressure would still overflow no matter how far the spacers
-   * collapsed.
+   * The list never gives way.
+   *
+   * This used to carry `min-height: 0`, which removed the automatic
+   * min-content floor a flex item has and let the browser compress the
+   * list's BOX below the height of the titles inside it. The titles kept
+   * their real height and spilled out, while the divider, paragraph and
+   * button were laid out against the compressed box — so they were
+   * positioned on top of the item text.
+   *
+   * Measured at 1366x768: the list needed 351px and was given 181px, and
+   * the divider ended up 46px ABOVE the last title, drawing a line
+   * straight through it. At 1152x864 it was 193px above.
+   *
+   * A flex item that cannot shrink is the whole fix for the collision.
+   * The height it then needs is found by the tiers below rather than
+   * taken out of the list.
    */
   .itemsWrapper {
-    min-height: 0;
+    flex-shrink: 0;
   }
 }
 
@@ -581,6 +610,92 @@
  * journey are held back for the tablet tier, in the block right after
  * this one.
  */
+/* =========================================================
+   Desktop, by viewport HEIGHT
+
+   The layout above was drawn against a 1080px-tall screen, where the
+   column has 864px to spend and needs about 730px. Every step down in
+   height takes from the same budget while the content stays the size it
+   is, and by 1366x768 the column had 614px for content that wanted 814.
+
+   Nothing here is decorative-only shrinking for its own sake: the order
+   is deliberate — the generous fixed gaps go first, then the column's
+   own rhythm, and only at the very bottom does the type step down. The
+   list itself is never touched, which is the rule that stops the
+   collision.
+
+   These are height queries, so they also catch the case that reported
+   this: a 1920x1080 laptop at 125% display scaling reports 1536x864 to
+   the browser, which lands in the first tier below.
+   ========================================================= */
+
+@media (min-width: 1025px) and (max-height: 920px) {
+  .content {
+    --content-gap: 30px;
+  }
+
+  /*
+   * 24px of breathing room under the section instead of the 20vh the
+   * flat 80vh left there, which is space the column can use.
+   */
+  .stickyViewport {
+    height: calc(100svh - 90px - 24px);
+  }
+
+  .dividerSpace {
+    flex: 0 1 calc(96px - var(--content-gap) * 2);
+  }
+}
+
+@media (min-width: 1025px) and (max-height: 800px) {
+  .content {
+    --content-gap: 22px;
+  }
+
+  .stickyViewport {
+    height: calc(100svh - 90px - 12px);
+  }
+
+  .dividerSpace {
+    flex: 0 1 calc(56px - var(--content-gap) * 2);
+  }
+
+  /*
+   * The first point the type gives ground. Under 800px of height the
+   * spacing alone cannot find the room, and a title one step smaller
+   * costs less than a button below the fold.
+   */
+  .itemTitle {
+    font-size: 21px;
+  }
+
+  .ctaText {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1025px) and (max-height: 720px) {
+  .content {
+    --content-gap: 16px;
+  }
+
+  .stickyViewport {
+    height: calc(100svh - 90px);
+  }
+
+  .dividerSpace {
+    flex: 0 1 calc(34px - var(--content-gap) * 2);
+  }
+
+  .ctaSpace {
+    flex: 0 1 12px;
+  }
+
+  .itemTitle {
+    font-size: 19px;
+  }
+}
+
 @media (max-width: 1024px) {
   .content {
     max-width: 100%;
